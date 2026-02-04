@@ -35,6 +35,40 @@ class TaskController extends Controller
         return view('Task.task', ["fromtask" => $tasks]);
     }
 
+    public function dashboard()
+    {
+        $now = Carbon::now();
+
+        $budget = DB::table('budget')
+        ->join('paps', 'budget.budgetPAP', '=', 'paps.id')
+        ->leftJoin('tasks', 'budget.id', '=', 'tasks.allocatedbudget')
+        ->select(
+                'budget.*',
+                'paps.pap',
+                DB::raw('SUM(tasks.costing) AS total')
+        )
+        ->groupBy('budget.id')
+        ->get();
+
+        $task = DB::table('tasks')
+    ->join('paps', 'tasks.PAP', '=', 'paps.id')
+    ->whereMonth('tasks.activitydate', $now->month)
+    ->select(
+        'tasks.PAP',
+        'tasks.activitydate',
+        'paps.pap'
+    )
+    ->groupBy(
+        'tasks.PAP',
+        'tasks.activitydate',
+        'paps.pap'
+    )
+    ->get();
+
+
+        return view('welcome', ["budget" => $budget , "task" => $task]);
+    }
+
     public function papforthemonth() {}
 
     public function forpap($year = null, $month = null)

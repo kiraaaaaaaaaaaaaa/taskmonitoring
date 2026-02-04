@@ -7,9 +7,7 @@ use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\BudgetController;
 use App\Models\Task;
 
-Route::get('/Task', function () {
-    return view('welcome');
-});
+Route::get('/Task', [TaskController::class, 'dashboard']) -> name('dashboard');
 
 Route::get('/', [AuthenticationController::class, 'index']);
 Route::post('/', [AuthenticationController::class, 'authenticate']) -> name('login');
