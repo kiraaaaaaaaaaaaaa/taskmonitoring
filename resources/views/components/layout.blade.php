@@ -25,6 +25,7 @@
     <link href="{{asset('assets/css/app.min.css')}}" rel="stylesheet" type="text/css" />
     <!-- custom Css-->
     <link href="{{asset('assets/css/custom.min.css')}}" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 
 </head>
@@ -97,7 +98,7 @@
                         <div class="dropdown ms-sm-3 header-item topbar-user">
                             <button type="button" class="btn shadow-none" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="d-flex align-items-center">
-                                    <img class="rounded-circle header-profile-user" src="assets/images/users/avatar-1.jpg" alt="Header Avatar">
+                                    <img class="rounded-circle header-profile-user" src={{Auth::user()->avatar}} alt="Header Avatar">
                                     <span class="text-start ms-xl-2">
                                         <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{Auth::user()->name}}</span>
                                         <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">{{Auth::user()->position}}</span>
@@ -107,9 +108,13 @@
                             <div class="dropdown-menu dropdown-menu-end">
                                 <!-- item-->
 
-                                <a class="dropdown-item" href="pages-profile.html"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Profile</span></a>
-                                <a class="dropdown-item" href="auth-logout-basic.html"><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-logout">Logout</span></a>
-                            </div>
+                                
+                                {{-- <a class="dropdown-item" href="pages-profile.html"><i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle">Profile</span></a> --}}
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                <button type="submit" class="dropdown-item"><i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-logout">Logout</span></button>
+                            
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -175,7 +180,7 @@
                     <ul class="navbar-nav" id="navbar-nav">
                         <li class="menu-title"><span data-key="t-menu">Menu</span></li>
                         <li class="nav-item">
-                            <a class="nav-link menu-link" href="/Task" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
+                            <a class="nav-link menu-link" href="{{route('dashboard')}}" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
                                 <i class="mdi mdi-speedometer"></i> <span data-key="t-dashboards">Dashboards</span>
                             </a>
 
@@ -360,4 +365,32 @@
     }
 
 });
+</script>
+<script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '{{ session('success') }}',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{{ session('error') }}',
+            showConfirmButton: true
+        });
+    @endif
+
+    @if(session('warning'))
+        Swal.fire({
+            icon: 'warning',
+            title: 'Warning',
+            text: '{{ session('warning') }}'
+        });
+    @endif
 </script>

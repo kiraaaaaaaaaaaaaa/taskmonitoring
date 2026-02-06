@@ -50,7 +50,7 @@
                                     <img src="assets/images/logo-light.png" alt="" height="20">
                                 </a>
                             </div>
-                            
+
                         </div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                                 </div>
                                 <div class="p-2 mt-4">
                                     <form method="POST" action="{{ route('login') }}">
-                                    @csrf
+                                        @csrf
                                         <div class="mb-3">
                                             <label for="username" class="form-label">Username</label>
                                             <input type="text" class="form-control" name="email" id="email" placeholder="Enter username">
@@ -91,9 +91,17 @@
 
                                         <div class="mt-4">
                                             <button class="btn btn-success w-100" type="submit">Sign In</button>
+                                            {{-- <button class="btn btn-success w-100" type="button" onclick="window.location.href='{{ route('google.login') }}'">Sign In with Google</button> --}}
+                                            <div class="py-1"></div>
+                                            <a href="{{ route('google.login') }}" class="btn btn-light d-flex align-items-center  justify-content-center gap-2">
+
+                                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" width="20">
+
+                                                <span>Sign in with Google</span>
+                                            </a>
                                         </div>
 
-                                    
+
                                     </form>
                                 </div>
                             </div>
@@ -101,7 +109,7 @@
                         </div>
                         <!-- end card -->
 
-                        
+
 
                     </div>
                 </div>
@@ -112,7 +120,7 @@
         <!-- end auth page content -->
 
         <!-- footer -->
-        
+
         <!-- end Footer -->
     </div>
     <!-- end auth-page-wrapper -->

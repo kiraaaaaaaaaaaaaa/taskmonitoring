@@ -6,8 +6,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 
+
 class UserController extends Controller
 {
+
+    public function redirectToGoogle()
+    {
+
+    }
+
+
     /**
      * Display a listing of the resource.
      */
@@ -39,6 +47,7 @@ class UserController extends Controller
             'usertype' => $request->usertype,
             'password' => bcrypt($request->password),
         ]);
+        session()->flash('success', 'User updated successfully.');
     } else {
 
         $request->validate([
@@ -56,6 +65,7 @@ class UserController extends Controller
             'usertype' => $request->usertype,
             'password' => bcrypt($request->password),
         ]);
+        session()->flash('success', 'User created successfully.');
     }
 
         return redirect()-> route('user management');

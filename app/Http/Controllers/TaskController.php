@@ -39,6 +39,17 @@ class TaskController extends Controller
     {
         $now = Carbon::now();
 
+
+        $monthtask = DB::table('tasks')
+        ->join('users', 'tasks.assigned', '=', 'users.id')
+        ->join('paps', 'tasks.PAP', '=', 'paps.id')
+        ->join('paptask', 'tasks.task', '=', 'paptask.id')
+        ->whereMonth('tasks.activitydate',$now->month)
+        ->select('tasks.*', 'users.name', 'paps.pap', 'paptask.tasks', 'users.avatar')
+        ->get();
+
+        
+
         $budget = DB::table('budget')
         ->join('paps', 'budget.budgetPAP', '=', 'paps.id')
         ->leftJoin('tasks', 'budget.id', '=', 'tasks.allocatedbudget')
@@ -66,7 +77,7 @@ class TaskController extends Controller
     ->get();
 
 
-        return view('welcome', ["budget" => $budget , "task" => $task]);
+        return view('welcome', ["budget" => $budget , "task" => $task, "monthtask" => $monthtask]);
     }
 
     public function papforthemonth() {}
@@ -92,6 +103,7 @@ class TaskController extends Controller
             ->groupBy('tasks.PAP', 'tasks.activitydate')
             ->get();
 
+           
 
         return view('Task.pap', compact('tasks', 'Year', 'Month'));
     }
@@ -121,6 +133,7 @@ class TaskController extends Controller
             'paptask',
             'tasksByPap'
         ));
+        
     }
 
     // for creating new PAP
@@ -132,6 +145,7 @@ class TaskController extends Controller
             Paps::create([
                 'pap' => $request->pap
             ]);
+           
         }
 
         if ($request->action === 'task') {
@@ -139,6 +153,7 @@ class TaskController extends Controller
                 'papID' => $request->PAP,
                 'tasks' => $request->task
             ]);
+           
         }
 
 
@@ -486,7 +501,7 @@ class TaskController extends Controller
             ]);
         }
         // Task::create($validate);
-        return redirect()->route('monitoring');
+        return redirect()->route('monitoring')->with('success', 'Task(s) created successfully.');
     }
 
     /**
@@ -526,7 +541,7 @@ class TaskController extends Controller
         ]);
 
 
-        return redirect()->route('my task');
+        return redirect()->route('my task')->with('success', 'Task updated successfully.');
     }
 
     /**

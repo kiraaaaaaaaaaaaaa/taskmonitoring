@@ -5,12 +5,16 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\GoogleController;
 use App\Models\Task;
 
 Route::get('/Task', [TaskController::class, 'dashboard']) -> name('dashboard');
 
 Route::get('/', [AuthenticationController::class, 'index']);
 Route::post('/', [AuthenticationController::class, 'authenticate']) -> name('login');
+Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
+Route::get('/auth/google/callback', [GoogleController::class, 'handleGooglCallbak'])->name('google.callback');
+Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
 //Task Routes
 
 Route::get('/Task/task/{date?}/{papM?}', [TaskController::class, 'index'])->name('task');

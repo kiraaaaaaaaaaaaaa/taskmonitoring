@@ -74,7 +74,7 @@
                             </div>
 
                             @php
-                            $percent = round( (float)$task->average_progress) * 100;
+                            $percent =  ((float)$task->average_progress * 100);
 
                             $progressClass = $percent >= 80
                             ? 'bg-success'
@@ -82,7 +82,7 @@
                             @endphp
 
                             <div class="mb-2">
-                                <span class="text-info fw-semibold">{{ $percent }}%</span> of 100%
+                                <span class="text-info fw-semibold">{{ number_format($percent, 2) }}%</span> of 100%
                             </div>
 
                             <div class="progress progress-sm">

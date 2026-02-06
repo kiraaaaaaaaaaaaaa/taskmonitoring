@@ -57,6 +57,7 @@ class BudgetController extends Controller
             'allocatedbudget' => $request->budget,
             
             ]);
+            session()->flash('success', 'Budget updated successfully.');
             }
         else
             {
@@ -68,6 +69,7 @@ class BudgetController extends Controller
             ]
            
             );
+            session()->flash('success', 'Budget created successfully.');
             Budget::create($validate);
         }
         
