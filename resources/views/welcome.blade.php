@@ -118,7 +118,6 @@
 
 
 
-
 <div class="card card-animate col-md-4 float-end">
 
     <div class="card-body pt-0">

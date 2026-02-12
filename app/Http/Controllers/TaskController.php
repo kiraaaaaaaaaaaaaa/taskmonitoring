@@ -41,43 +41,43 @@ class TaskController extends Controller
 
 
         $monthtask = DB::table('tasks')
-        ->join('users', 'tasks.assigned', '=', 'users.id')
-        ->join('paps', 'tasks.PAP', '=', 'paps.id')
-        ->join('paptask', 'tasks.task', '=', 'paptask.id')
-        ->whereMonth('tasks.activitydate',$now->month)
-        ->select('tasks.*', 'users.name', 'paps.pap', 'paptask.tasks', 'users.avatar')
-        ->get();
+            ->join('users', 'tasks.assigned', '=', 'users.id')
+            ->join('paps', 'tasks.PAP', '=', 'paps.id')
+            ->join('paptask', 'tasks.task', '=', 'paptask.id')
+            ->whereMonth('tasks.activitydate', $now->month)
+            ->select('tasks.*', 'users.name', 'paps.pap', 'paptask.tasks', 'users.avatar')
+            ->get();
 
-        
+
 
         $budget = DB::table('budget')
-        ->join('paps', 'budget.budgetPAP', '=', 'paps.id')
-        ->leftJoin('tasks', 'budget.id', '=', 'tasks.allocatedbudget')
-        ->select(
+            ->join('paps', 'budget.budgetPAP', '=', 'paps.id')
+            ->leftJoin('tasks', 'budget.id', '=', 'tasks.allocatedbudget')
+            ->select(
                 'budget.*',
                 'paps.pap',
                 DB::raw('SUM(tasks.costing) AS total')
-        )
-        ->groupBy('budget.id')
-        ->get();
+            )
+            ->groupBy('budget.id')
+            ->get();
 
         $task = DB::table('tasks')
-    ->join('paps', 'tasks.PAP', '=', 'paps.id')
-    ->whereMonth('tasks.activitydate', $now->month)
-    ->select(
-        'tasks.PAP',
-        'tasks.activitydate',
-        'paps.pap'
-    )
-    ->groupBy(
-        'tasks.PAP',
-        'tasks.activitydate',
-        'paps.pap'
-    )
-    ->get();
+            ->join('paps', 'tasks.PAP', '=', 'paps.id')
+            ->whereMonth('tasks.activitydate', $now->month)
+            ->select(
+                'tasks.PAP',
+                'tasks.activitydate',
+                'paps.pap'
+            )
+            ->groupBy(
+                'tasks.PAP',
+                'tasks.activitydate',
+                'paps.pap'
+            )
+            ->get();
 
 
-        return view('welcome', ["budget" => $budget , "task" => $task, "monthtask" => $monthtask]);
+        return view('welcome', ["budget" => $budget, "task" => $task, "monthtask" => $monthtask]);
     }
 
     public function papforthemonth() {}
@@ -103,7 +103,7 @@ class TaskController extends Controller
             ->groupBy('tasks.PAP', 'tasks.activitydate')
             ->get();
 
-           
+
 
         return view('Task.pap', compact('tasks', 'Year', 'Month'));
     }
@@ -133,7 +133,6 @@ class TaskController extends Controller
             'paptask',
             'tasksByPap'
         ));
-        
     }
 
     // for creating new PAP
@@ -145,7 +144,6 @@ class TaskController extends Controller
             Paps::create([
                 'pap' => $request->pap
             ]);
-           
         }
 
         if ($request->action === 'task') {
@@ -153,7 +151,6 @@ class TaskController extends Controller
                 'papID' => $request->PAP,
                 'tasks' => $request->task
             ]);
-           
         }
 
 
@@ -195,7 +192,7 @@ class TaskController extends Controller
     {
 
         $budgetoption = DB::table('budget')
-            ->join('paps','budget.budgetPAP', '=', 'paps.id')
+            ->join('paps', 'budget.budgetPAP', '=', 'paps.id')
             ->select('budget.*', 'paps.pap')
             ->get();
 
@@ -203,7 +200,7 @@ class TaskController extends Controller
         $tasks = DB::table('tasks')
             ->join('paps', 'tasks.PAP', '=', 'paps.id')
             ->leftjoin('budget', 'tasks.allocatedbudget', '=', 'budget.id')
-            ->leftjoin('paps as budgetpap','budget.budgetPAP', '=', 'budgetpap.id')
+            ->leftjoin('paps as budgetpap', 'budget.budgetPAP', '=', 'budgetpap.id')
             ->join('paptask', 'tasks.task', '=', 'paptask.id')
             ->join('users as PREPARER', 'tasks.preparer', '=', 'PREPARER.id')
             ->join('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
@@ -229,7 +226,7 @@ class TaskController extends Controller
             ->where('tasks.id', $id)
             ->first();
 
-        return view('Task.updatetask', ["fromtask" => $tasks, "budgetoption" =>$budgetoption]);
+        return view('Task.updatetask', ["fromtask" => $tasks, "budgetoption" => $budgetoption]);
     }
 
     public function mytask()
@@ -339,6 +336,7 @@ class TaskController extends Controller
         /* Expand grouped columns */
         $displayColumns = [];
 
+
         foreach ($selectedColumns as $col) {
 
             switch ($col) {
@@ -369,7 +367,7 @@ class TaskController extends Controller
             }
         }
 
-
+       
 
 
 
@@ -417,6 +415,23 @@ class TaskController extends Controller
         $reportData = $query->get();
 
         // dd($request);  
+         $totals = [
+            'budget'    => 0,
+            'costing'   => 0,
+            'remaining' => 0,
+        ];
+
+        if (in_array('budget', $displayColumns)) {
+            $totals['budget'] = $reportData->sum('budget');
+        }
+
+        if (in_array('costing', $displayColumns)) {
+            $totals['costing'] = $reportData->sum('costing');
+        }
+
+        if (in_array('remaining', $displayColumns)) {
+            $totals['remaining'] = $reportData->sum('remaining');
+        }
 
 
 
@@ -425,7 +440,8 @@ class TaskController extends Controller
             'mpap',
             'cath',
             'reportData',
-            'displayColumns'
+            'displayColumns',
+            'totals'
         ));
     }
 

@@ -84,15 +84,15 @@
 
 
 @if(count($reportData))
-<div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true" >
+<div class="modal fade" id="reportModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
         <div class="modal-content" id="report-printable">
             <div class="modal-header">
                 <h5 class="modal-title fw-bold">Generated Report</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" >
-                <div class="table-responsive" >
+            <div class="modal-body">
+                <div class="table-responsive">
                     <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
@@ -110,14 +110,30 @@
                             </tr>
                             @endforeach
                         </tbody>
+                        <tfoot class="table-secondary fw-bold">
+                            <tr>
+                                @foreach($displayColumns as $col)
+                                @if(in_array($col, ['budget','costing','remaining']))
+                                <td class="text-end">
+                                    {{ number_format($totals[$col] ?? 0, 2) }}
+                                </td>
+                                @elseif($loop->first)
+                                <td></td>
+                                @else
+                                <td>-</td>
+                                @endif
+                                @endforeach
+                            </tr>
+                        </tfoot>
+
                     </table>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-secondary btn-label waves-effect waves-light rounded-pill mb-4" onclick="window.print()">
-                <i class="ri-printer-fill label-icon align-middle rounded-pill fs-16 me-2"></i> Print Report
+                    <i class="ri-printer-fill label-icon align-middle rounded-pill fs-16 me-2"></i> Print Report
                 </button>
-                
+
             </div>
         </div>
     </div>
@@ -138,7 +154,7 @@
 <style>
     @media print {
 
-      
+
 
         body * {
             visibility: hidden;
