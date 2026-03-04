@@ -133,13 +133,14 @@
 
             <div class="flex-shrink-0 avatar-sm">
                 <span class="mini-stat-icon avatar-title rounded-circle text-secondary bg-secondary-subtle fs-4">
-                    {{\Carbon\Carbon::parse($tasks->activitydate)->format('d')}}
+                    {{\Carbon\Carbon::parse($tasks->fromdate)->format('d')}}
                 </span>
             </div>
             <div class="flex-grow-1 ms-3">
                 <h6 class="mb-1">{{$tasks->pap}}</h6>
 
             </div>
+            <p class="text-muted mb-0 fs-10 float-end">{{$tasks->location}}</p>
 
 
 
@@ -153,100 +154,134 @@
 </div>
 
 <div class="row">
-    <div class="col-xl-15">
-        <div class="card card-height-100">
-            <div class="card-header d-flex align-items-center">
-                <h4 class="card-title flex-grow-1 mb-0">Active Tasks for {{date('F')}}</h4>
-                <a href="{{ route('new task') }}" class="btn btn-success  btn-label waves-effect waves-light rounded-pill">
-                     <i class="ri-add-fill label-icon align-middle rounded-pill fs-16 me-2"></i>
-                   
-                </a>
-                
-                
+    <div class="col-12">
+
+        <div class="card h-100">
+
+            <!-- Header -->
+            <div class="card-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
+
+                <h4 class="card-title mb-0">
+                    Active Tasks for {{ date('F') }}
+                </h4>
+
+                {{-- <a href="{{ route('new task') }}"
+                    id="assignTaskBtn"
+                   class="btn btn-success btn-sm rounded-pill d-flex">
+                    <i class="ri-add-fill me-1 d-flex"></i>
+                    New Task
+                </a> --}}
+
             </div>
-            <!-- end cardheader -->
+
+            <!-- Body -->
             <div class="card-body">
-                <div class="table-responsive table-card">
-                    <table class="table table-nowrap table-centered align-middle">
-                        <thead class="bg-light text-muted">
-                            <tr>
-                                <th scope="col">PAP</th>
-                                <th scope="col">Task</th>
-                                <th scope="col">Progress</th>
-                                <th scope="col">Assigned</th>
-                                <th scope="col">Status</th>
-                                <th scope="col" style="width: 10%;">Due Date</th>
-                            </tr><!-- end tr -->
-                        </thead><!-- thead -->
 
-                        <tbody>
+                <div class="table-responsive">
+
+                    <table class="table align-middle table-hover fs-12">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>PAP</th>
+                                <th>Task</th>
+                                <th>Progress</th>
+                                <th>Assigned</th>
+                                <th>Status</th>
+                                <th>Due Date</th>
+                            </tr>
+                        </thead>
+
+                        <tbody >
                             @foreach($monthtask as $monthlytask)
-                            <tr>
-                                <td class="fw-medium">{{$monthlytask->pap}}</td>
-                                <td>
-                                
 
-                                    <a href="/Task/viewtask/{{$monthlytask->id}}" class="text-reset">
+                            @php
+                                $percent = ((float) $monthlytask->ProgressScore) * 100;
+
+                                $progressClass = $percent >= 80
+                                    ? 'bg-success'
+                                    : ($percent >= 50 ? 'bg-warning' : 'bg-danger');
+
+                                $statusText = $percent >= 100
+                                    ? 'Completed'
+                                    : ($percent > 1 ? 'In Progress' : 'Pending');
+
+                                $statusColor = $percent >= 100
+                                    ? 'success'
+                                    : ($percent > 1 ? 'warning' : 'danger');
+                            @endphp
+
+                            <tr>
+                                <td class="fw-medium text-truncate" style="max-width:150px;">
+                                    {{$monthlytask->pap}}
+                                </td>
+
+                                <td class="text-truncate" style="max-width:200px;">
+                                    <a href="/Task/viewtask/{{$monthlytask->id}}" class="text-decoration-none">
                                         {{$monthlytask->tasks}}
                                     </a>
                                 </td>
-                                <td>
-                                    @php
-                                    $percent = ((float) $monthlytask->ProgressScore) * 100;
 
-                                    $progressClass = $percent >= 80
-                                    ? 'bg-success'
-                                    : ($percent >= 50 ? 'bg-warning' : 'bg-danger');
-                                    @endphp
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0 me-1 text-muted fs-13">{{$percent}}%</div>
-                                        <div class="progress progress-sm bg-primary-subtle flex-grow-1" style="width: 68%;">
-                                            <div class="progress-bar {{$progressClass}} rounded" role="progressbar" style="width: {{$percent}}%" aria-valuenow="{{$percent}}" aria-valuemin="0" aria-valuemax="100"></div>
+                                <td style="min-width:150px;">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <small class="text-muted">{{$percent}}%</small>
+                                        <div class="progress flex-grow-1" style="height:6px;">
+                                            <div class="progress-bar {{$progressClass}}"
+                                                 style="width: {{$percent}}%">
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
+
                                 <td>
-                                    <div class="avatar-group flex-nowrap">
-                                        <div class="avatar-group-item">
-                                            <img class="rounded-circle header-profile-user" src={{$monthlytask->avatar}} alt="Header Avatar">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="{{$monthlytask->avatar}}"
+                                             class="rounded-circle"
+                                             width="30"
+                                             height="30">
+                                        <span class="d-none d-md-inline">
                                             {{$monthlytask->name}}
-                                        </div>
-
+                                        </span>
                                     </div>
                                 </td>
-                                @php
-                                $percent = ((float) $monthlytask->ProgressScore) * 100;
 
-                                $progressClass = $percent >= 100
-                                ? 'text-success'
-                                : ($percent > 1 ? 'text-warning' : 'text-danger');
-                                $badge = $percent >= 100
-                                ? 'Completed'
-                                : ($percent > 1 ? 'In Progress' : 'Pending');
-                                $bg = $percent >= 100
-                                ? 'bg-success-subtle'
-                                : ($percent > 1 ? 'bg-warning-subtle' : 'bg-danger-subtle');
-                                @endphp
-                                <td><span class="badge {{$bg}} {{$progressClass}}">{{$badge}}</span></td>
-                                <td class="text-muted">{{\Carbon\Carbon::parse($monthlytask->duedate)->format('M d, Y')}}</td>
-                            </tr><!-- end tr -->
+                                <td>
+                                    <span class="badge bg-{{$statusColor}}-subtle text-{{$statusColor}}">
+                                        {{$statusText}}
+                                    </span>
+                                </td>
+
+                                <td class="text-muted">
+                                    {{ \Carbon\Carbon::parse($monthlytask->duedate)->format('M d, Y') }}
+                                </td>
+
+                            </tr>
+
                             @endforeach
+                        </tbody>
 
+                    </table>
 
-                        </tbody><!-- end tbody -->
-                    </table><!-- end table -->
                 </div>
 
+            </div>
 
+        </div>
 
-            </div><!-- end card body -->
-        </div><!-- end card -->
-    </div><!-- end col -->
-
-
+    </div>
 </div><!-- end row -->
 
 
 
 
 @endsection
+
+<script>
+     document.addEventListener('DOMContentLoaded', function() {
+        const userType = @json(Auth::user()->usertype);
+        const assignTaskBtn = document.getElementById('assignTaskBtn');
+       if (userType !== 'admin') {
+            assignTaskBtn.style.display = 'none';
+        }
+    });
+</script>

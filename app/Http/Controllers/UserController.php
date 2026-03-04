@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\Sector;
 use Illuminate\Http\Request;
 use App\Models\User;
-
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -21,8 +21,17 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::all();
-        return view('users.userpage',['user'=>$user]);
+        $sector = Sector::all();
+        $divisions = DB::table('divisions')
+        ->join('sector', 'sector.id', '=', 'divisions.sectorID')
+        ->select('sector.*', 'divisions.*')
+        ->get();
+
+        $user = DB::table('users')
+        ->join('divisions', 'users.divisionID', '=', 'divisions.id')
+        ->select('users.*', 'divisions.division_short_name', 'divisions.division_name')
+        ->get();
+        return view('users.userpage',['user'=>$user, 'divisions'=>$divisions, 'sector'=>$sector]);
     }
 
     /**
@@ -38,6 +47,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+       
         if ($request->id) {
         // UPDATE
         User::where('id', $request->id)->update([
@@ -46,17 +56,12 @@ class UserController extends Controller
             'position' => $request->position,
             'usertype' => $request->usertype,
             'password' => bcrypt($request->password),
+            'divisionID' => $request->division,
+            'sectorID' => $request->sector,
         ]);
-        session()->flash('success', 'User updated successfully.');
+        return back()->with('success', 'User updated successfully.');
     } else {
 
-        $request->validate([
-            'name' => 'required|string',
-            'email' => 'required|email',
-            'position' => 'required|string',
-            'usertype' => 'required|string',
-            'password' => $request->id ? 'nullable' : 'required'
-        ]);
         // CREATE
         User::create([ 
             'name' => $request->name,
@@ -64,12 +69,16 @@ class UserController extends Controller
             'position' => $request->position,
             'usertype' => $request->usertype,
             'password' => bcrypt($request->password),
+            'divisionID' => $request->division,
+            'sectorID' => $request->sector,
         ]);
         session()->flash('success', 'User created successfully.');
     }
 
         return redirect()-> route('user management');
     }
+
+    
 
     /**
      * Display the specified resource.

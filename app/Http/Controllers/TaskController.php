@@ -6,7 +6,11 @@ use App\Models\User;
 use App\Models\Paps;
 use App\Models\paptask;
 use App\Models\Budget;
-
+use App\Models\createdPAP;
+use App\Models\divisions;
+use App\Models\fundSource;
+use App\Models\ooSupported;
+use App\Models\Sector;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,23 +22,39 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    // for task.blade
     public function index($date = null, $papM = null)
     {
-        $fromtask = Task::all();
-
-        $tasks = DB::table('tasks')
-            ->join('paps', 'tasks.PAP', '=', 'paps.id')
-            ->join('paptask', 'tasks.task', '=', 'paptask.id')
-            ->join('users as PREPARER', 'tasks.preparer', '=', 'PREPARER.id')
-            ->join('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
-            ->whereDate('tasks.activitydate', $date)
-            ->where('tasks.PAP', $papM)
-            ->select('tasks.*', 'paps.pap', 'paptask.tasks', 'PREPARER.name as Preparer', 'ASSIGNED.name as Assigned')
+        $viewpap = DB::table('papmanagement')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->join('users', 'papmanagement.focal', '=', 'users.id')
+            ->join('fundSource', 'papmanagement.fundSource', '=', 'fundSource.id')
+            ->join('divisions', 'papmanagement.divisionID', '=', 'divisions.id')
+            ->join('outputsupported', 'papmanagement.oosID', '=', 'outputsupported.oosID')
+            ->where('papmanagement.id', $papM)
+            ->select('papmanagement.*', 'paps.pap', 'users.name as focalPerson', 'fundSource.fundName as fundName', 'divisions.*', 'outputsupported.oosName')
             ->get();
 
-        return view('Task.task', ["fromtask" => $tasks]);
+      
+
+
+       
+        $tasks = DB::table('papmanagement')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->join('tasks', 'papmanagement.id', '=', 'tasks.PAP')
+            ->join('paptask', 'tasks.task', '=', 'paptask.id')
+            ->join('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
+            ->join('users as focal', 'papmanagement.focal', '=', 'focal.id')
+            ->join('fundSource', 'papmanagement.fundSource', '=', 'fundSource.id')
+            ->where('papmanagement.id', $papM)
+            ->select('tasks.*','tasks.id as taskid', 'paps.pap', 'paptask.tasks', 'ASSIGNED.name as Assigned', 'focal.name as focalPerson', 'papmanagement.*', 'fundSource.fundName as fundName')
+            ->get();
+
+        return view('Task.task', ["fromtask" => $tasks , "viewpap" => $viewpap]);
     }
 
+    // for dashboard.blade
     public function dashboard()
     {
         $now = Carbon::now();
@@ -42,7 +62,8 @@ class TaskController extends Controller
 
         $monthtask = DB::table('tasks')
             ->join('users', 'tasks.assigned', '=', 'users.id')
-            ->join('paps', 'tasks.PAP', '=', 'paps.id')
+            ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
             ->join('paptask', 'tasks.task', '=', 'paptask.id')
             ->whereMonth('tasks.activitydate', $now->month)
             ->select('tasks.*', 'users.name', 'paps.pap', 'paptask.tasks', 'users.avatar')
@@ -61,30 +82,71 @@ class TaskController extends Controller
             ->groupBy('budget.id')
             ->get();
 
-        $task = DB::table('tasks')
-            ->join('paps', 'tasks.PAP', '=', 'paps.id')
-            ->whereMonth('tasks.activitydate', $now->month)
-            ->select(
-                'tasks.PAP',
-                'tasks.activitydate',
-                'paps.pap'
-            )
-            ->groupBy(
-                'tasks.PAP',
-                'tasks.activitydate',
-                'paps.pap'
-            )
+        $task = createdPAP::join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->select('papmanagement.*', 'paps.pap')
+            ->whereMonth('papmanagement.fromdate', $now->month)
             ->get();
 
 
         return view('welcome', ["budget" => $budget, "task" => $task, "monthtask" => $monthtask]);
     }
 
-    public function papforthemonth() {}
+    // for creating new PAP(papmangement.blade)
+    public function savePAP(Request $request) 
+    {
+       
+  
+        if ($request->editpapid) {
 
+        createdPAP::where('id', $request->editpapid)->update([
+            'papID' => $request->editpapids,
+            'description' => ucfirst(strtolower($request->editdescription)),
+            'focal' => $request->editfocalSelect,
+            'todate' => $request->editdateend,
+            'location' => strtoupper($request->editlocation),
+            'fromdate' => $request->editdatefrom,
+            'fundSource' => $request->editfunds,
+            'divisionID' => $request->editdivisionSelect,
+            'oosID' => $request->editoosSelect,
+        ]);
+        return back()->with('success', 'Updated successfully');
+        }
+        else{
+
+            
+            createdPAP::create([
+                'papID' => $request->pap,
+                'description' => ucfirst(strtolower($request->description)),
+                'focal' => $request->focalSelect,
+                'todate' => $request->dateend,
+                'location' => strtoupper($request->location),
+                'fromdate' => $request->datefrom,
+                'fundSource' => $request->funds,
+                'divisionID' => $request->divisionSelect,
+                'sectorID' => $request->sectorselect,
+                'oosID' => $request->oosSelect,
+            ]);
+
+        return back()->with('success', 'Saved successfully');
+        }
+    }
+
+
+
+    // for pap.blade
     public function forpap($year = null, $month = null)
     {
         $now = Carbon::now();
+        $papOptions = Paps::all();
+        $users = User::all()
+        ->where('usertype', '!=', 'admin');
+
+        $fund = fundSource::all();
+        $division = divisions::all();
+        $sector = Sector::all();
+        $oos = ooSupported::all();
+        
+
 
         $Year = ($year && $year > 0) ? $year : $now->year;
         $Month = ($month && $month >= 1 && $month <= 12) ? $month : $now->month;
@@ -103,18 +165,64 @@ class TaskController extends Controller
             ->groupBy('tasks.PAP', 'tasks.activitydate')
             ->get();
 
+            $newtask = DB::table('papmanagement')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->join('users', 'papmanagement.focal', '=', 'users.id')
+            ->join('fundSource', 'papmanagement.fundSource', '=', 'fundSource.id')
+            ->join('divisions', 'papmanagement.divisionID', '=', 'divisions.id')
+            ->join('outputsupported', 'papmanagement.oosID', 'outputsupported.oosID')
+            ->whereYear('papmanagement.fromdate', $Year)
+            ->whereMonth('papmanagement.fromdate', $Month)
+            ->select('papmanagement.id as newID','papmanagement.*', 'paps.pap', 'users.name as focalPerson', 'fundSource.fundName as fundName', 'divisions.*', 'outputsupported.oosName')
+            ->get();
+
+    
 
 
-        return view('Task.pap', compact('tasks', 'Year', 'Month'));
+
+        return view('Task.pap', compact('tasks', 'Year', 'Month', 'papOptions', 'newtask', 'users', 'fund', 'division', 'sector', 'oos'));
     }
 
 
     // view for creating task page
-    public function create()
+    // public function create()
+    // {
+    //     $paps = Paps::all();
+    //     $users = User::all();
+    //     $paptask = PapTask::all();
+
+    //     $tasksByPap = $paptask
+    //         ->groupBy('papID')
+    //         ->map(function ($tasks) {
+    //             return $tasks->map(function ($task) {
+    //                 return [
+    //                     'id' => $task->id,
+    //                     'tasks' => $task->tasks
+    //                 ];
+    //             });
+    //         });
+       
+    //     return view('/Task.createtask', compact(
+    //         'paps',
+    //         'users',
+    //         'paptask',
+    //         'tasksByPap'
+    //     ));
+    // }
+
+    //  for creating specific PAP task(createtask.blade)
+    public function newcreate($id)
     {
         $paps = Paps::all();
         $users = User::all();
         $paptask = PapTask::all();
+        
+
+        $newpap = DB::table('papmanagement')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->select('papmanagement.*', 'paps.pap')
+            ->where('papmanagement.id', $id)
+            ->first();
 
         $tasksByPap = $paptask
             ->groupBy('papID')
@@ -126,19 +234,20 @@ class TaskController extends Controller
                     ];
                 });
             });
-
+       
         return view('/Task.createtask', compact(
             'paps',
             'users',
             'paptask',
-            'tasksByPap'
+            'tasksByPap',
+            'newpap'
         ));
     }
 
-    // for creating new PAP
+    // for creating new PAP(file management)
     public function createPAP(Request $request)
     {
-
+       
         if ($request->action === 'pap') {
 
             Paps::create([
@@ -158,13 +267,20 @@ class TaskController extends Controller
         return back()->with('success', 'Saved successfully');
     }
 
-    // viewing of individual task
+    // for deleting pap(file management)
+    public function deletePAP($id)
+    {
+        Paps::where('id', $id)->delete();
+        return back()->with('success', 'Deleted successfully');
+    }
+
+    // viewing of individual task(viewtask.blade)
     public function viewTask($id)
     {
         $tasks = DB::table('tasks')
-            ->join('paps', 'tasks.PAP', '=', 'paps.id')
+            ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
             ->join('paptask', 'tasks.task', '=', 'paptask.id')
-            ->join('users as PREPARER', 'tasks.preparer', '=', 'PREPARER.id')
             ->join('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
             ->leftJoin('users as r1', 'tasks.reviewer1', '=', 'r1.id')
             ->leftJoin('users as r2', 'tasks.reviewer2', '=', 'r2.id')
@@ -175,7 +291,7 @@ class TaskController extends Controller
                 'tasks.*',
                 'paps.pap',
                 'paptask.tasks',
-                'PREPARER.name as Preparer',
+
                 'ASSIGNED.name as Assigned',
                 'r1.name as rv1',
                 'r2.name as rv2',
@@ -188,9 +304,10 @@ class TaskController extends Controller
         return view('Task.viewtask', ["fromtask" => $tasks]);
     }
 
+    // for viewing the update task page(updatetask.blade)
     public function viewupdateTask($id)
     {
-
+       
         $budgetoption = DB::table('budget')
             ->join('paps', 'budget.budgetPAP', '=', 'paps.id')
             ->select('budget.*', 'paps.pap')
@@ -198,11 +315,11 @@ class TaskController extends Controller
 
 
         $tasks = DB::table('tasks')
-            ->join('paps', 'tasks.PAP', '=', 'paps.id')
+            ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
             ->leftjoin('budget', 'tasks.allocatedbudget', '=', 'budget.id')
             ->leftjoin('paps as budgetpap', 'budget.budgetPAP', '=', 'budgetpap.id')
             ->join('paptask', 'tasks.task', '=', 'paptask.id')
-            ->join('users as PREPARER', 'tasks.preparer', '=', 'PREPARER.id')
             ->join('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
             ->leftJoin('users as r1', 'tasks.reviewer1', '=', 'r1.id')
             ->leftJoin('users as r2', 'tasks.reviewer2', '=', 'r2.id')
@@ -215,25 +332,30 @@ class TaskController extends Controller
                 'budget.budgetPAP',
                 'budgetpap.pap as budgetpapname',
                 'paptask.tasks',
-                'PREPARER.name as Preparer',
                 'ASSIGNED.name as Assigned',
                 'r1.name as rv1',
                 'r2.name as rv2',
                 'r3.name as rv3',
                 'r4.name as rv4',
                 'r5.name as rv5',
+                'papmanagement.fromdate as papdate',
+                'papmanagement.todate as papdateend',
             )
             ->where('tasks.id', $id)
             ->first();
 
+           
+
         return view('Task.updatetask', ["fromtask" => $tasks, "budgetoption" => $budgetoption]);
     }
 
+    // for my task page(mytask.blade)
     public function mytask()
     {
 
         $tasks = DB::table('tasks')
-            ->join('paps', 'tasks.PAP', '=', 'paps.id')
+            ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
             ->join('paptask', 'tasks.task', '=', 'paptask.id')
             ->select(
                 'tasks.id',
@@ -244,7 +366,7 @@ class TaskController extends Controller
                 'paps.pap',
                 'paptask.tasks as task'
             )
-            ->where('tasks.preparer', Auth::user()->id)
+            ->where('tasks.assigned', Auth::user()->id)
             ->orderByDesc('tasks.activitydate')
             ->get();
 
@@ -254,28 +376,36 @@ class TaskController extends Controller
         });
 
         return view('Task.mytask', [
-            'groupedTasks' => $groupedTasks
+            'groupedTasks' => $tasks
         ]);
     }
 
+    // for review page(review.blade)
     public function toreview()
     {
 
         if (Auth::user()->usertype != "admin") {
 
             $tasks = DB::table('tasks')
-                ->join('paps', 'tasks.PAP', '=', 'paps.id')
-                ->join('paptask', 'tasks.task', '=', 'paptask.id')
-                ->select(
-                    'tasks.id',
-                    'tasks.activitydate',
-                    'tasks.duedate',
-                    'tasks.progressScore',
-                    'tasks.is_read',
-                    'paps.pap',
-                    'paptask.tasks as task'
+                ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->join('paptask', 'tasks.task', '=', 'paptask.id')
+            ->select(
+                'tasks.id',
+                'tasks.activitydate',
+                'tasks.duedate',
+                'tasks.progressScore',
+                'tasks.is_read',
+                'paps.pap',
+                'paptask.tasks as task'
                 )
-                ->where('tasks.reviewer1', Auth::user()->id)
+                ->where(function ($query) {
+                    $query->where('tasks.reviewer1', Auth::user()->id)
+                        ->orWhere('tasks.reviewer2', Auth::user()->id)
+                        ->orWhere('tasks.reviewer3', Auth::user()->id)
+                        ->orWhere('tasks.reviewer4', Auth::user()->id)
+                        ->orWhere('tasks.reviewer5', Auth::user()->id);
+                })
                 ->orderByDesc('tasks.activitydate')
                 ->get();
 
@@ -285,16 +415,17 @@ class TaskController extends Controller
             });
         } else {
             $tasks = DB::table('tasks')
-                ->join('paps', 'tasks.PAP', '=', 'paps.id')
-                ->join('paptask', 'tasks.task', '=', 'paptask.id')
-                ->select(
-                    'tasks.id',
-                    'tasks.activitydate',
-                    'tasks.duedate',
-                    'tasks.progressScore',
-                    'tasks.is_read',
-                    'paps.pap',
-                    'paptask.tasks as task'
+                ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->join('paptask', 'tasks.task', '=', 'paptask.id')
+            ->select(
+                'tasks.id',
+                'tasks.activitydate',
+                'tasks.duedate',
+                'tasks.progressScore',
+                'tasks.is_read',
+                'paps.pap',
+                'paptask.tasks as task'
                 )
 
                 ->orderByDesc('tasks.activitydate')
@@ -306,10 +437,11 @@ class TaskController extends Controller
             });
         }
         return view('Task.mytask', [
-            'groupedTasks' => $groupedTasks
+            'groupedTasks' => $tasks
         ]);
     }
 
+    // for reports page(reports.blade)
     public function reports()
     {
         return view('reports', [
@@ -321,6 +453,7 @@ class TaskController extends Controller
         ]);
     }
 
+    // for generating report based on filter(reports.blade)
     public function generate(Request $request)
     {
 
@@ -448,7 +581,7 @@ class TaskController extends Controller
 
 
 
-    // for creating task of employee
+    // for creating task (createtask.blade)
     public function store(Request $request)
     {
         // $validate = $request->validate([
@@ -487,7 +620,7 @@ class TaskController extends Controller
                 'PAP' => $request->PAP,
                 'task' => $taskId,
                 'assigned' => $request->assigned,
-                'preparer' => $request->preparer,
+                // 'preparer' => $request->preparer,
                 'activitydate' => $request->activitydate,
                 'duedate' => $request->duedate,
 
@@ -539,6 +672,8 @@ class TaskController extends Controller
     /**
      * Update the specified resource in storage.
      */
+
+    // for updating task(updatetask.blade)
     public function update(Request $request)
     {
 
@@ -556,8 +691,9 @@ class TaskController extends Controller
             'costing' => $request->costing,
         ]);
 
-
-        return redirect()->route('my task')->with('success', 'Task updated successfully.');
+        
+             return redirect()->route('my task')->with('success', 'Task updated successfully.');
+       
     }
 
     /**
@@ -566,5 +702,31 @@ class TaskController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    // for file management page(papmangement.blade)
+    public function papmanagement()
+    {
+        $paps = Paps::all();
+        
+        $paptask = PapTask::all();
+
+        $tasksByPap = $paptask
+            ->groupBy('papID')
+            ->map(function ($tasks) {
+                return $tasks->map(function ($task) {
+                    return [
+                        'id' => $task->id,
+                        'tasks' => $task->tasks
+                    ];
+                });
+            });
+            
+        return view('papmangement', compact(
+            'paps',
+           
+            'paptask',
+            'tasksByPap'
+        ));
     }
 }

@@ -11,14 +11,14 @@
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
-       
+
 
 
             <div class="card-body">
                 <div class="listjs-table" id="customerList">
                     <div class="row g-4 mb-3">
 
-                        
+
                     </div>
 
                     <div class="table-responsive table-card mt-3 mb-1">
@@ -30,6 +30,7 @@
                                     <th class="">Position</th>
                                     <th class="">Email</th>
                                     <th class="">User Type</th>
+                                    <th class="">Division</th>
                                 </tr>
                             </thead>
                             <tbody class="list form-check-all">
@@ -42,10 +43,11 @@
                                     <td class="email">{{$users->position}}</td>
                                     <td class="phone">{{$users->email}}</td>
                                     <td class="status"><span class="badge bg-success-subtle text-success text-uppercase">{{$users->usertype}}</span></td>
+                                    <td class="division">{{$users->division_name}}({{$users->division_short_name}})</td>
                                     <td>
                                         <div class="d-flex gap-2">
                                             <div class="edit">
-                                                <button class="btn btn-sm btn-success edit-item-btn" data-bs-toggle="modal" data-bs-target="#showModal" data-id="{{ $users->id }}" data-name="{{ $users->name }}" data-position="{{ $users->position }}" data-email="{{ $users->email }}" data-utype="{{ $users->usertype }}">Edit</button>
+                                                <button class="btn btn-sm btn-success edit-item-btn" data-bs-toggle="modal" data-bs-target="#showModal" data-id="{{ $users->id }}" data-name="{{ $users->name }}" data-position="{{ $users->position }}" data-email="{{ $users->email }}" data-utype="{{ $users->usertype }}" data-division="{{ $users->divisionID }}" data-sector="{{$users->sectorID}}">Edit</button>
                                             </div>
                                         </div>
                                     </td>
@@ -74,7 +76,7 @@
             <form action="{{route('storeuser')}}" method="POST" id="userform">
                 @csrf
                 <div class="modal-body">
-                 @if ($errors->any())
+                    @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul>
                             @foreach ($errors->all() as $error)
@@ -83,7 +85,7 @@
                         </ul>
                     </div>
                     @endif
-                    
+
                     <div class="mb-3" id="modal-id" style="display: none;">
                         <label for="id-field" class="form-label">ID</label>
                         <input type="text" id="id-field" name="id" class="form-control" placeholder="ID" readonly="">
@@ -105,6 +107,27 @@
                         <label for="email-field" class="form-label">Email</label>
                         <input type="email" id="email-field" name="email" class="form-control" placeholder="Enter Email" required="">
                         <div class="invalid-feedback">Please enter an email.</div>
+                    </div>
+                    <div class="mb-3">
+
+                        <label for="sector-field" class="form-label">Sector</label>
+                        <select class="form-select shadow-sm" name="sector" id="sector-field">
+                            <option selected value="">--Choose Sector--</option>
+                            @foreach($sector as $sect)
+                            <option value="{{$sect->id}}">{{$sect->sector_long_name}} ({{$sect->sector_short_name}})</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="divi-field" class="form-label">Division</label>
+
+                        <select class="form-select shadow-sm" name="division" id="divi-field">
+                           
+                            @foreach($divisions as $division)
+                            <option value="{{$division->id}}">{{$division->division_name}} ({{$division->division_short_name}})</option>
+                            @endforeach
+                        </select>
+
                     </div>
 
                     <div class="mb-3">
@@ -157,12 +180,17 @@
             document.getElementById("utype").value =
                 button.getAttribute("data-utype");
 
+            document.getElementById("divi-field").value =
+                button.getAttribute("data-division");
+
+            document.getElementById("sector-field").value =
+                button.getAttribute("data-sector");
+
             // Password intentionally left blank for security
 
         });
 
     });
-
 
 </script>
 @endsection

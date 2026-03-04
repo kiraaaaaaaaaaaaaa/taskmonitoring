@@ -17,23 +17,18 @@
                 <div class="card shadow rounded-4 mb-4">
                     <div class="card-body">
 
-                        <h4>PAP</h4>
+                   
 
                         <div class="mb-3">
-                            <label class="form-label">Select PAP</label>
-                            <select class="form-select" id="papselect" name="PAP">
-                                <option value="">-- Choose PAP --</option>
-                                @foreach($paps as $pap)
-                                <option value="{{ $pap->id }}">{{ $pap->pap }}</option>
-                                @endforeach
-                                <option value="newpap">-- Add new PAP --</option>
-                            </select>
+                            <input type="hidden" id="papID" value="{{ $newpap->papID}}">
+                            <input type="hidden" id="papID" name="PAP" value="{{ $newpap->id}}">
+                            <input type="text" id="pap" name="pap" class="form-control" value="{{ $newpap->pap ?? '' }}" readonly>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Select Task(s)</label>
                             <select id="paptask" name="tasks[]" class="form-control" multiple>
-
+                            <option value="newtask">-- Add new Task --</option>
                             </select>
                         </div>
 
@@ -47,7 +42,7 @@
                             </select>
                         </div>
 
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label class="form-label">Preparer</label>
                             <select class="form-select" name="preparer">
                                 <option value="">-- Choose Personnel --</option>
@@ -55,15 +50,14 @@
                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
 
                         <div class="row">
+                           
+                                <input type="date" class="form-control" name="activitydate" value="{{ $newpap->fromdate}}" hidden>
+                            
                             <div class="col-md-6 mb-3">
-                                <label>Activity Date</label>
-                                <input type="date" class="form-control" name="activitydate">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label>Due Date</label>
+                                <label>Target Date of Completion</label>
                                 <input type="date" class="form-control" name="duedate">
                             </div>
                         </div>
@@ -74,10 +68,22 @@
                 <!-- ================= REVIEWERS ================= -->
                 <div class="card shadow rounded-4 mb-4">
                     <div class="card-body">
-                        <h4>Reviewers</h4>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4>Reviewer(s)</h4>
+                        <button type="button" class="btn btn-sm btn-success rounded-pill mb-3" id="addReviewerBtn">
+                            <i class="ri-add-line me-2"></i> Add Reviewer
+                        </button>
+                        </div>
 
-                        @for($i=1; $i<=5; $i++) <fieldset class="border rounded p-3 mb-3">
-                            <legend class="w-auto px-2">Reviewer {{ $i }}</legend>
+                        <div id="reviewersContainer">
+                        @php
+                            $reviewerCount = 1; // Set the maximum number of reviewer
+                        @endphp
+                        @for($i=01; $i<=$reviewerCount; $i++) 
+                        
+                        
+                        <fieldset class="border rounded p-3 mb-3">
+                            
 
                             <div class="row g-2">
                                 <div class="col-md-6">
@@ -94,14 +100,19 @@
                                 <div class="col-md-4">
                                     <input type="date" id="date{{ $i }}" class="form-control" name="returneddate{{ $i }}">
                                 </div>
-
-                                <div class="col-md-2 d-flex align-items-center">
-                                    <input type="checkbox" onclick="toggleReviewerFields({{ $i }})">
-                                    <input type="hidden" id="st{{ $i }}" name="status{{ $i }}" value="Pending">
+                                <div class="col-md-4 d-flex align-items-center">
+                                    <label class="ms-2 form-label fs-10 px-1 mb-0">Not Applicable</label>
+                                    <div class="col-md-2 d-flex align-items-center">
+                                 
+                                        <input type="checkbox" onclick="toggleReviewerFields({{ $i }})">
+                                   
+                                        <input type="hidden" id="st{{ $i }}" name="status{{ $i }}" value="Pending">
+                                    </div>
                                 </div>
                             </div>
                             </fieldset>
                             @endfor
+                            </div>
 
                     </div>
                 </div>
@@ -146,16 +157,9 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <label class="form-label">Select PAP</label>
-                    <select class="form-select" id="papselect" name="PAP">
-                        <option value="">-- Choose PAP --</option>
-                        @foreach($paps as $pap)
-                        <option value="{{ $pap->id }}">{{ $pap->pap }}</option>
-                        @endforeach
-                        <option value="newpap">-- Add new PAP --</option>
-                    </select>
+                    <input type="hidden" id="papID" name="PAP" value="{{ $newpap->papID}}">
                     <br>
-                    <input type="text" name="task" class="form-control" placeholder="Enter PAP" required>
+                    <input type="text" name="task" class="form-control" placeholder="Enter Task" required>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-success" name="action" value="task">Save</button>
@@ -169,34 +173,30 @@
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
 
-        const papSelect = document.getElementById('papselect');
-        const taskSelect = document.getElementById('paptask');
+    // Hidden PAP input
+    const papInput = document.getElementById('papID');
+    const taskSelect = document.getElementById('paptask');
+    const addreviewer = document.getElementById('addReviewerBtn');
 
-        const choices = new Choices(taskSelect, {
-            removeItemButton: true
-            , placeholderValue: 'Select task(s)'
-            , shouldSort: false
-        });
+    // Choices.js
+    const choices = new Choices(taskSelect, {
+        removeItemButton: true,
+        placeholderValue: 'Select task(s)',
+        shouldSort: false
+    });
 
-        const tasksByPap = @json($tasksByPap);
+    // Tasks by PAP (make sure this exists in your controller)
+    const tasksByPap = {!! json_encode($tasksByPap) !!};
 
-        /* PAP change */
-        papSelect.addEventListener('change', () => {
-            const papId = papSelect.value;
+    // Populate tasks based on PAP
+    function populateTasks(papId) {
+        choices.clearChoices();
 
-            if (papId === 'newpap') {
-                papSelect.selectedIndex = 0;
-                new bootstrap.Modal(document.getElementById('addPapModal')).show();
-                return;
-            }
+        if (!tasksByPap[papId]) return;
 
-            choices.clearChoices();
-
-            if (!tasksByPap[papId]) return;
-
-            choices.setChoices(
+        choices.setChoices(
                 [
                     ...tasksByPap[papId].map(task => ({
                         value: task.id
@@ -211,31 +211,84 @@
                 , 'label'
                 , true
             );
-        });
 
-        taskSelect.addEventListener('change', () => {
-            const papId = taskSelect.value;
+        choices.removeActiveItems();
+    }
 
-            if (papId === 'newtask') {
-                papSelect.selectedIndex = 0;
-                new bootstrap.Modal(document.getElementById('addTaskpModal')).show();
-                return;
-            }
-        });
+    // Initial load
+    populateTasks(papInput.value);
 
-        /* Reviewer toggle */
-        window.toggleReviewerFields = (i) => {
-            const r = document.getElementById('reviewer' + i);
-            const d = document.getElementById('date' + i);
-            const s = document.getElementById('st' + i);
+    // Task change event
+    taskSelect.addEventListener('change', () => {
+        const selectedValues = choices.getValue(true); // safer for multiple
 
-            const disabled = !r.disabled;
-            r.disabled = disabled;
-            d.disabled = disabled;
-            s.value = disabled ? 'Not Applicable' : 'Pending';
-        };
-
+        if (selectedValues.includes('newtask')) {
+            choices.removeActiveItems();
+            new bootstrap.Modal(document.getElementById('addTaskpModal')).show();
+        }
     });
 
+    // Reviewer toggle
+    window.toggleReviewerFields = (i) => {
+        const r = document.getElementById('reviewer' + i);
+        const d = document.getElementById('date' + i);
+        const s = document.getElementById('st' + i);
+
+        const disabled = !r.disabled;
+        r.disabled = disabled;
+        d.disabled = disabled;
+        s.value = disabled ? 'Not Applicable' : 'Pending';
+    };
+
+
+
+    const reviewersContainer = document.getElementById('reviewersContainer');
+    let reviewerCount = document.querySelectorAll('[id^="reviewer"]').length;
+
+    addReviewerBtn.addEventListener('click', () => {
+        reviewerCount++;
+        if (reviewerCount > 6) {
+            alert('Maximum of 5 reviewers allowed.');
+            reviewerCount--;
+            return;
+        }
+
+        const fieldset = document.createElement('fieldset');
+        fieldset.classList.add('border', 'rounded', 'p-3', 'mb-3');
+        fieldset.innerHTML = `
+            <div class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <select id="reviewer${reviewerCount}" class="form-select" name="reviewer${reviewerCount}">
+                        <option value="">-- Choose Reviewer --</option>
+                        @foreach($users as $user)
+                            @if(in_array($user->usertype, ['Reviewer','Supervisor']))
+                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <input type="date" id="date${reviewerCount}" class="form-control" name="returneddate${reviewerCount}">
+                </div>
+
+                <div class="col-md-3 d-flex align-items-center">
+                    <button type="button" class="btn btn-danger btn-sm removeReviewerBtn">Remove</button>
+                </div>
+            </div>
+        `;
+
+        reviewersContainer.appendChild(fieldset);
+
+        // Remove functionality
+        fieldset.querySelector('.removeReviewerBtn').addEventListener('click', () => {
+            fieldset.remove();
+            reviewerCount--;
+        });
+    });
+
+
+
+});
 </script>
 @endsection

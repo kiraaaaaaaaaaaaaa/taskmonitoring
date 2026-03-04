@@ -4,7 +4,7 @@
 
 
 
-<form action="{{ route('updatetask') }}" method="POST">
+<form action="{{ route('updatetask') }}" method="POST" id="updateTaskForm">
 @csrf
 <a href="javascript:history.back()"
    class="btn btn-secondary btn-label waves-effect waves-light rounded-pill mb-4">
@@ -18,7 +18,7 @@
                 <div class="card-body p-4 p-md-5 ">
                 
                        
-                        <input type="hidden" class="form-control" name="id" value="{{$fromtask->id}}" >
+                        <input class="form-control" name="id" value="{{$fromtask->id}}" hidden>
                    
                     <div class="mb-3">
                         <label for="employeeName" class="form-label">PAP</label>
@@ -32,16 +32,13 @@
                         <label for="StartleaveDate" class="form-label">Assigned Personnel</label>
                         <input type="text" class="form-control" value="{{$fromtask->Assigned}}" readonly>
                     </div>
+                
                     <div class="mb-3">
-                        <label for="EndleaveDate" class="form-label">Preparer</label>
-                        <input type="text" class="form-control" value="{{$fromtask->Preparer}}" readonly>
+                        <label for="EndleaveDate" class="form-label">Indicative Date</label>
+                        <input type="text" class="form-control" value="{{ \Carbon\Carbon::parse($fromtask->papdate)->format('F d') }} to {{ \Carbon\Carbon::parse($fromtask->papdateend)->format('d, Y') }}" readonly>
                     </div>
                     <div class="mb-3">
-                        <label for="EndleaveDate" class="form-label">Activity Date</label>
-                        <input type="date" class="form-control" value="{{$fromtask->activitydate}}" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="EndleaveDate" class="form-label">Due Date</label>
+                        <label for="EndleaveDate" class="form-label">Target Date of Accomplishment</label>
                         <input type="date" class="form-control" value="{{$fromtask->duedate}}" readonly>
                     </div>
                     <div class="mb-3">
@@ -205,11 +202,13 @@
 
         if (!r || !s) return;
 
-        if (status === "Not Applicable" || r.value === "Not Applicable") {
+        if (status === "Not Applicable" || r.value === "Not Applicable" || r.value === "") {
             r.style.display = "none";
             s.style.display = "none";
         }
     });
+
 </script>
+
 
 @endsection

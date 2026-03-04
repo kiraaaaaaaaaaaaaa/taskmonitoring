@@ -15,12 +15,13 @@ Route::post('/', [AuthenticationController::class, 'authenticate']) -> name('log
 Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGooglCallbak'])->name('google.callback');
 Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
-//Task Routes
 
+//Task Routes
 Route::get('/Task/task/{date?}/{papM?}', [TaskController::class, 'index'])->name('task');
-Route::get('/Task.createtask', [TaskController::class, 'create'])->name('new task');
+Route::get('/Task.createtask/{id}', [TaskController::class, 'newcreate'])->name('new task');
 Route::post('/Task', [TaskController::class, 'store'])->name('store');
 Route::post('/Task/createtask', [TaskController::class, 'createPAP'])->name('createPAP');
+Route::post('/papmangement/{papID}', [TaskController::class, 'deletePAP'])->name('deletePAP');
 Route::get('/Task/viewtask/{id}', [TaskController::class, 'viewTask']);
 Route::get('/Task/pap/{year?}/{month?}', [TaskController::class, 'forpap'])->name('monitoring');
 Route::get('/Task/mytask', [TaskController::class, 'mytask'])->name('my task');
@@ -29,6 +30,8 @@ Route::post('/Task/updatetask', [TaskController::class, 'update']) -> name('upda
 Route::get('/Task/toreview', [TaskController::class, 'toreview'])->name('review');
 Route::get('/reports', [TaskController::class, 'reports']) ->name('Reports');
 Route::post('/reports', [TaskController::class, 'generate'])->name('reports-generate');
+Route::get('/papmangement', [TaskController::class, 'papmanagement'])->name('pap management');
+Route::post('/Task/pap', [TaskController::class, 'savePAP'])->name('savePAP');
 
 
 //User routes
@@ -38,5 +41,12 @@ Route::post('/users', [UserController::class, 'store'])->name('storeuser');
 //budget routes
 Route::get('/budget', [BudgetController::class, 'index'])->name('budget management');
 Route::post('/budget', [BudgetController::class, 'store'])->name('budget store');
+
+//sector routes
+Route::get('/sectormanagement', [App\Http\Controllers\SectorController::class, 'index'])->name('sector management');
+Route::post('/sectormanagement', [App\Http\Controllers\SectorController::class, 'store'])->name('storesector');
+Route::post('/sectormanagement/division', [App\Http\Controllers\SectorController::class, 'storeDivision'])->name('storedivision');
+Route::post('/sectormanagement/division/{id}', [App\Http\Controllers\SectorController::class, 'deleteDivision'])->name('deletdivision');
+Route::post('/sectormanagement/sector/{id}', [App\Http\Controllers\SectorController::class, 'deleteSector'])->name('deletesector');
 
 

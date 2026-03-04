@@ -2,71 +2,122 @@
 
 @section('content')
 
-<div class="row g-4">
-    @foreach ($groupedTasks as $date => $tasks)
-    <div class="mb-4" id="cardborder">
+<style>
+    .board {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+    }
 
-        <!-- Group Header -->
-        <h4 class="pb-2 mb-3">
-            <i class="bi bi-calendar-event text-warning"></i>
-            {{ \Carbon\Carbon::parse($date)->format('F d, Y') }}
-        </h4>
+    .column {
+        flex: 1;
+        min-width: 300px;
+        background: #f4f6f9;
+        padding: 15px;
+        border-radius: 12px;
+    }
 
-        <div class="row">
-            @foreach ($tasks as $task)
-                <div class="col-md-4 mb-4">
-                    <div class="card task-card h-100 shadow-lg border-0">
-                        <div class="card-body d-flex flex-column">
+    .column h4 {
+        text-align: center;
+        margin-bottom: 15px;
+    }
 
-                            <div class="d-flex align-items-center">
-                                <!-- Left Icon -->
-                                @if($task->is_read == 0)
-                                    <i class="bi bi-exclamation-circle-fill text-danger"></i>
-                                @endif
-                            </div>
 
-                            <h5 class="card-title fw-bold">
-                                {{ $task->pap }}
-                            </h5>
+    .task-card:hover {
 
-                            <p class="mb-1">
-                                <i class="bi bi-pencil-square"></i>
-                                {{ $task->task }}
-                            </p>
-                            
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
 
-                            <p class="mb-1">
-                                @if($task->progressScore < 1)
-                                    <i class="bi bi-hourglass-split text-warning"></i>
-                                    In Progress
-                                @else
-                                    <i class="bi bi-check-circle-fill text-success"></i>
-                                    Completed
-                                @endif
-                            </p>
 
-                             <p class="mb-1">
-                                <i class="bi bi-pencil-square">Due:</i>
-                                {{ $task->duedate }}
-                            </p>
 
-                            <div class="mt-auto d-flex justify-content-between">
+    .column.drag-over {
+        background: #e2e6ea;
+    }
 
-                                <!-- VIEW -->
-                                <a href="/Task/updatetask/{{$task->id}}"
-                                   class="btn btn-outline-info btn-sm">
-                                    <i class="bi bi-pencil"></i> View
-                                </a>
+</style>
 
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
+<div class="board">
+
+    <!-- PENDING -->
+    <div class="column" data-status="pending">
+
+        <h4>🟡 Pending</h4>
+
+        @foreach ($groupedTasks as $task)
+        @if($task->progressScore == 0)
+        @include('components.taskcard', ['task' => $task, 'status' => 'pending'])
+        @endif
+        @endforeach
     </div>
-@endforeach
+
+    <!-- ONGOING -->
+    <div class="column" data-status="ongoing">
+        <h4>🔵 Ongoing</h4>
+
+        @foreach ($groupedTasks as $task)
+        @if($task->progressScore > 0 && $task->progressScore < 1) @include('components.taskcard', ['task'=> $task, 'status' => 'ongoing'])
+            @endif
+            @endforeach
+    </div>
+
+    <!-- DONE -->
+    <div class="column" data-status="done">
+        <h4>🟢 Done</h4>
+
+        @foreach ($groupedTasks as $task)
+        @if($task->progressScore >= 1)
+        @include('components.taskcard', ['task' => $task, 'status' => 'done'])
+        @endif
+        @endforeach
+    </div>
+
 </div>
 
+
+{{-- <script>
+document.querySelectorAll('.task-card').forEach(card => {
+
+    card.addEventListener('dragstart', function(e) {
+        e.dataTransfer.setData('text/plain', card.dataset.id);
+        setTimeout(() => card.style.display = 'none', 0);
+    });
+
+    card.addEventListener('dragend', function() {
+        card.style.display = 'block';
+    });
+});
+
+document.querySelectorAll('.column').forEach(column => {
+
+    column.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        column.classList.add('drag-over');
+    });
+
+    column.addEventListener('dragleave', function() {
+        column.classList.remove('drag-over');
+    });
+
+    column.addEventListener('drop', function(e) {
+        e.preventDefault();
+        const id = e.dataTransfer.getData('text/plain');
+        const card = document.querySelector(`[data-id='${id}']`);
+        column.appendChild(card);
+        column.classList.remove('drag-over');
+
+        // OPTIONAL: send AJAX to update status in DB
+        fetch(`/task/update-status/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({
+status: column.dataset.status
+})
+});
+});
+});
+</script> --}}
 
 @endsection

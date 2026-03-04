@@ -98,7 +98,7 @@
                         <div class="dropdown ms-sm-3 header-item topbar-user">
                             <button type="button" class="btn shadow-none" id="page-header-user-dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="d-flex align-items-center">
-                                    <img class="rounded-circle header-profile-user" src={{Auth::user()->avatar}} alt="Header Avatar">
+                                    <img class="rounded-circle header-profile-user" src="{{Auth::user()->avatar}}" alt="Header Avatar">
                                     <span class="text-start ms-xl-2">
                                         <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{Auth::user()->name}}</span>
                                         <span class="d-none d-xl-block ms-1 fs-12 user-name-sub-text">{{Auth::user()->position}}</span>
@@ -181,13 +181,13 @@
                         <li class="menu-title"><span data-key="t-menu">Menu</span></li>
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="{{route('dashboard')}}" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
-                                <i class="mdi mdi-speedometer"></i> <span data-key="t-dashboards">Dashboards</span>
+                                <i class="mdi mdi-speedometer"></i> <span data-key="t-dashboards">Dashboard</span>
                             </a>
 
                         </li> <!-- end Dashboard Menu -->
                         <li class="nav-item">
                             <a class="nav-link menu-link" href="{{route('monitoring')}}" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
-                                <i class="mdi mdi-view-grid-plus-outline"></i> <span data-key="t-apps">Monitoring</span>
+                                <i class="mdi mdi-view-grid-plus-outline"></i> <span data-key="t-apps">Task Disposition</span>
                             </a>
 
                         </li>
@@ -207,35 +207,54 @@
                         </li>
 
                         <li class="nav-item">
+                                        <a class="nav-link menu-link" href="{{route('budget management')}}" role="button" aria-expanded="false" aria-controls="sidebarLanding">
+                                            <i class="ri-rocket-line"></i> <span data-key="t-landing">Budget Management</span>
+                                        </a>
+
+                        </li>
+                        
+
+                         <li class="nav-item">
                             <a class="nav-link menu-link" href="/reports" role="button" aria-expanded="false" aria-controls="sidebarPages">
                                 <i class="mdi mdi-sticker-text-outline"></i> <span data-key="t-pages">Reports</span>
                             </a>
 
                         </li>
 
+                       
 
 
                         <li class="nav-item">
-                            <a class="nav-link menu-link" href="#sidebarTables" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarTables">
-                                <i class="mdi mdi-grid-large"></i> <span data-key="t-tables">Management</span>
+                            <a class="nav-link menu-link" href="#sidebarTables" id="management" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarTables">
+                                <i class="mdi mdi-grid-large"></i> <span data-key="t-tables">Master Data</span>
                             </a>
                             <div class="collapse menu-dropdown" id="sidebarTables">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
                                         <a class="nav-link menu-link" href="{{route('user management')}}" id="users" role="button" aria-expanded="false" aria-controls="sidebarLanding">
-                                            <i class="ri-rocket-line"></i> <span data-key="t-landing">User Management</span>
+                                            <i class="ri-rocket-line"></i> <span data-key="t-landing">User</span>
+                                        </a>
+
+                                    </li>
+                                    
+                                    <li class="nav-item">
+                                        <a class="nav-link menu-link" href="{{route('pap management')}}" role="button" aria-expanded="false" aria-controls="sidebarLanding">
+                                            <i class="ri-rocket-line"></i> <span data-key="t-landing">PAP</span>
                                         </a>
 
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link menu-link" href="{{route('budget management')}}" id="users" role="button" aria-expanded="false" aria-controls="sidebarLanding">
-                                            <i class="ri-rocket-line"></i> <span data-key="t-landing">Budget Management</span>
+                                        <a class="nav-link menu-link" href="{{route('sector management')}}" role="button" aria-expanded="false" aria-controls="sidebarLanding">
+                                            <i class="ri-rocket-line"></i> <span data-key="t-landing">Sector</span>
                                         </a>
 
                                     </li>
                                 </ul>
                             </div>
                         </li>
+
+                        
+
 
 
 
@@ -330,8 +349,10 @@
     <script src="{{asset('assets/libs/node-waves/waves.min.js')}}"></script>
     <script src="{{asset('assets/libs/feather-icons/feather.min.js')}}"></script>
     <script src="{{asset('assets/js/pages/plugins/lord-icon-2.1.0.js')}}"></script>
-    <script src="{{asset('assets/js/plugins.js')}}"></script>
-    <script src="{{asset('assets/libs/list/list.min.js')}}"></script>
+    <script  src="{{asset('assets/libs/choices.js/public/assets/scripts/choices.min.js')}}"></script>
+    {{-- <script src="{{asset('assets/js/plugins.js')}}"></script> --}}
+    {{-- <script src="{{asset('assets/js/jquery-4.0.0.min.js')}}"></script> --}}
+    <script src="{{asset('assets/libs/list.js/list.min.js')}}"></script>
 
 
     <!-- apexcharts -->
@@ -356,12 +377,17 @@
 
     const review = document.getElementById('review');
     const user = document.getElementById('users');
+    const management = document.getElementById('management');
 
     const userType = @json(Auth::user()->usertype);
 
     if (userType !== 'admin' && userType !== 'reviewer') {
         review.style.display = 'none';
         user.style.display = 'none';
+    }
+
+    if (userType !== 'admin') {
+        management.style.display = 'none';
     }
 
 });

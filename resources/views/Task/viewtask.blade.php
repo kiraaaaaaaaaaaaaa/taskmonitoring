@@ -28,10 +28,7 @@
                         <label for="StartleaveDate" class="form-label">Assigned Personnel</label>
                         <input type="text" class="form-control" value="{{$fromtask->Assigned}}" readonly>
                     </div>
-                    <div class="mb-3">
-                        <label for="EndleaveDate" class="form-label">Preparer</label>
-                        <input type="text" class="form-control" value="{{$fromtask->Preparer}}" readonly>
-                    </div>
+                
                     <div class="mb-3">
                         <label for="EndleaveDate" class="form-label">Activity Date</label>
                         <input type="date" class="form-control" value="{{$fromtask->activitydate}}" readonly>
@@ -47,8 +44,12 @@
                     <div class="mb-3">
                         <label for="EndleaveDate" class="form-label">File link</label>
                          <div class="input-group">
-                            <input type="text" class="form-control"  value="{{$fromtask->link}}">
-                            <button class="btn btn-info ri-link" type="button"></button>
+                            <input type="text" class="form-control" id="fileLink" value="{{$fromtask->link}}">
+                            
+                            <a href="{{ $fromtask->link }}"
+   class="btn btn-info ri-link"
+   target="_blank">
+</a>
                         
                         </div>
                     </div>
@@ -163,11 +164,14 @@
 
         if (!r || !s) return;
 
-        if (status === "Not Applicable" || r.value === "Not Applicable") {
+        if (status === "Not Applicable" || r.value === "Not Applicable" || r.value === "") {
             r.style.display = "none";
             s.style.display = "none";
         }
     });
+
+   
+
 </script>
 
 @endsection
