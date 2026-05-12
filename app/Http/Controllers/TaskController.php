@@ -225,7 +225,7 @@ class TaskController extends Controller
     {
         $paps = Paps::all();
         $users = User::all();
-        $paptask = PapTask::all();
+        $paptask = Paptask::all();
         
 
         $newpap = DB::table('papmanagement')
@@ -764,7 +764,7 @@ class TaskController extends Controller
     {
         $paps = Paps::all();
         
-        $paptask = PapTask::all();
+        $paptask = Paptask::all();
 
         $paptasks = DB::table('paptask')
         ->join('paps', 'paptask.papID','=','paps.id')
