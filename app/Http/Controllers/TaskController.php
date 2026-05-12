@@ -33,11 +33,11 @@ class TaskController extends Controller
         $viewpap = DB::table('papmanagement')
             ->join('paps', 'papmanagement.papID', '=', 'paps.id')
             ->join('users', 'papmanagement.focal', '=', 'users.id')
-            ->join('fundSource', 'papmanagement.fundSource', '=', 'fundSource.id')
+            ->join('fundsource', 'papmanagement.fundsource', '=', 'fundsource.id')
             ->join('divisions', 'papmanagement.divisionID', '=', 'divisions.id')
             ->join('outputsupported', 'papmanagement.oosID', '=', 'outputsupported.oosID')
             ->where('papmanagement.id', $papM)
-            ->select('papmanagement.*', 'paps.pap', 'users.name as focalPerson', 'fundSource.fundName as fundName', 'divisions.*', 'outputsupported.oosName')
+            ->select('papmanagement.*', 'paps.pap', 'users.name as focalPerson', 'fundsource.fundName as fundName', 'divisions.*', 'outputsupported.oosName')
             ->get();
 
       
@@ -50,9 +50,9 @@ class TaskController extends Controller
             ->join('paptask', 'tasks.task', '=', 'paptask.id')
             ->join('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
             ->join('users as focal', 'papmanagement.focal', '=', 'focal.id')
-            ->join('fundSource', 'papmanagement.fundSource', '=', 'fundSource.id')
+            ->join('fundsource', 'papmanagement.fundsource', '=', 'fundsource.id')
             ->where('papmanagement.id', $papM)
-            ->select('tasks.*','tasks.id as taskid', 'paps.pap', 'paptask.tasks', 'ASSIGNED.name as Assigned', 'focal.name as focalPerson', 'papmanagement.*', 'fundSource.fundName as fundName')
+            ->select('tasks.*','tasks.id as taskid', 'paps.pap', 'paptask.tasks', 'ASSIGNED.name as Assigned', 'focal.name as focalPerson', 'papmanagement.*', 'fundsource.fundName as fundName')
             ->get();
 
         return view('Task.task', ["fromtask" => $tasks , "viewpap" => $viewpap]);
@@ -115,7 +115,7 @@ class TaskController extends Controller
             'todate' => $request->editdateend,
             'location' => strtoupper($request->editlocation),
             'fromdate' => $request->editdatefrom,
-            'fundSource' => $request->editfunds,
+            'fundsource' => $request->editfunds,
             'divisionID' => $request->editdivisionSelect,
             'oosID' => $request->editoosSelect,
         ]);
@@ -131,7 +131,7 @@ class TaskController extends Controller
                 'todate' => $request->dateend,
                 'location' => strtoupper($request->location),
                 'fromdate' => $request->datefrom,
-                'fundSource' => $request->funds,
+                'fundsource' => $request->funds,
                 'divisionID' => $request->divisionSelect,
                 'sectorID' => $request->sectorselect,
                 'oosID' => $request->oosSelect,
@@ -178,12 +178,12 @@ class TaskController extends Controller
             $newtask = DB::table('papmanagement')
             ->join('paps', 'papmanagement.papID', '=', 'paps.id')
             ->join('users', 'papmanagement.focal', '=', 'users.id')
-            ->join('fundSource', 'papmanagement.fundSource', '=', 'fundSource.id')
+            ->join('fundsource', 'papmanagement.fundsource', '=', 'fundsource.id')
             ->join('divisions', 'papmanagement.divisionID', '=', 'divisions.id')
             ->join('outputsupported', 'papmanagement.oosID', 'outputsupported.oosID')
             ->whereYear('papmanagement.fromdate', $Year)
             ->whereMonth('papmanagement.fromdate', $Month)
-            ->select('papmanagement.id as newID','papmanagement.*', 'paps.pap', 'users.name as focalPerson', 'fundSource.fundName as fundName', 'divisions.*', 'outputsupported.oosName')
+            ->select('papmanagement.id as newID','papmanagement.*', 'paps.pap', 'users.name as focalPerson', 'fundsource.fundName as fundName', 'divisions.*', 'outputsupported.oosName')
             ->get();
 
     
