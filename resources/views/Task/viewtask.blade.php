@@ -116,29 +116,40 @@
         <div class="col-md-3 col-lg-3">
             <div class="card shadow-lg border-0 rounded-4 ">
                 <div class="card-header bg-transparent  fw-bold py-2 px-3 rounded-10">
-                    Financial Details
+                    Obligation Details
                 </div>
-                <div class="card-body p-4 p-md-3">
+                <div class="card-body p-4 p-md-3 card-header">
 
-                    <div class="mb-2">
+                    
                         <label for="employeeName" class="form-label">Allocated from</label>
-                        <input type="text" class="form-control" value="{{$fromtask->allocatedbudget}}" readonly>
+                        
+                        <br>
+                        <label class="form-label fs-11">Program</label>
+                        <input  class="form-control " value="{{$fromtask->programname}}" readonly>
+
+                        <label class="form-label fs-11">Subprogram</label>
+                        <input  class="form-control " value="{{$fromtask->subprogramname}}" readonly>
+
+                        <label  class="form-label fs-11">OBEX</label>
+                        <input class="form-control " value="{{$fromtask->mooeName}}" readonly>
                     </div>
+
+                   <hr class="border-3 border-dark my-4">
+                        
+                     <div class="card-body p-4 p-md-3 card-header">
+                   
                     <div class="mb-2">
-                        <label for="employeeName" class="form-label">Budget</label>
-                        <input type="text" class="form-control" value="{{$fromtask->budget}}" readonly>
+                        <label for="employeeName" class="form-label">Obligated amount</label>
+                        <div class="input-group">
+                        <label class="input-group-text">₱ </label>
+                        <input class="form-control text-end" value="{{number_format($fromtask->obligatedbudget,2)}}" readonly>
+                        </div>
                     </div>
-                    <div class="mb-2">
-                        <label for="employeeName" class="form-label">Costing</label>
-                        <input type="text" class="form-control" value="{{$fromtask->costing}}" readonly>
-                    </div>
-                    <div class="mb-2">
-                        <label for="employeeName" class="form-label">Remaining</label>
-                        <input type="text" class="form-control" value="{{$fromtask->remaining}}" readonly>
-                    </div>
+                    
 
                 </div>
             </div>
+  
         </div>
 
 

@@ -6,7 +6,7 @@
 
 <div class="d-flex justify-content-center align-items-center mb-4">
     {{-- PREVIOUS --}}
-    <a href="{{ route('monitoring', [
+    <a href="{{ route('task disposition', [
         'year' => $Month == 1 ? $Year - 1 : $Year,
         'month' => $Month == 1 ? 12 : $Month - 1
     ]) }}" class="btn btn-outline-primary me-2">
@@ -19,7 +19,7 @@
     </span>
 
     {{-- NEXT --}}
-    <a href="{{ route('monitoring', [
+    <a href="{{ route('task disposition', [
         'year' => $Month == 12 ? $Year + 1 : $Year,
         'month' => $Month == 12 ? 1 : $Month + 1
     ]) }}" class="btn btn-outline-primary ms-2">
@@ -206,6 +206,8 @@ Assign Task
 
 </div>
 
+
+
 <div>
     <!-- add pap modal -->
     <div class="modal fade" id="addPapModal" tabindex="-1" aria-labelledby="addPapModalLabel" aria-hidden="true">
@@ -225,6 +227,7 @@ Assign Task
                                 @foreach($papOptions as $option)
                                 <option value="{{ $option->id }}">{{ $option->pap }}</option>
                                 @endforeach
+                                <option value="addpap" data-bs-toggle="modal" data-bs-target="#addPapModals" data-bs-dismiss="modal">--Add PAP--</option>
                             </select>
                         </div>
                         <div class="mb-3">
@@ -245,14 +248,13 @@ Assign Task
                             </div>
                         </div>
                         <div class="mb-3">
-                            <div class="d-flex gap-2">
+                           
                             <div class="flex-grow-1">
-                                <label for="divisionSelect" class="form-label">Assign Sector <span class="text-danger">*</span></label>
-                                <select class="form-select" id="sectorselect" name="sectorselect" required>
+                                
+                                <select class="form-select" id="sectorselect" name="sectorselect" hidden>
                                     <option value="" disabled selected>-- Select Sector --</option>
-                                    @foreach($sector as $sectors)
-                                    <option value="{{ $sectors->id }}">{{ $sectors->sector_long_name }} ({{$sectors->sector_short_name}})</option>
-                                    @endforeach
+                                    <option value="{{ Auth::user()->sectorID }}"></option>
+                                    
                                 </select>
 
                             </div>
@@ -260,12 +262,10 @@ Assign Task
                                 <label for="divisionSelect" class="form-label">Assign Division <span class="text-danger">*</span></label>
                                 <select class="form-select" id="divisionSelect" name="divisionSelect" required>
                                     <option value="" disabled selected>-- Select Division --</option>
-                                    @foreach($division as $divisions)
-                                    <option value="{{ $divisions->id }}">{{ $divisions->division_name }} ({{$divisions->division_short_name}})</option>
-                                    @endforeach
+                                    
                                 </select>
                             </div>
-                            </div>
+                            
                         </div>
 
                         <div class="mb-3">
@@ -319,6 +319,26 @@ Assign Task
 
 
 </div>
+
+<form action="{{ route('createPAP') }}" method="POST">
+    @csrf
+    <div class="modal fade" id="addPapModals">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5>New PAP</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" name="pap" class="form-control" placeholder="Enter PAP" required>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" name="action" value="pap">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
 
 {{-- edit pap modal --}}
 
@@ -439,6 +459,8 @@ Assign Task
             dropdownDivider.style.display = 'none';
         }
 
+        
+
 
         document.querySelectorAll('.editPapLink').forEach(link => {
             link.addEventListener('click', function() {
@@ -468,8 +490,57 @@ Assign Task
             });
         });
 
+        document.getElementById("papName").addEventListener("change", function(){
+
+        if(this.value === "addpap"){
+
+                let modal = new bootstrap.Modal(document.getElementById("addPapModals"));
+                modal.show();
+
+                this.value = ""; // reset select
+
+            }
+
+        });
 
 
+    const inputsector = document.getElementById('sectorselect');
+    const inputdivision= document.getElementById('divisionSelect');
+    const sector = {!! json_encode($sector) !!};
+    const division = {!! json_encode($division) !!};
+
+    
+
+    inputsector.addEventListener('change', function () {
+
+        const programID = this.value;
+
+        inputdivision.innerHTML = '<option value="">--Select Division--</option>';
+
+        division.forEach(div => {
+
+            if(div.sectorID == programID){
+
+                let option = document.createElement('option');
+                option.value = div.id;
+                option.textContent = div.division_name + "("+div.division_short_name+")";
+
+                inputdivision.appendChild(option);
+
+            }
+
+        });
+
+    });
+
+    
+         if (!inputsector.value) {
+        inputsector.selectedIndex = 1; // selects first real option
+    }
+
+    inputsector.dispatchEvent(new Event('change'));
+
+   
 
     });
 

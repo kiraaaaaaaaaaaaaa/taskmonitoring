@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class adjustedhistory extends Model
+{
+    use HasFactory;
+    protected $table = 'adjustedhistory';
+   protected $fillable = [
+        'toobexID',
+        'fromobexID',
+        'adjustedamount',
+        'created_at',
+       
+    ];
+}

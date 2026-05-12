@@ -22,18 +22,18 @@
                     </div>
 
                     <div class="table-responsive table-card mt-3 mb-1">
-                        <table class="table align-middle table-nowrap" id="customerTable">
+                        <table class="table align-middle table-nowrap table-sm" id="customerTable">
                             <thead class="table-light">
                                 <tr>
                                     <th class="d-none">ID</th>
-                                    <th class="">Sector</th>
-                                    <th class="">Division</th>
+                                    <th class="">Sector/Division</th>
+                                    {{-- <th class="">Division</th> --}}
 
                                 </tr>
                             </thead>
                             <tbody class="list form-check-all">
                                 @foreach($sector as $sectors)
-                                <tr>
+                                <tr class="bg-info-subtle text-primary">
 
 
                                     <td class="d-none">{{$sectors->id}}</td>
@@ -67,6 +67,8 @@
                                         </div>
 
                                     </td>
+                                </tr>
+                                <tr>
                                     <td>
 
                                         @foreach($divisions as $division)
@@ -74,8 +76,8 @@
 
                                         <div class="d-flex align-items-center justify-content-between">
                                             
-                                            <span class="text-primary">
-                                                {{ $division->division_name }} ({{ $division->division_short_name }})
+                                            <span class="fs-11 px-5">
+                                               {{ $division->division_name }} ({{ $division->division_short_name }})
                                             </span>
 
                                            

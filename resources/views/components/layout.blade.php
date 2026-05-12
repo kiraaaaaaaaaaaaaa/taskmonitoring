@@ -4,7 +4,7 @@
 <head>
 
     <meta charset="utf-8" />
-    <title>BROTHER</title>
+    <title>{{ Str::title(str_replace('.', ' ', Route::currentRouteName())) }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="Themesbrand" name="author" />
@@ -186,7 +186,7 @@
 
                         </li> <!-- end Dashboard Menu -->
                         <li class="nav-item">
-                            <a class="nav-link menu-link" href="{{route('monitoring')}}" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
+                            <a class="nav-link menu-link" href="{{route('task disposition')}}" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
                                 <i class="mdi mdi-view-grid-plus-outline"></i> <span data-key="t-apps">Task Disposition</span>
                             </a>
 
@@ -214,12 +214,12 @@
                         </li>
                         
 
-                         <li class="nav-item">
+                         {{-- <li class="nav-item">
                             <a class="nav-link menu-link" href="/reports" role="button" aria-expanded="false" aria-controls="sidebarPages">
                                 <i class="mdi mdi-sticker-text-outline"></i> <span data-key="t-pages">Reports</span>
                             </a>
 
-                        </li>
+                        </li> --}}
 
                        
 
@@ -246,6 +246,12 @@
                                     <li class="nav-item">
                                         <a class="nav-link menu-link" href="{{route('sector management')}}" role="button" aria-expanded="false" aria-controls="sidebarLanding">
                                             <i class="ri-rocket-line"></i> <span data-key="t-landing">Sector</span>
+                                        </a>
+
+                                    </li>
+                                     <li class="nav-item">
+                                        <a class="nav-link menu-link" href="{{route('obex management')}}" role="button" aria-expanded="false" aria-controls="sidebarLanding">
+                                            <i class="ri-rocket-line"></i> <span data-key="t-landing">Program/Sub-program/OBEX</span>
                                         </a>
 
                                     </li>

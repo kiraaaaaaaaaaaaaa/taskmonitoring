@@ -20,5 +20,6 @@ class createdPAP extends Model
         'fundSource',
         'divisionID',
         'sectorID',
+        'oosID'
     ];
 }

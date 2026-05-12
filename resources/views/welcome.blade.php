@@ -1,9 +1,37 @@
 @extends('components.layout')
 @section('content')
 <div class="row g-3">
+<style>
+.circular-progress{
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: conic-gradient(#0d6efd calc(var(--value) * 1%), #aec6de 0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.circular-progress::before{
+    content: "";
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: white;
+}
+
+.progress-value{
+    position: relative;
+    font-size: 18px;
+    font-weight: 600;
+    color: #0d6efd;
+}
+</style>
     <!-- main row for spacing -->
 
-    @php
+    {{-- @php
     $total = 0;
     $totalcost = 0;
 
@@ -29,7 +57,7 @@
     $totalprogs = $totalpercent >= 80
     ? 'excellent'
     : ($totalpercent >= 50 ? 'average' : 'poor');
-    @endphp
+    @endphp --}}
 
 
 
@@ -37,50 +65,9 @@
         <div class="card card-animate">
             <div class="card-body d-flex justify-content-between">
                 <div>
-                    <p class="fw-medium text-muted mb-0">Total Budget</p>
+                    <p class="fw-medium text-muted mb-0 fs-11">APPROVED BUDGET FOR FY {{ date('Y') }}</p>
                     <h2 class="mt-4 ff-secondary fw-semibold">
-                        <span>{{number_format($total,2)}}</span>
-                    </h2>
-
-                </div>
-                <div class="avatar-sm flex-shrink-0">
-                    <span class="avatar-title bg-secondary rounded-circle fs-2">
-                        <i class="ri-funds-line"></i>
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-
-    <div class="col-md-3">
-        <div class="card card-animate">
-            <div class="card-body d-flex justify-content-between">
-                <div>
-                    <p class="fw-medium text-muted mb-0">Utilized Budget</p>
-                    <h2 class="mt-4 ff-secondary fw-semibold">
-                        <span>{{number_format($totalcost,2)}}</span>
-                    </h2>
-
-                </div>
-                <div class="avatar-sm flex-shrink-0">
-                    <span class="avatar-title bg-secondary rounded-circle fs-2">
-                        <i data-feather="activity"></i>
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-3">
-        <div class="card card-animate">
-            <div class="card-body d-flex justify-content-between">
-                <div>
-                    <p class="fw-medium text-muted mb-0">Remaining</p>
-                    <h2 class="mt-4 ff-secondary fw-semibold">
-                        <span>{{number_format(($total - $totalcost),2)}}</span>
-
+                        {{number_format($fybudget[0]->grandtotal,2)}}
                     </h2>
 
                 </div>
@@ -93,27 +80,72 @@
         </div>
     </div>
 
+
+
     <div class="col-md-3">
+        <div class="card card-animate">
+            <div class="card-body d-flex justify-content-between">
+                <div>
+                    <p class="fw-medium text-muted mb-0 fs-11">UTILIZED BUDGET</p>
+                    <h2 class="mt-4 ff-secondary fw-semibold">
+                        {{number_format($totalobligation[0]->totalobligation,2)}}
+                    </h2>
+
+                </div>
+                <div class="avatar-sm flex-shrink-0">
+                    <span class="avatar-title bg-secondary rounded-circle fs-2">
+                        <div class="d-flex justify-content-center">
+
+                            <div class="circular-progress" style="--value:{{number_format($totalobligation[0]->totalobligation/$fybudget[0]->grandtotal*100,2)}}">
+                               
+                            </div>
+
+                        </div>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- <div class="col-md-3">
+        <div class="card card-animate">
+            <div class="card-body d-flex justify-content-between">
+                <div>
+                    <p class="fw-medium text-muted mb-0">Remaining</p>
+                    <h2 class="mt-4 ff-secondary fw-semibold">
+                      
+
+                    </h2>
+
+                </div>
+                <div class="avatar-sm flex-shrink-0">
+                    <span class="avatar-title bg-secondary rounded-circle fs-2">
+                        <i class="ri-wallet-line"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div> --}}
+
+    {{-- <div class="col-md-3">
         <div class="card card-animate">
             <div class="card-body d-flex justify-content-between">
                 <div>
                     <p class="fw-medium text-muted mb-0">Utilization Rate</p>
                     <h2 class="mt-4 ff-secondary fw-semibold">
-                        <span class="float-end px-1">{{$totalpercent}}%</span>
+                       
                     </h2>
                     <p class="mb-0 text-muted">
 
                     </p>
                 </div>
                 <div class="avatar-sm flex-shrink-0">
-                    <span class="avatar-title {{$totalprog}} rounded-circle fs-10 float-end text-uppercase">
-                        {{$totalprogs}}
-                    </span>
+                    
 
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 
 
@@ -181,14 +213,14 @@
 
                     <table class="table align-middle table-hover fs-12">
 
-                        <thead class="table-light">
-                            <tr>
+                        <thead class="table-light ">
+                            <tr class="fs-11">
                                 <th>PAP</th>
-                                <th>Task</th>
-                                <th>Progress</th>
-                                <th>Assigned</th>
-                                <th>Status</th>
-                                <th>Due Date</th>
+                                <th>TASK</th>
+                                <th>PROGRESS</th>
+                                <th>ASSIGNED</th>
+                                <th>STATUS</th>
+                                <th>DUE DATE</th>
                             </tr>
                         </thead>
 

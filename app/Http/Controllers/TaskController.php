@@ -10,7 +10,11 @@ use App\Models\createdPAP;
 use App\Models\divisions;
 use App\Models\fundSource;
 use App\Models\ooSupported;
+use app\Models\mooe;
+use App\Models\mooe as ModelsMooe;
 use App\Models\Sector;
+use App\Models\SectorProgram;
+use App\Models\Subprogram;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -59,6 +63,12 @@ class TaskController extends Controller
     {
         $now = Carbon::now();
 
+        $totalmooe = DB::table('mooe')
+            ->select(DB::raw('SUM(budgetallotment) as grandtotal, SUM(adjustedbudget) as totaladjusted'))
+            ->get();
+        $totalobligation = DB::table('tasks')
+        ->select(DB::raw('SUM(tasks.obligatedbudget) AS totalobligation'))
+        ->get();
 
         $monthtask = DB::table('tasks')
             ->join('users', 'tasks.assigned', '=', 'users.id')
@@ -71,16 +81,16 @@ class TaskController extends Controller
 
 
 
-        $budget = DB::table('budget')
-            ->join('paps', 'budget.budgetPAP', '=', 'paps.id')
-            ->leftJoin('tasks', 'budget.id', '=', 'tasks.allocatedbudget')
-            ->select(
-                'budget.*',
-                'paps.pap',
-                DB::raw('SUM(tasks.costing) AS total')
-            )
-            ->groupBy('budget.id')
-            ->get();
+        // $budget = DB::table('budget')
+        //     ->join('paps', 'budget.budgetPAP', '=', 'paps.id')
+        //     ->leftJoin('tasks', 'budget.id', '=', 'tasks.allocatedbudget')
+        //     ->select(
+        //         'budget.*',
+        //         'paps.pap',
+        //         DB::raw('SUM(tasks.costing) AS total')
+        //     )
+        //     ->groupBy('budget.id')
+        //     ->get();
 
         $task = createdPAP::join('paps', 'papmanagement.papID', '=', 'paps.id')
             ->select('papmanagement.*', 'paps.pap')
@@ -88,7 +98,7 @@ class TaskController extends Controller
             ->get();
 
 
-        return view('welcome', ["budget" => $budget, "task" => $task, "monthtask" => $monthtask]);
+        return view('welcome', ["task" => $task, "monthtask" => $monthtask, "fybudget" => $totalmooe, "totalobligation" => $totalobligation]);
     }
 
     // for creating new PAP(papmangement.blade)
@@ -262,6 +272,21 @@ class TaskController extends Controller
             ]);
         }
 
+        if($request->action === 'editpap')
+            {
+                  Paps::where('id', $request->PAP)->update([
+            'pap' => $request->task,
+                  ]);
+            }
+
+        if($request->action === 'edittask')
+            {
+                  paptask::where('id', $request->PAP)->update([
+            'tasks' => $request->task,
+                  ]);
+            }
+            
+
 
 
         return back()->with('success', 'Saved successfully');
@@ -273,59 +298,78 @@ class TaskController extends Controller
         Paps::where('id', $id)->delete();
         return back()->with('success', 'Deleted successfully');
     }
+    public function deleteTasks($id)
+    {
+        paptask::where('id', $id)->delete();
+        return back()->with('success', 'Deleted successfully');
+    }
 
     // viewing of individual task(viewtask.blade)
     public function viewTask($id)
     {
         $tasks = DB::table('tasks')
-            ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
-            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
-            ->join('paptask', 'tasks.task', '=', 'paptask.id')
-            ->join('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
-            ->leftJoin('users as r1', 'tasks.reviewer1', '=', 'r1.id')
-            ->leftJoin('users as r2', 'tasks.reviewer2', '=', 'r2.id')
-            ->leftJoin('users as r3', 'tasks.reviewer3', '=', 'r3.id')
-            ->leftJoin('users as r4', 'tasks.reviewer4', '=', 'r4.id')
-            ->leftJoin('users as r5', 'tasks.reviewer5', '=', 'r5.id')
-            ->select(
-                'tasks.*',
-                'paps.pap',
-                'paptask.tasks',
+    ->leftjoin('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
+    ->leftjoin('paps', 'papmanagement.papID', '=', 'paps.id')
+    ->leftjoin('paptask', 'tasks.task', '=', 'paptask.id')
+    ->leftjoin('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
+    ->leftJoin('users as r1', 'tasks.reviewer1', '=', 'r1.id')
+    ->leftJoin('users as r2', 'tasks.reviewer2', '=', 'r2.id')
+    ->leftJoin('users as r3', 'tasks.reviewer3', '=', 'r3.id')
+    ->leftJoin('users as r4', 'tasks.reviewer4', '=', 'r4.id')
+    ->leftJoin('users as r5', 'tasks.reviewer5', '=', 'r5.id')
+    ->leftjoin('mooe', 'tasks.allocatedbudget', '=', 'mooe.mooeID')
+    ->leftJoin('subprogram', 'mooe.subprogramID', '=', 'subprogram.id')
+    ->leftJoin('sectorprogram', 'subprogram.programID', '=', 'sectorprogram.id')
+    ->select(
+        'tasks.*',
+        'paps.pap',
+        'paptask.tasks',
 
-                'ASSIGNED.name as Assigned',
-                'r1.name as rv1',
-                'r2.name as rv2',
-                'r3.name as rv3',
-                'r4.name as rv4',
-                'r5.name as rv5',
-            )
-            ->where('tasks.id', $id)
-            ->first();
+        'ASSIGNED.name as Assigned',
+        'r1.name as rv1',
+        'r2.name as rv2',
+        'r3.name as rv3',
+        'r4.name as rv4',
+        'r5.name as rv5',
+
+        'mooe.mooeName',
+        'mooe.mooeID',
+
+        'subprogram.id as subprogram_id',
+        'subprogram.subprogramname',
+
+        'sectorprogram.id as program_id',
+        'sectorprogram.programname'
+    )
+    ->where('tasks.id', $id)
+    ->first();
         return view('Task.viewtask', ["fromtask" => $tasks]);
     }
 
     // for viewing the update task page(updatetask.blade)
     public function viewupdateTask($id)
     {
-       
-        $budgetoption = DB::table('budget')
-            ->join('paps', 'budget.budgetPAP', '=', 'paps.id')
-            ->select('budget.*', 'paps.pap')
-            ->get();
 
+       
+        $program = SectorProgram::all();
+        $subprogram = Subprogram::all();
+        $mooe = ModelsMooe::all();
 
         $tasks = DB::table('tasks')
-            ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
-            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->leftjoin('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
+            ->leftjoin('paps', 'papmanagement.papID', '=', 'paps.id')
             ->leftjoin('budget', 'tasks.allocatedbudget', '=', 'budget.id')
             ->leftjoin('paps as budgetpap', 'budget.budgetPAP', '=', 'budgetpap.id')
-            ->join('paptask', 'tasks.task', '=', 'paptask.id')
-            ->join('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
+            ->leftjoin('paptask', 'tasks.task', '=', 'paptask.id')
+            ->leftjoin('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
             ->leftJoin('users as r1', 'tasks.reviewer1', '=', 'r1.id')
             ->leftJoin('users as r2', 'tasks.reviewer2', '=', 'r2.id')
             ->leftJoin('users as r3', 'tasks.reviewer3', '=', 'r3.id')
             ->leftJoin('users as r4', 'tasks.reviewer4', '=', 'r4.id')
             ->leftJoin('users as r5', 'tasks.reviewer5', '=', 'r5.id')
+            ->leftjoin('mooe', 'tasks.allocatedbudget', '=', 'mooe.mooeID')
+            ->leftJoin('subprogram', 'mooe.subprogramID', '=', 'subprogram.id')
+            ->leftJoin('sectorprogram', 'subprogram.programID', '=', 'sectorprogram.id')
             ->select(
                 'tasks.*',
                 'paps.pap',
@@ -340,13 +384,21 @@ class TaskController extends Controller
                 'r5.name as rv5',
                 'papmanagement.fromdate as papdate',
                 'papmanagement.todate as papdateend',
+
+                'subprogram.id as subprogram_id',
+                'subprogram.subprogramname',
+                'mooe.mooeID',
+
+                'sectorprogram.id as program_id',
+                'sectorprogram.programname',
+                'mooe.mooeName'
             )
             ->where('tasks.id', $id)
             ->first();
 
            
-
-        return view('Task.updatetask', ["fromtask" => $tasks, "budgetoption" => $budgetoption]);
+       
+        return view('Task.updatetask', ["fromtask" => $tasks, "program" => $program, "subprogram"=>$subprogram, "mooe"=>$mooe]);
     }
 
     // for my task page(mytask.blade)
@@ -650,7 +702,7 @@ class TaskController extends Controller
             ]);
         }
         // Task::create($validate);
-        return redirect()->route('monitoring')->with('success', 'Task(s) created successfully.');
+        return redirect()->route('task disposition')->with('success', 'Task(s) created successfully.');
     }
 
     /**
@@ -676,6 +728,7 @@ class TaskController extends Controller
     // for updating task(updatetask.blade)
     public function update(Request $request)
     {
+       
 
         Task::where('id', $request->id)->update([
 
@@ -686,10 +739,12 @@ class TaskController extends Controller
             'status3' => $request->status3,
             'status4' => $request->status4,
             'status5' => $request->status5,
-            'allocatedbudget' => $request->allocatedbugdet,
-            'budget' => $request->budget,
-            'costing' => $request->costing,
+            'allocatedbudget' => $request->mooe,
+            
+            'obligatedbudget' => $request->budget,
         ]);
+
+
 
         
              return redirect()->route('my task')->with('success', 'Task updated successfully.');
@@ -711,6 +766,13 @@ class TaskController extends Controller
         
         $paptask = PapTask::all();
 
+        $paptasks = DB::table('paptask')
+        ->join('paps', 'paptask.papID','=','paps.id')
+        ->select(['paptask.*', 'paps.pap'])
+        ->get();
+
+       
+      
         $tasksByPap = $paptask
             ->groupBy('papID')
             ->map(function ($tasks) {
@@ -726,7 +788,8 @@ class TaskController extends Controller
             'paps',
            
             'paptask',
-            'tasksByPap'
+            'tasksByPap',
+            'paptasks'
         ));
     }
 }

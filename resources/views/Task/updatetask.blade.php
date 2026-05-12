@@ -18,7 +18,7 @@
                 <div class="card-body p-4 p-md-5 ">
                 
                        
-                        <input class="form-control" name="id" value="{{$fromtask->id}}" hidden>
+                    <input class="form-control" name="id" value="{{$fromtask->id}}" hidden>
                    
                     <div class="mb-3">
                         <label for="employeeName" class="form-label">PAP</label>
@@ -146,33 +146,44 @@
         <div class="col-md-3 col-lg-3">
             <div class="card shadow-lg border-0 rounded-4 ">
                 <div class="card-header bg-transparent  fw-bold py-2 px-3 rounded-10">
-                    Financial Details
+                    Obligation Details
                 </div>
-                <div class="card-body p-4 p-md-3">
+                <div class="card-body p-4 p-md-3 card-header">
 
-                    <div class="mb-2">
+                    
                         <label for="employeeName" class="form-label">Allocated from</label>
-                        <select class="form-control"name="allocatedbugdet">
-                            <option value="{{$fromtask->budgetPAP}}">{{$fromtask->budgetpapname}}</option>
-                            @foreach($budgetoption as $bdoptions)
-                                <option value="{{$bdoptions->id}}">{{$bdoptions->pap}}</option>
+                        
+                        <br>
+                        <label class="form-label fs-11">Program</label>
+                        <select class="form-control"name="program" id="program">
+                            <option value="{{$fromtask->program_id}}">{{$fromtask->programname}}</option>
+                            @foreach($program as $programsoption)
+                                <option value="{{$programsoption->id}}">{{$programsoption->programname}}</option>
                             @endforeach
                             
                         </select>
+                        <label class="form-label fs-11">Subprogram</label>
+                        <select class="form-control"name="subprogram" id="subprogram">
+                           <option value="{{$fromtask->subprogram_id}}">{{$fromtask->subprogramname}}</option>
+                        </select>
+                        <label  class="form-label fs-11">OBEX</label>
+                        <select class="form-control"name="mooe" id="mooe">
+                           <option value="{{$fromtask->mooeID}}">{{$fromtask->mooeName}}</option>
+                        </select>
+                    </div>
+
+                   <hr class="border-3 border-dark my-4">
                         
-                    </div>
+                     <div class="card-body p-4 p-md-3 card-header">
+                   
                     <div class="mb-2">
-                        <label for="employeeName" class="form-label">Budget</label>
-                        <input type="text" class="form-control" name="budget" value="{{$fromtask->budget}}">
+                        <label for="employeeName" class="form-label">Obligated amount</label>
+                        <div class="input-group">
+                        <label class="input-group-text">₱ </label>
+                        <input type="number" class="form-control text-end" name="budget" value="{{$fromtask->obligatedbudget}}">
+                        </div>
                     </div>
-                    <div class="mb-2">
-                        <label for="employeeName" class="form-label">Costing</label>
-                        <input type="text" class="form-control" name="costing" value="{{$fromtask->costing}}">
-                    </div>
-                    <div class="mb-2">
-                        <label for="employeeName" class="form-label">Remaining</label>
-                        <input type="text" class="form-control" value="{{$fromtask->remaining}}" readonly>
-                    </div>
+                    
 
                 </div>
             </div>
@@ -208,7 +219,71 @@
         }
     });
 
+
+document.addEventListener('DOMContentLoaded', () => {
+
+   
+
+    const inputprogram = document.getElementById('program');
+    const inputsubprogram = document.getElementById('subprogram');
+    const inputmooe = document.getElementById('mooe');
+
+    const program = {!! json_encode($program) !!};
+    const subprogram = {!! json_encode($subprogram) !!};
+    const mooe = {!! json_encode($mooe) !!};
+
+
+    inputprogram.addEventListener('change', function () {
+
+        const programID = this.value;
+
+        inputsubprogram.innerHTML = '<option value="">--Select Subprogram--</option>';
+
+        subprogram.forEach(sub => {
+
+            if(sub.programID == programID){
+
+                let option = document.createElement('option');
+                option.value = sub.id;
+                option.textContent = sub.subprogramname;
+
+                inputsubprogram.appendChild(option);
+
+            }
+
+        });
+
+        inputmooe.innerHTML = '<option value="">--Select OBEX--</option>';
+
+    });
+
+
+    inputsubprogram.addEventListener('change', function () {
+
+        const subprogramID = this.value;
+
+        inputmooe.innerHTML = '<option value="">--Select OBEX--</option>';
+
+        mooe.forEach(ob => {
+
+            if(ob.subprogramID == subprogramID){
+
+                let option = document.createElement('option');
+                option.value = ob.mooeID;
+                option.textContent = ob.mooeName;
+
+                inputmooe.appendChild(option);
+
+            }
+
+        });
+
+    });
+
+});
 </script>
+
+
 
 
 @endsection

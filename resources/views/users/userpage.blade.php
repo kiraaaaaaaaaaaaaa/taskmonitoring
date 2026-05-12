@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="table-responsive table-card mt-3 mb-1">
-                        <table class="table align-middle table-nowrap" id="customerTable">
+                        <table class="table align-middle table-nowrap table-sm" id="customerTable">
                             <thead class="table-light">
                                 <tr>
                                     <th class="d-none">ID</th>
@@ -123,9 +123,10 @@
 
                         <select class="form-select shadow-sm" name="division" id="divi-field">
                            
-                            @foreach($divisions as $division)
-                            <option value="{{$division->id}}">{{$division->division_name}} ({{$division->division_short_name}})</option>
+                           @foreach($divisions as $sect)
+                            <option value="{{$sect->id}}">{{$sect->division_name}} ({{$sect->division_short_name}})</option>
                             @endforeach
+                           
                         </select>
 
                     </div>
@@ -189,6 +190,35 @@
             // Password intentionally left blank for security
 
         });
+
+        const inputsector = document.getElementById('sector-field');
+    const inputdivision= document.getElementById('divi-field');
+    const sector = {!! json_encode($sector) !!};
+    const division = {!! json_encode($divisions) !!};
+
+    
+
+    inputsector.addEventListener('change', function () {
+
+        const programID = this.value;
+
+        inputdivision.innerHTML = '<option value="">--Select Division--</option>';
+
+        division.forEach(div => {
+
+            if(div.sectorID == programID){
+
+                let option = document.createElement('option');
+                option.value = div.id;
+                option.textContent = div.division_name + "("+div.division_short_name+")";
+
+                inputdivision.appendChild(option);
+
+            }
+
+        });
+
+    });
 
     });
 

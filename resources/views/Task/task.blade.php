@@ -19,6 +19,8 @@
             <p class="text-muted">
                 {{ $viewpaps->location }} | {{ \Carbon\Carbon::parse($viewpaps->fromdate)->format('F d ') }} to {{ \Carbon\Carbon::parse($viewpaps->todate)->format(' d, Y') }}
             <br>
+                Assigned division: {{ $viewpaps->division_name }} ({{ $viewpaps->division_short_name }})
+            <br>
                 Focal Person: {{ $viewpaps->focalPerson }}
             <br>
                 Fund Source: {{ $viewpaps->fundName }}
@@ -27,6 +29,7 @@
             <br>
             <br> 
                  {{ $viewpaps->description }}
+            
             
             </p>
         </div>
@@ -90,14 +93,7 @@
                             </p>
 
                             <div class="mb-3">
-                                <div class="d-flex mb-1">
-                                    <div class="flex-grow-1">
-                                        <h6 class="text-muted mb-0">
-                                            <span class="text-info">{{ round($percent) }}%</span> of 100%
-                                        </h6>
-                                    </div>
-                                </div>
-
+                              
                                 <div class="progress rounded-3 progress-sm progress-bar-animated">
                                     <div class="progress-bar {{ $progressClass }}" role="progressbar" style="width: {{ $percent }}%" aria-valuenow="{{ $percent }}" aria-valuemin="0" aria-valuemax="100">
                                     </div>
@@ -109,7 +105,7 @@
                             <div class="d-flex">
                                 <div class="flex-grow-1">
                                     <h6 class="text-muted mb-0">
-                                        {{ $task->activitydate }}
+                                        <span class="fs-10">TARGET DATE - </span> <span class="text-info">{{ $task->duedate }}</span>
                                     </h6>
                                 </div>
                             </div>
