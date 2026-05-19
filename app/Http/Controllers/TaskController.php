@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Paps;
-use App\Models\paptask;
+use App\Models\Paptask;
 use App\Models\Budget;
 use App\Models\createdPAP;
 use App\Models\divisions;

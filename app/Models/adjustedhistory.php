@@ -14,6 +14,7 @@ class adjustedhistory extends Model
         'fromobexID',
         'adjustedamount',
         'created_at',
+        'updated_at'
        
     ];
 }

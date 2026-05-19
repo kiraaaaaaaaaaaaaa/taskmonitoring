@@ -210,7 +210,8 @@ class BudgetController extends Controller
                 'fromobeID' => $request->fromobex,
                 'toobexID' => $request->toobex,
                 'adjustedamount' => $request->allocatedbudget,
-                'created_at' => now()
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
 
         //add adjustment
