@@ -457,7 +457,7 @@
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
 
-            <form method="POST">
+            <form method="POST" action="{{ route('adjustbudget') }}">
                 @csrf
 
                 <div class="modal-header">
