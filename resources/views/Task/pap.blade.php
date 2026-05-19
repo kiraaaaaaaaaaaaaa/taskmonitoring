@@ -157,10 +157,14 @@ Assign Task
                                                 Add Task
                                             </a>
 
-                                            <a class="dropdown-item" href="#" id="deletepapbtn">
-                                                <i class="ri-subtract-fill align-bottom me-2 text-muted"></i>
-                                                Remove PAP
-                                            </a>
+                                            <form action="/Task/pap/{{ $task->newID }}" method="POST" style="display: inline;">
+                                                @csrf
+                                                
+                                                <button type="submit" class="dropdown-item" onclick="return confirm('Are you sure you want to remove this PAP?')">
+                                                    <i class="ri-subtract-fill align-bottom me-2 text-muted"></i>
+                                                    Remove PAP
+                                                </button>
+                                            </form>
                                             <a class="dropdown-item editPapLink" id="editPapLinkbtn" href="#" data-bs-toggle="modal" data-bs-target="#editPapModal" data-id="{{ $task->newID }}" data-papid="{{ $task->papID }}" data-pap="{{ $task->pap }}" data-location="{{ $task->location }}" data-datefrom="{{ $task->fromdate }}" data-dateend="{{$task->todate}}" data-description="{{ $task->description }}" data-focal="{{ $task->focal }}" data-fund="{{ $task->fundSource }}" data-division="{{$task->divisionID }}" data-oos="{{$task->oosID}}">
                                                 <i class="ri-pencil-fill align-bottom me-2 text-muted"></i>
                                                 Edit PAP

@@ -172,7 +172,7 @@ class TaskController extends Controller
                 DB::raw('MIN(tasks.activitydate) as first_activity'),
                 DB::raw('AVG(tasks.progressScore) as average_progress')
             )
-            ->groupBy('tasks.PAP', 'tasks.activitydate')
+            ->groupBy('tasks.PAP', 'tasks.activitydate', 'paps.pap')
             ->get();
 
             $newtask = DB::table('papmanagement')
@@ -254,6 +254,12 @@ class TaskController extends Controller
         ));
     }
 
+    public function removepaptask($id)
+    {
+        Task::where('id', $id)->delete();
+        return back()->with('success', 'Deleted successfully');
+    }
+
     // for creating new PAP(file management)
     public function createPAP(Request $request)
     {
@@ -301,6 +307,12 @@ class TaskController extends Controller
     public function deleteTasks($id)
     {
         paptask::where('id', $id)->delete();
+        return back()->with('success', 'Deleted successfully');
+    }
+    //for deleting pap in papmanagement
+    public function deletepapmanagement($id)
+    {
+        createdPAP::where('id', $id)->delete();
         return back()->with('success', 'Deleted successfully');
     }
 
@@ -488,7 +500,7 @@ class TaskController extends Controller
                 return Carbon::parse($task->activitydate)->toDateString();
             });
         }
-        return view('Task.mytask', [
+        return view('Task.toreview', [
             'groupedTasks' => $tasks
         ]);
     }

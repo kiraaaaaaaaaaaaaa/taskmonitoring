@@ -81,6 +81,15 @@
                                                 <i class="ri-eye-fill align-bottom me-2 text-muted"></i>
                                                 View
                                             </a>
+                                            
+                                            <form action="/Task/task/{{ $task->taskid }}" method="POST" style="display: inline;">
+                                                @csrf
+                                                
+                                                <button type="submit" class="dropdown-item" onclick="return confirm('Are you sure you want to remove this task?')">
+                                                    <i class="ri-minus-fill align-bottom me-2 text-muted"></i>
+                                                    Remove Task
+                                                </button>
+                                            </form>
                                         </li>
                                     </ul>
                                 </div>

@@ -48,6 +48,9 @@ class BudgetController extends Controller
             ->groupBy(
                 'sectorprogram.id',
                 'subprogram.id',
+                'subprogram.subprogramname',
+                'sectorprogram.programname',
+                
 
             )
             ->get();
@@ -79,7 +82,7 @@ class BudgetController extends Controller
 
                 DB::raw('SUM(tasks.obligatedbudget) AS totalbudget')
             )
-            ->groupBy('mooe.mooeID')
+            ->groupBy('mooe.mooeID', 'tasks.allocatedbudget',)
             ->get();
 
         $budgetperobex = DB::table('tasks')
@@ -109,7 +112,7 @@ class BudgetController extends Controller
             ->leftJoin('subprogram', 'mooe.subprogramID', '=', 'subprogram.id')
             ->leftJoin('sectorprogram', 'subprogram.programID', '=', 'sectorprogram.id')
             ->select(DB::raw('SUM(mooe.budgetallotment) as grandtotal, SUM(mooe.adjustedbudget) as totaladjusted'), 'mooe.subprogramID', 'mooe.type','sectorprogram.id', 'subprogram.id')
-            ->groupBy('sectorprogram.id', 'mooe.type', 'mooe.subprogramID')
+            ->groupBy('sectorprogram.id', 'mooe.type', 'mooe.subprogramID', 'subprogram.id')
             ->get();
         
         $totalobligationmooeperprogram = DB::table('tasks')
@@ -160,7 +163,7 @@ class BudgetController extends Controller
 
                 DB::raw('SUM(tasks.obligatedbudget) AS totalbudget')
             )
-            ->groupBy('capitaloutlay.coID')
+            ->groupBy('capitaloutlay.coID', 'tasks.allocatedbudget')
             ->get();
 
           

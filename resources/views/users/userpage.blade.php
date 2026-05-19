@@ -21,7 +21,7 @@
 
                     </div>
 
-                    <div class="table-responsive table-card mt-3 mb-1">
+                    <div class="table-responsive mt-3 mb-1">
                         <table class="table align-middle table-nowrap table-sm" id="customerTable">
                             <thead class="table-light">
                                 <tr>
@@ -56,6 +56,9 @@
                                 @endforeach
                             </tbody>
                         </table>
+                        <nav>
+                        <ul class="pagination justify-content-center" id="pagination"></ul>
+                    </nav>
                     </div>
                 </div>
             </div><!-- end card -->
@@ -157,6 +160,67 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        const rowsPerPage = 10;
+        const table = document.getElementById("customerTable");
+        const rows = table.querySelectorAll("tbody tr");
+        const pagination = document.getElementById("pagination");
+
+        let currentPage = 1;
+        const totalPages = Math.ceil(rows.length / rowsPerPage);
+
+        function displayRows(page) {
+
+            rows.forEach((row, index) => {
+
+                row.style.display =
+                    (index >= (page - 1) * rowsPerPage &&
+                        index < page * rowsPerPage) ?
+                    "" :
+                    "none";
+            });
+        }
+
+        function setupPagination() {
+
+            pagination.innerHTML = "";
+
+            for (let i = 1; i <= totalPages; i++) {
+
+                const li = document.createElement("li");
+                li.className = "page-item";
+
+                if (i === currentPage) {
+                    li.classList.add("active");
+                }
+
+                const a = document.createElement("a");
+                a.className = "page-link";
+                a.href = "#";
+                a.innerText = i;
+
+                a.addEventListener("click", function(e) {
+                    e.preventDefault();
+
+                    currentPage = i;
+
+                    displayRows(currentPage);
+                    setupPagination();
+                });
+
+                li.appendChild(a);
+                pagination.appendChild(li);
+            }
+        }
+
+        displayRows(currentPage);
+        setupPagination();
+
+    });
+
+</script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 

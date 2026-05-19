@@ -33,6 +33,8 @@ Route::get('/reports', [TaskController::class, 'reports']) ->name('Reports');
 Route::post('/reports', [TaskController::class, 'generate'])->name('reports-generate');
 Route::get('/papmangement', [TaskController::class, 'papmanagement'])->name('pap management');
 Route::post('/Task/pap', [TaskController::class, 'savePAP'])->name('savePAP');
+Route::post('/Task/task/{id}', [TaskController::class, 'removepaptask'])->name('deletetask');
+Route::post('/Task/pap/{id}', [TaskController::class, 'deletepapmanagement'])->name('deletepapmanagement');
 
 
 //User routes
