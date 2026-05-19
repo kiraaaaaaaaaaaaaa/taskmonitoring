@@ -535,7 +535,7 @@
 
                         <div class="col-md-4">
                             <label class="form-label">OBEX</label>
-                            <select name="obex" id="allocateobexs" class="form-control">
+                            <select name="fromobex" id="allocateobexs" class="form-control">
                                 <option value="">--Select OBEX--</option>
                             </select>
                         </div>
