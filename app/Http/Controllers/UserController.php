@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sector;
+use App\Models\usertype;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +23,7 @@ class UserController extends Controller
     public function index()
     {
         $sector = Sector::all();
+        $utypes = usertype::all();
         $divisions = DB::table('divisions')
         ->join('sector', 'sector.id', '=', 'divisions.sectorID')
         ->select('sector.*', 'divisions.*')
@@ -29,9 +31,10 @@ class UserController extends Controller
 
         $user = DB::table('users')
         ->join('divisions', 'users.divisionID', '=', 'divisions.id')
-        ->select('users.*', 'divisions.division_short_name', 'divisions.division_name')
+        ->leftjoin('usertype', 'users.usertype', '=', 'usertype.id')
+        ->select('users.*', 'divisions.division_short_name', 'divisions.division_name', 'usertype.position as usertype')
         ->get();
-        return view('users.userpage',['user'=>$user, 'divisions'=>$divisions, 'sector'=>$sector]);
+        return view('users.userpage',['user'=>$user, 'divisions'=>$divisions, 'sector'=>$sector, 'utypes'=>$utypes]);
     }
 
     /**
@@ -72,10 +75,20 @@ class UserController extends Controller
             'divisionID' => $request->division,
             'sectorID' => $request->sector,
         ]);
-        session()->flash('success', 'User created successfully.');
+        $request->session()->flash('success', 'User created successfully.');
     }
 
         return redirect()-> route('user management');
+    }
+
+    public function newusertype(Request $request)
+    {
+        
+        usertype::create([
+            'position' => $request->newUserType,
+            
+        ]);
+        return back()->with('success', 'New user type added successfully.');
     }
 
     

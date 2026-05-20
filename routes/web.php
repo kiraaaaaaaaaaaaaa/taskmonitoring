@@ -40,6 +40,7 @@ Route::post('/Task/pap/{id}', [TaskController::class, 'deletepapmanagement'])->n
 //User routes
 Route::get('/users', [UserController::class, 'index'])->name('user management');
 Route::post('/users', [UserController::class, 'store'])->name('storeuser');
+Route::post('/users/newusertype', [UserController::class, 'newusertype'])->name('newusertype');
 
 //budget routes
 Route::get('/budget', [BudgetController::class, 'index'])->name('budget management');

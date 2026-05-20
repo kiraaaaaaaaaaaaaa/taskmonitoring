@@ -387,12 +387,12 @@
 
     const userType = @json(Auth::user()->usertype);
 
-    if (userType !== 'admin' && userType !== 'reviewer') {
+    if (userType !== '1' && userType !== '5') {
         review.style.display = 'none';
         user.style.display = 'none';
     }
 
-    if (userType !== 'admin') {
+    if (userType !== '1') {
         management.style.display = 'none';
     }
 

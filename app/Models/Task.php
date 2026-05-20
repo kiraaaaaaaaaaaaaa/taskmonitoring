@@ -39,7 +39,8 @@ class Task extends Model
                             ,'budget'
                             ,'costing'
                             ,'is_read'
-                            ,'allocatedbudget' ];
+                            ,'allocatedbudget'
+                            ,'reviewLevel'];
 
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     

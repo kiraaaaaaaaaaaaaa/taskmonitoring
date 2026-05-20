@@ -10,7 +10,7 @@ use App\Models\createdPAP;
 use App\Models\divisions;
 use App\Models\fundSource;
 use App\Models\ooSupported;
-use app\Models\mooe;
+use App\Models\mooe;
 use App\Models\mooe as ModelsMooe;
 use App\Models\Sector;
 use App\Models\SectorProgram;
@@ -469,7 +469,9 @@ class TaskController extends Controller
                         ->orWhere('tasks.reviewer3', Auth::user()->id)
                         ->orWhere('tasks.reviewer4', Auth::user()->id)
                         ->orWhere('tasks.reviewer5', Auth::user()->id);
+                         
                 })
+               
                 ->orderByDesc('tasks.activitydate')
                 ->get();
 
@@ -477,7 +479,10 @@ class TaskController extends Controller
             $groupedTasks = $tasks->groupBy(function ($task) {
                 return Carbon::parse($task->activitydate)->toDateString();
             });
-        } else {
+
+            
+        }  
+        else {
             $tasks = DB::table('tasks')
                 ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
             ->join('paps', 'papmanagement.papID', '=', 'paps.id')
@@ -711,33 +716,13 @@ class TaskController extends Controller
 
                 'created_at' => now(),
                 'updated_at' => now(),
+                'reviewLevel' => 2, // default to first level
             ]);
         }
         // Task::create($validate);
         return redirect()->route('task disposition')->with('success', 'Task(s) created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-
-    // for updating task(updatetask.blade)
     public function update(Request $request)
     {
        
@@ -752,23 +737,37 @@ class TaskController extends Controller
             'status4' => $request->status4,
             'status5' => $request->status5,
             'allocatedbudget' => $request->mooe,
-            
             'obligatedbudget' => $request->budget,
         ]);
 
+        if ($request->status1 == 'Completed') {
+            Task::where('id', $request->id)->update([
+                'reviewLevel' => DB::raw('reviewLevel + 1'), // move to next level
+            ]);
+        }
+        if ($request->status2 == 'Completed') {
+            Task::where('id', $request->id)->update([
+                'reviewLevel' => DB::raw('reviewLevel + 1'), // move to next level
+            ]);
+        }
+        if ($request->status3 == 'Completed') {
+            Task::where('id', $request->id)->update([
+                'reviewLevel' => DB::raw('reviewLevel + 1'), // move to next level
+            ]);
+        }
+        if ($request->status4 == 'Completed') {
+            Task::where('id', $request->id)->update([           
+                'reviewLevel' => DB::raw('reviewLevel + 1'), // move to next level
+            ]);
+        }
+        if ($request->status5 == 'Completed') {
+            Task::where('id', $request->id)->update([
+                'reviewLevel' => DB::raw('reviewLevel + 1'), // move to next level
+            ]);
+        }
 
-
-        
-             return redirect()->route('my task')->with('success', 'Task updated successfully.');
+        return redirect()->route('my task')->with('success', 'Task updated successfully.');
        
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 
     // for file management page(papmangement.blade)

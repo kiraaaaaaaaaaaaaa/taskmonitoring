@@ -138,9 +138,9 @@
                         <label for="date-field" class="form-label">User Type</label>
                         <select class="form-select shadow-sm" name="usertype" id="utype">
                             <option selected value="">--Choose User Type--</option>
-                            <option value="Supervisor">Supervisor</option>
-                            <option value="User">User</option>
-                            <option value="Reviewer">Reviewer</option>
+                           @foreach($utypes as $utype)
+                            <option value="{{$utype->id}}">{{$utype->position}}</option>
+                           @endforeach
                         </select>
                     </div>
                     <div class="mb-3">
@@ -160,6 +160,33 @@
         </div>
     </div>
 </div>
+
+<-- new type modal -->
+<div class="modal fade" id="newTypeModal" tabindex="-1" aria-labelledby="newTypeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newTypeModalLabel">Add New User Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="newTypeForm" method="POST" action="{{ route('newusertype') }}">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="newUserType" class="form-label">User Type Name</label>
+                        <input type="text" class="form-control" id="newUserType" name="newUserType" placeholder="Enter new user type" required>
+                        <div class="invalid-feedback">Please enter a user type name.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add User Type</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
 
@@ -284,6 +311,15 @@
 
     });
 
+    document.getElementById('utype').addEventListener('change', function() {
+        if (this.value === 'newtype') {
+            var newTypeModal = new bootstrap.Modal(document.getElementById('newTypeModal'));
+            newTypeModal.show();
+        }
+    });
+
+
+    
     });
 
 </script>
