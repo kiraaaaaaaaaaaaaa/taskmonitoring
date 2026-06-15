@@ -10,6 +10,12 @@ class Paps extends Model
     use HasFactory;
 
     protected $fillable = [
-        'pap'
+        'pap',
+        'sectorID',
+        'divID',
+        'fundID',
+        'userID',
+        'oosID',
+
     ];
 }

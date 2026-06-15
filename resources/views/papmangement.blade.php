@@ -144,25 +144,96 @@
 
 
 <!-- ================= NEW PAP MODAL ================= -->
-<form action="{{ route('createPAP') }}" method="POST">
-    @csrf
-    <div class="modal fade" id="addPapModal">
-        <div class="modal-dialog modal-dialog-centered">
+<div>
+    <!-- add pap modal -->
+    <div class="modal fade" id="addPapModal" tabindex="-1" aria-labelledby="addPapModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5>New PAP</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="addPapModalLabel">New  PAP</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <input type="text" name="pap" class="form-control" placeholder="Enter PAP" required>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-success" name="action" value="pap">Save</button>
-                </div>
+                <form method="POST" action="{{ route('createPAP') }}">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="papName" class="form-label">PAP Name <span class="text-danger">*</span></label>
+                            <div class="flex-grow-1">
+                                    
+                                    <input type="text" class="form-control d-flex" id="PAPname" name="PAPname" required>
+                                </div>
+                        </div>
+                       
+                        
+                        <div class="mb-3">
+                           
+                            <div class="flex-grow-1">
+                                
+                                <select class="form-select" id="sectorselect" name="sectorselect" hidden>
+                                    <option value="" disabled selected>-- Select Sector --</option>
+                                    <option value="{{ Auth::user()->sectorID }}"></option>
+                                    
+                                </select>
+
+                            </div>
+                            <div class="flex-grow-1">
+                                <label for="divisionSelect" class="form-label">Assign Division <span class="text-danger">*</span></label>
+                                <select class="form-select" id="divisionSelect" name="divisionSelect" required>
+                                    <option value="" disabled selected>-- Select Division --</option>
+                                    
+                                </select>
+                            </div>
+                            
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex gap-2">
+                                
+                                <div class="flex-grow-1">
+                                    <label for="funds" class="form-label">Fund Source <span class="text-danger">*</span></label>
+
+                                    <select class="form-select" id="funds" name="funds" required>
+                                     <option value="" disabled selected>-- Select Source of Fund --</option>
+                                        @foreach($fund as $funds)
+                                        <option value="{{ $funds->id }}">{{ $funds->fundName }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="focal" class="form-label">Assign Focal <span class="text-danger">*</span></label>
+                            <select class="form-select" id="focalSelect" name="focalSelect" required>
+                                <option value="" disabled selected>-- Select Focal --</option>
+                                @foreach($users as $user)
+                                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="oosSelect" class="form-label">Output/Outcome Supported <span class="text-danger">*</span></label>
+                            <select class="form-select" id="oosSelect" name="oosSelect" required>
+                                <option value="" disabled selected>-- Select Output/Outcome --</option>
+                                @foreach($oos as $user)
+                                <option value="{{ $user->oosID }}">{{ $user->oosName }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" name="action" value="pap">Save Activity</button>
+                        </div>
+                </form>
             </div>
         </div>
     </div>
-</form>
+
+
+
+</div> 
 
 <!-- ================= edit PAP ================= -->
  @foreach($paps as $pap)
@@ -216,7 +287,45 @@
 </form>
 @endforeach
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const inputsector = document.getElementById('sectorselect');
+    const inputdivision= document.getElementById('divisionSelect');
+    const sector = {!! json_encode($sector) !!};
+    const division = {!! json_encode($division) !!};
 
+        inputsector.addEventListener('change', function () {
+
+        const programID = this.value;
+
+        inputdivision.innerHTML = '<option value="">--Select Division--</option>';
+
+        division.forEach(div => {
+
+            if(div.sectorID == programID){
+
+                let option = document.createElement('option');
+                option.value = div.id;
+                option.textContent = div.division_name + "("+div.division_short_name+")";
+
+                inputdivision.appendChild(option);
+
+            }
+
+        });
+
+    });
+
+    
+         if (!inputsector.value) {
+        inputsector.selectedIndex = 1; // selects first real option
+    }
+
+    inputsector.dispatchEvent(new Event('change'));
+
+   
+    });
+</script>
 
 
 

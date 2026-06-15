@@ -63,7 +63,7 @@
     <!-- DONE -->
     <div class="column" data-status="done">
         <h4>🟢 Done</h4>
-        <label class="text-muted fs-12">*Tasks that are reviewed this month</label>
+        <label class="text-muted fs-11">*Tasks that are reviewed this month</label>
 
         @foreach ($groupedTasks as $task)
         @if($task->progressScore >= 1 && \Carbon\Carbon::parse($task->duedate)->isSameMonth(now()))

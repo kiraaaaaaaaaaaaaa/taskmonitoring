@@ -165,7 +165,7 @@ Assign Task
                                                     Remove PAP
                                                 </button>
                                             </form>
-                                            <a class="dropdown-item editPapLink" id="editPapLinkbtn" href="#" data-bs-toggle="modal" data-bs-target="#editPapModal" data-id="{{ $task->newID }}" data-papid="{{ $task->papID }}" data-pap="{{ $task->pap }}" data-location="{{ $task->location }}" data-datefrom="{{ $task->fromdate }}" data-dateend="{{$task->todate}}" data-description="{{ $task->description }}" data-focal="{{ $task->focal }}" data-fund="{{ $task->fundSource }}" data-division="{{$task->divisionID }}" data-oos="{{$task->oosID}}">
+                                            <a class="dropdown-item editPapLink" id="editPapLinkbtn" href="#" data-bs-toggle="modal" data-bs-target="#editPapModal" data-id="{{ $task->newID }}" data-papid="{{ $task->papID }}" data-pap="{{ $task->pap }}" data-location="{{ $task->location }}" data-datefrom="{{ $task->fromdate }}" data-dateend="{{$task->todate}}" data-description="{{ $task->description }}">
                                                 <i class="ri-pencil-fill align-bottom me-2 text-muted"></i>
                                                 Edit PAP
                                             </a>
@@ -187,9 +187,7 @@ Assign Task
                             </div>
                             <p class="fs-11 mb-3 text-truncate">
                                 {{ $task->location }} | {{ \Carbon\Carbon::parse($task->fromdate)->format('F d ') }} to {{ \Carbon\Carbon::parse($task->todate)->format(' d, Y') }}
-                                <br>
-                                Focal Person: {{ $task->focalPerson }}
-                                <br>
+                               
 
 
                             </p>
@@ -251,66 +249,8 @@ Assign Task
                                 </div>
                             </div>
                         </div>
-                        <div class="mb-3">
-                           
-                            <div class="flex-grow-1">
-                                
-                                <select class="form-select" id="sectorselect" name="sectorselect" hidden>
-                                    <option value="" disabled selected>-- Select Sector --</option>
-                                    <option value="{{ Auth::user()->sectorID }}"></option>
-                                    
-                                </select>
+                       
 
-                            </div>
-                            <div class="flex-grow-1">
-                                <label for="divisionSelect" class="form-label">Assign Division <span class="text-danger">*</span></label>
-                                <select class="form-select" id="divisionSelect" name="divisionSelect" required>
-                                    <option value="" disabled selected>-- Select Division --</option>
-                                    
-                                </select>
-                            </div>
-                            
-                        </div>
-
-                        <div class="mb-3">
-                            <div class="d-flex gap-2">
-                                <div class="flex-grow-1">
-                                    <label for="location" class="form-label">Location <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control d-flex" id="location" name="location" required>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <label for="funds" class="form-label">Fund Source <span class="text-danger">*</span></label>
-
-                                    <select class="form-select" id="funds" name="funds" required>
-                                     <option value="" disabled selected>-- Select Source of Fund --</option>
-                                        @foreach($fund as $funds)
-                                        <option value="{{ $funds->id }}">{{ $funds->fundName }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="focal" class="form-label">Assign Focal <span class="text-danger">*</span></label>
-                            <select class="form-select" id="focalSelect" name="focalSelect" required>
-                                <option value="" disabled selected>-- Select Focal --</option>
-                                @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="oosSelect" class="form-label">Output/Outcome Supported <span class="text-danger">*</span></label>
-                            <select class="form-select" id="oosSelect" name="oosSelect" required>
-                                <option value="" disabled selected>-- Select Output/Outcome --</option>
-                                @foreach($oos as $user)
-                                <option value="{{ $user->oosID }}">{{ $user->oosName }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-primary">Save Activity</button>
@@ -380,16 +320,7 @@ Assign Task
                                 </div>
                             </div>
                         </div>
-                         <div class="mb-3">
-                            <label for="editdivisionSelect" class="form-label">Assign Division</label>
-                            <select class="form-select" id="editdivisionSelect" name="editdivisionSelect" required>
-                                <option value="" disabled selected>-- Select Division --</option>
-                                @foreach($division as $divisions)
-                                <option value="{{ $divisions->id }}">{{ $divisions->division_name }} ({{$divisions->division_short_name}})</option>
-                                @endforeach
-                            </select>
-
-                        </div>
+                         
                         <div class="mb-3">
 
                             <div class="d-flex gap-2">
@@ -397,38 +328,14 @@ Assign Task
                                     <label for="editlocation" class="form-label">Location</label>
                                     <input type="text" class="form-control" id="editlocation" name="editlocation">
                                 </div>
-                                <div class="flex-grow-1">
-                                    <label for="editfunds" class="form-label">Fund Source</label>
-
-                                    <select class="form-select" id="editfunds" name="editfunds">
-                                        @foreach($fund as $funds)
-                                        <option value="{{ $funds->id }}">{{ $funds->fundName }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                
                             </div>
                         </div>
 
 
-                        <div class="mb-3">
-                            <label class="form-label">Assign Focal</label>
-                            <select class="form-select" id="editfocalSelect" name="editfocalSelect">
+                        
 
-                                @foreach($users as $user)
-                                <option value="{{ $user->id }}">{{ $user->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="editoosSelect" class="form-label">Output/Outcome Supported <span class="text-danger">*</span></label>
-                            <select class="form-select" id="editoosSelect" name="editoosSelect" required>
-                                <option value="" disabled selected>-- Select Output/Outcome --</option>
-                                @foreach($oos as $user)
-                                <option value="{{ $user->oosID }}">{{ $user->oosName }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                      
                         
                     </div>
                     <div class="modal-footer">
@@ -455,7 +362,7 @@ Assign Task
         const editPapLinkBtn = document.getElementById('editPapLinkbtn');
         const deletePapBtn = document.getElementById('deletepapbtn');
         const dropdownDivider = document.getElementById('dropdownDivider');
-        if (userType !== 'admin' && userType !== 'Supervisor') {
+        if (userType === '2') {
             assignTaskBtn.style.display = 'none';
             addTaskBtn.style.display = 'none';
             editPapLinkBtn.style.display = 'none';
@@ -486,11 +393,7 @@ Assign Task
                 document.getElementById('editindicativeDate').value = dateFrom;
                 document.getElementById('editindicativeDateEnd').value = dateEnd;
                 document.getElementById('editdescription').value = description;
-                document.getElementById('editfocalSelect').value = link.getAttribute('data-focal');
-                document.getElementById('editpapids').value = link.getAttribute('data-papid');
-                document.getElementById('editfunds').value = link.getAttribute('data-fund');
-                document.getElementById('editdivisionSelect').value = link.getAttribute('data-division');
-                document.getElementById('editoosSelect').value = link.getAttribute('data-oos');
+                
             });
         });
 
@@ -507,42 +410,7 @@ Assign Task
 
         });
 
-
-    const inputsector = document.getElementById('sectorselect');
-    const inputdivision= document.getElementById('divisionSelect');
-    const sector = {!! json_encode($sector) !!};
-    const division = {!! json_encode($division) !!};
-
-    
-
-    inputsector.addEventListener('change', function () {
-
-        const programID = this.value;
-
-        inputdivision.innerHTML = '<option value="">--Select Division--</option>';
-
-        division.forEach(div => {
-
-            if(div.sectorID == programID){
-
-                let option = document.createElement('option');
-                option.value = div.id;
-                option.textContent = div.division_name + "("+div.division_short_name+")";
-
-                inputdivision.appendChild(option);
-
-            }
-
-        });
-
-    });
-
-    
-         if (!inputsector.value) {
-        inputsector.selectedIndex = 1; // selects first real option
-    }
-
-    inputsector.dispatchEvent(new Event('change'));
+                             
 
    
 

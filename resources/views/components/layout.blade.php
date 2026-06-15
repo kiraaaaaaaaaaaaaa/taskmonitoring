@@ -387,7 +387,7 @@
 
     const userType = @json(Auth::user()->usertype);
 
-    if (userType !== '1' && userType !== '5') {
+    if (userType === '2') {
         review.style.display = 'none';
         user.style.display = 'none';
     }

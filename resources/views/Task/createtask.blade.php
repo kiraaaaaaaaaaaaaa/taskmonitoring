@@ -90,7 +90,7 @@
                                     <select id="reviewer{{ $i }}" class="form-select" name="reviewer{{ $i }}">
                                         <option value="">-- Choose Reviewer --</option>
                                         @foreach($users as $user)
-                                        @if(in_array($user->usertype, ['Reviewer','Supervisor']))
+                                        @if(in_array($user->usertype, ['3','4','5']))
                                         <option value="{{ $user->id }}">{{ $user->name }}</option>
                                         @endif
                                         @endforeach
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <select id="reviewer${reviewerCount}" class="form-select" name="reviewer${reviewerCount}">
                         <option value="">-- Choose Reviewer --</option>
                         @foreach($users as $user)
-                            @if(in_array($user->usertype, ['Reviewer','Supervisor']))
+                            @if(in_array($user->usertype, ['3','4','5']))
                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endif
                         @endforeach

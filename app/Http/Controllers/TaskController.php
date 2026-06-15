@@ -32,10 +32,10 @@ class TaskController extends Controller
     {
         $viewpap = DB::table('papmanagement')
             ->join('paps', 'papmanagement.papID', '=', 'paps.id')
-            ->join('users', 'papmanagement.focal', '=', 'users.id')
-            ->join('fundsource', 'papmanagement.fundsource', '=', 'fundsource.id')
-            ->join('divisions', 'papmanagement.divisionID', '=', 'divisions.id')
-            ->join('outputsupported', 'papmanagement.oosID', '=', 'outputsupported.oosID')
+            ->leftjoin('users', 'paps.userID', '=', 'users.id')
+            ->leftjoin('fundsource', 'paps.fundID', '=', 'fundsource.id')
+            ->leftjoin('divisions', 'paps.divID', '=', 'divisions.id')
+            ->leftjoin('outputsupported', 'paps.oosID', '=', 'outputsupported.oosID')
             ->where('papmanagement.id', $papM)
             ->select('papmanagement.*', 'paps.pap', 'users.name as focalPerson', 'fundsource.fundName as fundName', 'divisions.*', 'outputsupported.oosName')
             ->get();
@@ -49,8 +49,8 @@ class TaskController extends Controller
             ->join('tasks', 'papmanagement.id', '=', 'tasks.PAP')
             ->join('paptask', 'tasks.task', '=', 'paptask.id')
             ->join('users as ASSIGNED', 'tasks.assigned', '=', 'ASSIGNED.id')
-            ->join('users as focal', 'papmanagement.focal', '=', 'focal.id')
-            ->join('fundsource', 'papmanagement.fundsource', '=', 'fundsource.id')
+            ->leftjoin('users as focal', 'paps.userID', '=', 'focal.id')
+            ->leftjoin('fundsource', 'paps.fundID', '=', 'fundsource.id')
             ->where('papmanagement.id', $papM)
             ->select('tasks.*','tasks.id as taskid', 'paps.pap', 'paptask.tasks', 'ASSIGNED.name as Assigned', 'focal.name as focalPerson', 'papmanagement.*', 'fundsource.fundName as fundName')
             ->get();
@@ -105,19 +105,17 @@ class TaskController extends Controller
     public function savePAP(Request $request) 
     {
        
-  
+        dd($request);
         if ($request->editpapid) {
 
         createdPAP::where('id', $request->editpapid)->update([
             'papID' => $request->editpapids,
             'description' => ucfirst(strtolower($request->editdescription)),
-            'focal' => $request->editfocalSelect,
+            
             'todate' => $request->editdateend,
             'location' => strtoupper($request->editlocation),
             'fromdate' => $request->editdatefrom,
-            'fundsource' => $request->editfunds,
-            'divisionID' => $request->editdivisionSelect,
-            'oosID' => $request->editoosSelect,
+            
         ]);
         return back()->with('success', 'Updated successfully');
         }
@@ -127,14 +125,11 @@ class TaskController extends Controller
             createdPAP::create([
                 'papID' => $request->pap,
                 'description' => ucfirst(strtolower($request->description)),
-                'focal' => $request->focalSelect,
+                
                 'todate' => $request->dateend,
                 'location' => strtoupper($request->location),
                 'fromdate' => $request->datefrom,
-                'fundsource' => $request->funds,
-                'divisionID' => $request->divisionSelect,
-                'sectorID' => $request->sectorselect,
-                'oosID' => $request->oosSelect,
+                
             ]);
 
         return back()->with('success', 'Saved successfully');
@@ -148,15 +143,7 @@ class TaskController extends Controller
     {
         $now = Carbon::now();
         $papOptions = Paps::all();
-        $users = User::all()
-        ->where('usertype', '!=', 'admin');
-
-        $fund = fundSource::all();
-        $division = divisions::all();
-        $sector = Sector::all();
-        $oos = ooSupported::all();
-        
-
+       
 
         $Year = ($year && $year > 0) ? $year : $now->year;
         $Month = ($month && $month >= 1 && $month <= 12) ? $month : $now->month;
@@ -177,20 +164,16 @@ class TaskController extends Controller
 
             $newtask = DB::table('papmanagement')
             ->join('paps', 'papmanagement.papID', '=', 'paps.id')
-            ->join('users', 'papmanagement.focal', '=', 'users.id')
-            ->join('fundsource', 'papmanagement.fundsource', '=', 'fundsource.id')
-            ->join('divisions', 'papmanagement.divisionID', '=', 'divisions.id')
-            ->join('outputsupported', 'papmanagement.oosID', 'outputsupported.oosID')
             ->whereYear('papmanagement.fromdate', $Year)
             ->whereMonth('papmanagement.fromdate', $Month)
-            ->select('papmanagement.id as newID','papmanagement.*', 'paps.pap', 'users.name as focalPerson', 'fundsource.fundName as fundName', 'divisions.*', 'outputsupported.oosName')
+            ->select('papmanagement.id as newID','papmanagement.*', 'paps.pap')
             ->get();
 
     
 
 
 
-        return view('Task.pap', compact('tasks', 'Year', 'Month', 'papOptions', 'newtask', 'users', 'fund', 'division', 'sector', 'oos'));
+        return view('Task.pap', compact('tasks', 'Year', 'Month', 'papOptions', 'newtask'));
     }
 
 
@@ -267,7 +250,14 @@ class TaskController extends Controller
         if ($request->action === 'pap') {
 
             Paps::create([
-                'pap' => $request->pap
+                'pap' => $request->PAPname,
+                'sectorID' => $request->sectorselect,
+                'divID' => $request->divisionSelect,
+                'fundID' => $request->funds,
+                'userID' => $request->focalSelect,
+                'oosID' => $request->oosSelect,
+
+
             ]);
         }
 
@@ -281,7 +271,12 @@ class TaskController extends Controller
         if($request->action === 'editpap')
             {
                   Paps::where('id', $request->PAP)->update([
-            'pap' => $request->task,
+            'pap' => $request->PAPname,
+            'sectorID' => $request->sectorselect,
+            'divID' => $request->divisionSelect,
+            'fundID' => $request->funds,
+            'userID' => $request->focalSelect,
+            'oosID' => $request->oosSelect
                   ]);
             }
 
@@ -448,7 +443,7 @@ class TaskController extends Controller
     public function toreview()
     {
 
-        if (Auth::user()->usertype != "admin") {
+        if (Auth::user()->usertype != "1") {
 
             $tasks = DB::table('tasks')
                 ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
@@ -471,16 +466,20 @@ class TaskController extends Controller
                         ->orWhere('tasks.reviewer5', Auth::user()->id);
                          
                 })
-               
+                ->where(function ($query) {
+                    $query->where('tasks.progressScore', 1)
+                          ->orWhere('tasks.reviewLevel', Auth::user()->usertype);
+                })
                 ->orderByDesc('tasks.activitydate')
                 ->get();
+
+            
 
 
             $groupedTasks = $tasks->groupBy(function ($task) {
                 return Carbon::parse($task->activitydate)->toDateString();
             });
 
-            
         }  
         else {
             $tasks = DB::table('tasks')
@@ -716,7 +715,7 @@ class TaskController extends Controller
 
                 'created_at' => now(),
                 'updated_at' => now(),
-                'reviewLevel' => 2, // default to first level
+                'reviewLevel' => 3, // default to first level
             ]);
         }
         // Task::create($validate);
@@ -742,31 +741,23 @@ class TaskController extends Controller
 
         if ($request->status1 == 'Completed') {
             Task::where('id', $request->id)->update([
-                'reviewLevel' => DB::raw('reviewLevel + 1'), // move to next level
+                'reviewLevel' => 4 // move to next level
             ]);
         }
         if ($request->status2 == 'Completed') {
             Task::where('id', $request->id)->update([
-                'reviewLevel' => DB::raw('reviewLevel + 1'), // move to next level
+                'reviewLevel' => 5, // move to next level
             ]);
         }
         if ($request->status3 == 'Completed') {
             Task::where('id', $request->id)->update([
-                'reviewLevel' => DB::raw('reviewLevel + 1'), // move to next level
+                'reviewLevel' => 6, // move to next level
             ]);
         }
-        if ($request->status4 == 'Completed') {
-            Task::where('id', $request->id)->update([           
-                'reviewLevel' => DB::raw('reviewLevel + 1'), // move to next level
-            ]);
-        }
-        if ($request->status5 == 'Completed') {
-            Task::where('id', $request->id)->update([
-                'reviewLevel' => DB::raw('reviewLevel + 1'), // move to next level
-            ]);
-        }
+        
+       
 
-        return redirect()->route('my task')->with('success', 'Task updated successfully.');
+        return back()->with('success', 'Task updated successfully.');
        
     }
 
@@ -774,6 +765,14 @@ class TaskController extends Controller
     public function papmanagement()
     {
         $paps = Paps::all();
+        $papOptions = Paps::all();
+        $users = User::all()
+        ->where('usertype', '!=', 'admin');
+
+        $fund = fundSource::all();
+        $division = divisions::all();
+        $sector = Sector::all();
+        $oos = ooSupported::all();
         
         $paptask = Paptask::all();
 
@@ -800,7 +799,13 @@ class TaskController extends Controller
            
             'paptask',
             'tasksByPap',
-            'paptasks'
+            'paptasks',
+            'papOptions',
+            'users',
+            'fund',
+            'division',
+            'sector',
+            'oos'
         ));
     }
 }
