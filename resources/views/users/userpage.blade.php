@@ -141,7 +141,6 @@
                            @foreach($utypes as $utype)
                             <option value="{{$utype->id}}">{{$utype->position}}</option>
                            @endforeach
-                            <option value="newtype" class="text-muted fs-11">+Add New User Type</option>
                         </select>
                     </div>
                     <div class="mb-3">
