@@ -207,7 +207,7 @@
                         </li>
 
                         <li class="nav-item">
-                                        <a class="nav-link menu-link" href="{{route('budget management')}}" role="button" aria-expanded="false" aria-controls="sidebarLanding">
+                                        <a class="nav-link menu-link" href="{{route('budget management')}}" id="budget" role="button" aria-expanded="false" aria-controls="sidebarLanding">
                                             <i class="ri-rocket-line"></i> <span data-key="t-landing">Budget Management</span>
                                         </a>
 
@@ -384,6 +384,7 @@
     const review = document.getElementById('review');
     const user = document.getElementById('users');
     const management = document.getElementById('management');
+    const budget = document.getElementById('budget');
 
     const userType = @json(Auth::user()->usertype);
 
@@ -394,6 +395,7 @@
 
     if (userType !== '1') {
         management.style.display = 'none';
+        budget.style.display = 'none';
     }
 
 });

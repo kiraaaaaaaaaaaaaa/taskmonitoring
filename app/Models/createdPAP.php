@@ -15,11 +15,7 @@ class createdPAP extends Model
         'date',
         'location',
         'fromdate',
-        'todate',
-        'focal',
-        'fundSource',
-        'divisionID',
-        'sectorID',
-        'oosID'
+        'todate'
+        
     ];
 }
