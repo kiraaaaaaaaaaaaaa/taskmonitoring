@@ -20,8 +20,8 @@
                    
 
                         <div class="mb-3">
-                            <input type="hidden" id="papID" value="{{ $newpap->papID}}">
-                            <input type="hidden" id="papID" name="PAP" value="{{ $newpap->id}}">
+                            <input  id="papID" value="{{ $newpap->papID}}" name="papID" hidden>
+                            <input  id="papID" name="PAP" value="{{ $newpap->id}}" hidden>
                             <input type="text" id="pap" name="pap" class="form-control" value="{{ $newpap->pap ?? '' }}" readonly>
                         </div>
 

@@ -1,4 +1,6 @@
 <!doctype html>
+
+
 <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 
 <head>
@@ -62,7 +64,7 @@
 
                             <div class="card-body p-4">
                                 <div class="text-center mt-2">
-                                    <h5 class="text-primary">Welcome</h5>
+                                    <h5 class="text-primary">BRO Task Monitoring</h5>
                                     <p class="text-muted">Sign in to continue</p>
                                 </div>
                                 <div class="p-2 mt-4">

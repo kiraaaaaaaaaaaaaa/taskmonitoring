@@ -39,7 +39,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="VertimeassageInput" class="form-label">Notes</label>
-                        <textarea class="form-control" id="note" rows="3" placeholder="Enter your message"></textarea>
+                        <input type="text" class="form-control" value="{{$fromtask->note}}" readonly>
                     </div>
                     <div class="mb-3">
                         <label for="EndleaveDate" class="form-label">File link</label>

@@ -45,78 +45,6 @@ Assign Task
 
 @else
 
-<div class="row g-4">
-    <div class="row g-4">
-        @foreach ($tasks as $task)
-
-
-
-        <div class="col-12 col-md-6 col-xl-4">
-            <div class="card h-80">
-                <div class="card-body p-0">
-                    <div class="alert alert-primary border-0 rounded-top rounded-0 m-0 d-flex align-items-center" role="alert">
-
-                    </div>
-                    <div class="card tasks-box border-0">
-                        <div class="card-body">
-                            <div class="d-flex align-items-start justify-content-between mb-2">
-
-                                <h6 class="fs-15 mb-3 text-truncate">
-                                    {{ $task->pap }}
-                                </h6>
-
-                                <div class="dropdown">
-                                    <a href="#" class="text-muted" data-bs-toggle="dropdown">
-                                        <i class="ri-more-fill"></i>
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-
-
-                                            <a class="dropdown-item" href="/Task/task/{{$task->first_activity}}/{{$task->PAP}}">
-                                                <i class="ri-eye-fill align-bottom me-2 text-muted"></i>
-                                                View
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </div>
-
-
-                            </div>
-
-                            {{-- @php
-                            $percent = ((float)$task->average_progress * 100);
-
-                            $progressClass = $percent >= 80
-                            ? 'bg-success'
-                            : ($percent >= 50 ? 'bg-warning' : 'bg-danger');
-                            @endphp
-
-                            <div class="mb-2">
-                                <span class="text-info fw-semibold">{{ number_format($percent, 2) }}%</span> of 100%
-                        </div> --}}
-
-                        {{-- <div class="progress progress-sm">
-                                <div class="progress-bar {{ $progressClass }}" role="progressbar" style="width: {{ $percent }}%" aria-valuenow="{{ $percent }}" aria-valuemin="0" aria-valuemax="100">
-                    </div>
-                </div> --}}
-
-            </div>
-        </div>
-
-    </div>
-</div>
-</div>
-
-@endforeach
-</div>
-
-</div>
-
-@endif
-
-
-
 <div class="row g-4 ">
     <div class="row g-4 ">
 
@@ -208,6 +136,16 @@ Assign Task
 
 </div>
 
+</div>
+
+</div>
+
+@endif
+
+
+
+
+
 
 
 <div>
@@ -249,6 +187,13 @@ Assign Task
                                 </div>
                             </div>
                         </div>
+                        <div class="d-flex gap-2">
+                                <div class="flex-grow-1">
+                                    <label for="editlocation" class="form-label">Location</label>
+                                    <input type="text" class="form-control" id="location" name="location">
+                                </div>
+                                
+                            </div>
                        
 
                         <div class="modal-footer">
@@ -299,8 +244,8 @@ Assign Task
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="papName" class="form-label">PAP Name</label>
-                            <input type="hidden" id="editpapid" name="editpapid">
-                            <input type="hidden" id="editpapids" name="editpapids">
+                            <input  type="hidden" id="editpapid" name="editpapid">
+                            
                             <input type="text" class="form-control" id="editpapName" name="editpapName" readonly>
                         </div>
                         <div class="mb-3">

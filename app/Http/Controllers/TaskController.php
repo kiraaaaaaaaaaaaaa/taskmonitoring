@@ -105,11 +105,11 @@ class TaskController extends Controller
     public function savePAP(Request $request) 
     {
        
-        dd($request);
+       
         if ($request->editpapid) {
 
         createdPAP::where('id', $request->editpapid)->update([
-            'papID' => $request->editpapids,
+            
             'description' => ucfirst(strtolower($request->editdescription)),
             
             'todate' => $request->editdateend,

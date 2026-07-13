@@ -208,7 +208,7 @@
 
                         <li class="nav-item">
                                         <a class="nav-link menu-link" href="{{route('budget management')}}" id="budget" role="button" aria-expanded="false" aria-controls="sidebarLanding">
-                                            <i class="ri-rocket-line"></i> <span data-key="t-landing">Budget Management</span>
+                                            <i class="ri-rocket-line"></i> <span data-key="t-landing">BUR Monitoring</span>
                                         </a>
 
                         </li>

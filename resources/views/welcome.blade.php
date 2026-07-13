@@ -1,6 +1,9 @@
 @extends('components.layout')
 @section('content')
+
+
 <div class="row g-3">
+
 <style>
 .circular-progress{
     position: relative;
@@ -58,7 +61,6 @@
     ? 'excellent'
     : ($totalpercent >= 50 ? 'average' : 'poor');
     @endphp --}}
-
 
 
     <div class="col-md-3">
@@ -170,6 +172,7 @@
             </div>
             <div class="flex-grow-1 ms-3">
                 <h6 class="mb-1">{{$tasks->pap}}</h6>
+                <p class="text-muted mb-0">{{$tasks->description}}</p>
 
             </div>
             <p class="text-muted mb-0 fs-10 float-end">{{$tasks->location}}</p>
