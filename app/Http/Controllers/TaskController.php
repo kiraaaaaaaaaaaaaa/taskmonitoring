@@ -20,6 +20,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Spatie\GoogleCalendar\Event;
+use App\Services\GoogleCalendarService;
 
 class TaskController extends Controller
 {
@@ -101,10 +103,11 @@ class TaskController extends Controller
         return view('welcome', ["task" => $task, "monthtask" => $monthtask, "fybudget" => $totalmooe, "totalobligation" => $totalobligation]);
     }
 
-    // for creating new PAP(papmangement.blade)
+    // for creating new PAP(paps.blade)
     public function savePAP(Request $request) 
     {
-       
+
+        $gcalendar = new GoogleCalendarService();
        
         if ($request->editpapid) {
 
@@ -115,12 +118,23 @@ class TaskController extends Controller
             'todate' => $request->editdateend,
             'location' => strtoupper($request->editlocation),
             'fromdate' => $request->editdatefrom,
-            
+            'googlecalendareventID' => $request->googlecalendareventID
         ]);
+
+        $gcalendar->updateEvent($request->googlecalendareventID, (object)[
+            'title' => $request->editpapid,
+            'description' => ucfirst(strtolower($request->editdescription)),
+            'start_date' => $request->editdatefrom,
+            'end_date' => $request->editdateend,
+        ]);
+
+
         return back()->with('success', 'Updated successfully');
         }
         else{
 
+             $papname = Paps::where('id', $request->pap)->first();
+            
             
             createdPAP::create([
                 'papID' => $request->pap,
@@ -129,11 +143,28 @@ class TaskController extends Controller
                 'todate' => $request->dateend,
                 'location' => strtoupper($request->location),
                 'fromdate' => $request->datefrom,
+                'googlecalendareventID' => $gcalendar->createEvent((object)[
+                    'title' => $papname->pap,
+                    'description' => ucfirst(strtolower($request->description)),
+                    'start_date' => $request->datefrom,
+                    'end_date' => $request->dateend,
+                    'color_id' => 9
+                ])
+                
                 
             ]);
+            
+           
+
+           
+            
+
+        
 
         return back()->with('success', 'Saved successfully');
         }
+
+        
     }
 
 
@@ -307,8 +338,15 @@ class TaskController extends Controller
     //for deleting pap in papmanagement
     public function deletepapmanagement($id)
     {
+        $gcalendar = new GoogleCalendarService();
+
+        $createdpap = createdPAP::find($id);
+
+        $gcalendar->deleteEvent($createdpap->googlecalendareventID);
+
         createdPAP::where('id', $id)->delete();
         return back()->with('success', 'Deleted successfully');
+
     }
 
     // viewing of individual task(viewtask.blade)

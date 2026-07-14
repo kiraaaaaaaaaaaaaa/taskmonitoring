@@ -15,7 +15,8 @@ class createdPAP extends Model
         'date',
         'location',
         'fromdate',
-        'todate'
+        'todate',
+        'googlecalendareventID',
         
     ];
 }

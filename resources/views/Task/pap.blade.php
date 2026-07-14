@@ -93,7 +93,7 @@ Assign Task
                                                     Remove PAP
                                                 </button>
                                             </form>
-                                            <a class="dropdown-item editPapLink" id="editPapLinkbtn" href="#" data-bs-toggle="modal" data-bs-target="#editPapModal" data-id="{{ $task->newID }}" data-papid="{{ $task->papID }}" data-pap="{{ $task->pap }}" data-location="{{ $task->location }}" data-datefrom="{{ $task->fromdate }}" data-dateend="{{$task->todate}}" data-description="{{ $task->description }}">
+                                            <a class="dropdown-item editPapLink" id="editPapLinkbtn" href="#" data-bs-toggle="modal" data-bs-target="#editPapModal" data-id="{{ $task->newID }}" data-googlecalendareventID="{{ $task->googlecalendareventID }}" data-papid="{{ $task->papID }}" data-pap="{{ $task->pap }}" data-location="{{ $task->location }}" data-datefrom="{{ $task->fromdate }}" data-dateend="{{$task->todate}}" data-description="{{ $task->description }}">
                                                 <i class="ri-pencil-fill align-bottom me-2 text-muted"></i>
                                                 Edit PAP
                                             </a>
@@ -244,7 +244,8 @@ Assign Task
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="papName" class="form-label">PAP Name</label>
-                            <input  type="hidden" id="editpapid" name="editpapid">
+                            <input  type="" id="editpapid" name="editpapid">
+                            <input  type="" id="googlecalendareventID" name="googlecalendareventID">
                             
                             <input type="text" class="form-control" id="editpapName" name="editpapName" readonly>
                         </div>
@@ -329,6 +330,7 @@ Assign Task
                 const dateEnd = this.getAttribute('data-dateend');
                 const description = this.getAttribute('data-description');
                 const focalPerson = this.getAttribute('data-focal');
+                const googlecalendareventID = this.getAttribute('data-googlecalendareventID');
 
 
 
@@ -338,6 +340,7 @@ Assign Task
                 document.getElementById('editindicativeDate').value = dateFrom;
                 document.getElementById('editindicativeDateEnd').value = dateEnd;
                 document.getElementById('editdescription').value = description;
+                document.getElementById('googlecalendareventID').value = googlecalendareventID;
                 
             });
         });
