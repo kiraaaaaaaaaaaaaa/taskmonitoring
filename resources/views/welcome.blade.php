@@ -1,235 +1,135 @@
 @extends('components.layout')
 @section('content')
 
-
-<div class="row g-3">
-
 <style>
-.circular-progress{
-    position: relative;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: conic-gradient(#0d6efd calc(var(--value) * 1%), #aec6de 0);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    /* Modern Theme Customizations: Dark Green, Golden Yellow, and White */
+    :root {
+        --bs-dark-green: #0b3c29;
+        --bs-medium-green: #134e38;
+        --bs-golden-yellow: #d4af37;
+        --bs-golden-yellow-light: #fef9e7;
+    }
 
-.circular-progress::before{
-    content: "";
-    position: absolute;
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background: white;
-}
+    .card.card-animate {
+        border-radius: 1rem;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 0.5rem 1.25rem rgba(11, 60, 41, 0.04);
+    }
+    
+    .card.card-animate:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.75rem 2rem rgba(11, 60, 41, 0.08);
+    }
 
-.progress-value{
-    position: relative;
-    font-size: 18px;
-    font-weight: 600;
-    color: #0d6efd;
-}
+    /* Circular Progress Customization */
+    .circular-progress{
+        position: relative;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: conic-gradient(var(--bs-golden-yellow) calc(var(--value) * 1%), #e9ecef 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .circular-progress::before{
+        content: "";
+        position: absolute;
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: white;
+    }
+
+    /* Table Hover Enhancements */
+    .table-hover tbody tr {
+        transition: background-color 0.2s ease;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(212, 175, 55, 0.04);
+    }
 </style>
-    <!-- main row for spacing -->
 
-    {{-- @php
-    $total = 0;
-    $totalcost = 0;
-
-    @endphp
-
-    @foreach($budget as $bud)
-
-    @php
-    $total +=$bud->allocatedbudget;
-    $totalcost +=$bud->total;
-
-    @endphp
-
-    @endforeach
-
-    @php
-    $totalpercent =round( (float) $totalcost / $total * 100);
-
-    $totalprog = $totalpercent >= 80
-    ? 'bg-success'
-    : ($totalpercent >= 50 ? 'bg-warning' : 'bg-danger');
-
-    $totalprogs = $totalpercent >= 80
-    ? 'excellent'
-    : ($totalpercent >= 50 ? 'average' : 'poor');
-    @endphp --}}
-
-
-    <div class="col-md-3">
-        <div class="card card-animate">
-            <div class="card-body d-flex justify-content-between">
+<!-- Top Dashboard Metrics Row -->
+<div class="row g-4 mb-4">
+    
+    <!-- Approved Budget Card -->
+    <div class="col-xl-6 col-md-6">
+        <div class="card card-animate border-start border-4 border-success bg-white">
+            <div class="card-body p-4 d-flex justify-content-between align-items-center">
                 <div>
-                    <p class="fw-medium text-muted mb-0 fs-11">APPROVED BUDGET FOR FY {{ date('Y') }}</p>
-                    <h2 class="mt-4 ff-secondary fw-semibold">
-                        {{number_format($fybudget[0]->grandtotal,2)}}
+                    <p class="text-uppercase fw-semibold text-muted mb-1 fs-12 tracking-wide">Approved Budget for FY {{ date('Y') }}</p>
+                    <h2 class="mt-2 fw-bold text-dark font-monospace mb-0">
+                        ₱{{ number_format($fybudget[0]->grandtotal, 2) }}
                     </h2>
-
                 </div>
-                <div class="avatar-sm flex-shrink-0">
-                    <span class="avatar-title bg-secondary rounded-circle fs-2">
-                        <i class="ri-wallet-line"></i>
+                <div class="flex-shrink-0">
+                    <span class="avatar-title rounded-circle p-3 fs-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px; background-color: var(--bs-dark-green); color: white;">
+                        <i class="ri-wallet-3-line"></i>
                     </span>
                 </div>
             </div>
         </div>
     </div>
 
-
-
-    <div class="col-md-3">
-        <div class="card card-animate">
-            <div class="card-body d-flex justify-content-between">
+    <!-- Utilized Budget Card -->
+    <div class="col-xl-6 col-md-6">
+        <div class="card card-animate border-start border-4 border-warning bg-white">
+            <div class="card-body p-4 d-flex justify-content-between align-items-center">
                 <div>
-                    <p class="fw-medium text-muted mb-0 fs-11">UTILIZED BUDGET</p>
-                    <h2 class="mt-4 ff-secondary fw-semibold">
-                        {{number_format($totalobligation[0]->totalobligation,2)}}
+                    <p class="text-uppercase fw-semibold text-muted mb-1 fs-12 tracking-wide">Utilized Budget</p>
+                    <h2 class="mt-2 fw-bold text-dark font-monospace mb-0">
+                        ₱{{ number_format($totalobligation[0]->totalobligation, 2) }}
                     </h2>
-
                 </div>
-                <div class="avatar-sm flex-shrink-0">
-                    <span class="avatar-title bg-secondary rounded-circle fs-2">
-                        <div class="d-flex justify-content-center">
-
-                            <div class="circular-progress" style="--value:{{number_format($totalobligation[0]->totalobligation/$fybudget[0]->grandtotal*100,2)}}">
-                               
-                            </div>
-
-                        </div>
-                    </span>
+                <div class="flex-shrink-0 d-flex align-items-center gap-3">
+                    <div class="text-end d-none d-sm-block">
+                        <span class="fs-12 text-muted d-block">Utilization Rate</span>
+                        <span class="fw-bold fs-14 text-dark">
+                            {{ number_format(($totalobligation[0]->totalobligation / max($fybudget[0]->grandtotal, 1)) * 100, 1) }}%
+                        </span>
+                    </div>
+                    <div class="circular-progress shadow-sm" style="--value:{{ ($totalobligation[0]->totalobligation / max($fybudget[0]->grandtotal, 1)) * 100 }}"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- <div class="col-md-3">
-        <div class="card card-animate">
-            <div class="card-body d-flex justify-content-between">
-                <div>
-                    <p class="fw-medium text-muted mb-0">Remaining</p>
-                    <h2 class="mt-4 ff-secondary fw-semibold">
-                      
-
-                    </h2>
-
-                </div>
-                <div class="avatar-sm flex-shrink-0">
-                    <span class="avatar-title bg-secondary rounded-circle fs-2">
-                        <i class="ri-wallet-line"></i>
-                    </span>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-
-    {{-- <div class="col-md-3">
-        <div class="card card-animate">
-            <div class="card-body d-flex justify-content-between">
-                <div>
-                    <p class="fw-medium text-muted mb-0">Utilization Rate</p>
-                    <h2 class="mt-4 ff-secondary fw-semibold">
-                       
-                    </h2>
-                    <p class="mb-0 text-muted">
-
-                    </p>
-                </div>
-                <div class="avatar-sm flex-shrink-0">
-                    
-
-                </div>
-            </div>
-        </div>
-    </div> --}}
 </div>
 
-
-
-<div class="card card-animate col-md-4 float-end">
-
-    <div class="card-body pt-0">
-
-
-        <div class="upcoming-scheduled">
-            <h6 class="text-uppercase fw-semibold mt-4 mb-3 text-muted">Upcoming Events for {{date('F')}}:</h6>
-        </div>
-        @foreach($task as $tasks)
-        <div class="mini-stats-wid d-flex align-items-center mt-3">
-
-
-
-            <div class="flex-shrink-0 avatar-sm">
-                <span class="mini-stat-icon avatar-title rounded-circle text-secondary bg-secondary-subtle fs-4">
-                    {{\Carbon\Carbon::parse($tasks->fromdate)->format('d')}}
-                </span>
-            </div>
-            <div class="flex-grow-1 ms-3">
-                <h6 class="mb-1">{{$tasks->pap}}</h6>
-                <p class="text-muted mb-0">{{$tasks->description}}</p>
-
-            </div>
-            <p class="text-muted mb-0 fs-10 float-end">{{$tasks->location}}</p>
-
-
-
-        </div><!-- end -->
-
-        @endforeach
-
-
-    </div><!-- end cardbody -->
-</div><!-- end card -->
-</div>
-
-<div class="row">
-    <div class="col-12">
-
-        <div class="card h-100">
-
-            <!-- Header -->
-            <div class="card-header d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-2">
-
-                <h4 class="card-title mb-0">
-                    Active Tasks for {{ date('F') }}
-                </h4>
-
-                {{-- <a href="{{ route('new task') }}"
-                    id="assignTaskBtn"
-                   class="btn btn-success btn-sm rounded-pill d-flex">
-                    <i class="ri-add-fill me-1 d-flex"></i>
-                    New Task
-                </a> --}}
-
+<!-- Main Grid: Active Tasks Table & Upcoming Events Column -->
+<div class="row g-4">
+    
+    <!-- Active Tasks Table Section -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card card-animate h-100 bg-white">
+            
+            <div class="card-header bg-transparent border-0 pt-4 px-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <h4 class="card-title fw-bold text-dark mb-1">
+                        Active Tasks for {{ date('F') }}
+                    </h4>
+                    <p class="text-muted fs-13 mb-0">Real-time status tracking for current operational milestones.</p>
+                </div>
             </div>
 
-            <!-- Body -->
-            <div class="card-body">
-
+            <div class="card-body px-4 pb-4">
                 <div class="table-responsive">
-
-                    <table class="table align-middle table-hover fs-12">
-
-                        <thead class="table-light ">
-                            <tr class="fs-11">
-                                <th>PAP</th>
-                                <th>TASK</th>
-                                <th>PROGRESS</th>
-                                <th>ASSIGNED</th>
-                                <th>STATUS</th>
-                                <th>DUE DATE</th>
+                    <table class="table align-middle table-hover fs-13 mb-0">
+                        <thead class="table-light text-uppercase fs-11 text-muted">
+                            <tr>
+                                <th class="py-3">PAP</th>
+                                <th class="py-3">Task</th>
+                                <th class="py-3">Progress</th>
+                                <th class="py-3">Assigned</th>
+                                <th class="py-3">Status</th>
+                                <th class="py-3">Due Date</th>
                             </tr>
                         </thead>
-
-                        <tbody >
+                        <tbody>
                             @foreach($monthtask as $monthlytask)
-
                             @php
                                 $percent = ((float) $monthlytask->ProgressScore) * 100;
 
@@ -243,79 +143,108 @@
 
                                 $statusColor = $percent >= 100
                                     ? 'success'
-                                    : ($percent > 1 ? 'warning' : 'danger');
+                                    : ($percent > 1 ? 'warning' : 'secondary');
                             @endphp
 
                             <tr>
-                                <td class="fw-medium text-truncate" style="max-width:150px;">
-                                    {{$monthlytask->pap}}
+                                <td class="fw-medium text-truncate py-3" style="max-width:140px;" title="{{ $monthlytask->pap }}">
+                                    {{ $monthlytask->pap }}
                                 </td>
 
-                                <td class="text-truncate" style="max-width:200px;">
-                                    <a href="/Task/viewtask/{{$monthlytask->id}}" class="text-decoration-none">
-                                        {{$monthlytask->tasks}}
+                                <td class="text-truncate py-3" style="max-width:180px;" title="{{ $monthlytask->tasks }}">
+                                    <a href="/Task/viewtask/{{ $monthlytask->id }}" class="text-decoration-none fw-semibold text-dark text-hover-success">
+                                        {{ $monthlytask->tasks }}
                                     </a>
                                 </td>
 
-                                <td style="min-width:150px;">
+                                <td class="py-3" style="min-width:130px;">
                                     <div class="d-flex align-items-center gap-2">
-                                        <small class="text-muted">{{$percent}}%</small>
-                                        <div class="progress flex-grow-1" style="height:6px;">
-                                            <div class="progress-bar {{$progressClass}}"
-                                                 style="width: {{$percent}}%">
-                                            </div>
+                                        <small class="text-muted fw-semibold">{{ $percent }}%</small>
+                                        <div class="progress flex-grow-1 bg-light" style="height:6px;">
+                                            <div class="progress-bar {{ $progressClass }} rounded-pill" role="progressbar" style="width: {{ $percent }}%"></div>
                                         </div>
                                     </div>
                                 </td>
 
-                                <td>
+                                <td class="py-3">
                                     <div class="d-flex align-items-center gap-2">
-                                        <img src="{{$monthlytask->avatar}}"
-                                             class="rounded-circle"
-                                             width="30"
-                                             height="30">
-                                        <span class="d-none d-md-inline">
-                                            {{$monthlytask->name}}
+                                        <img src="{{ $monthlytask->avatar }}" class="rounded-circle border" width="32" height="32" alt="Avatar">
+                                        <span class="d-none d-md-inline text-dark fw-medium fs-12">
+                                            {{ $monthlytask->name }}
                                         </span>
                                     </div>
                                 </td>
 
-                                <td>
-                                    <span class="badge bg-{{$statusColor}}-subtle text-{{$statusColor}}">
-                                        {{$statusText}}
+                                <td class="py-3">
+                                    <span class="badge bg-{{ $statusColor }}-subtle text-{{ $statusColor }} px-2.5 py-1.5 rounded-pill fs-11">
+                                        {{ $statusText }}
                                     </span>
                                 </td>
 
-                                <td class="text-muted">
+                                <td class="py-3 text-muted fs-12 text-nowrap">
                                     {{ \Carbon\Carbon::parse($monthlytask->duedate)->format('M d, Y') }}
                                 </td>
-
                             </tr>
-
                             @endforeach
                         </tbody>
-
                     </table>
-
                 </div>
-
             </div>
 
         </div>
-
     </div>
-</div><!-- end row -->
 
+    <!-- Upcoming Events Column -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card card-animate h-100 bg-white">
+            <div class="card-body p-4">
+                
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="text-uppercase fw-bold text-dark mb-0 fs-13">
+                        <i class="ri-calendar-event-line text-success me-1"></i> Upcoming Events for {{ date('F') }}
+                    </h6>
+                </div>
 
+                <div class="upcoming-scheduled">
+                    @forelse($task as $tasks)
+                    <a href="/Task/task/{{ $tasks->fromdate }}/{{ $tasks->id}}" class="text-decoration-none">
+                    <div class="d-flex align-items-start mt-3 p-2 rounded-3 transition">
+                        <div class="flex-shrink-0">
+                            <span class="avatar-title rounded-circle text-white fw-bold fs-13 d-flex flex-column align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px; background-color: var(--bs-dark-green);">
+                                <span class="fs-14 lh-1">{{ \Carbon\Carbon::parse($tasks->fromdate)->format('d') }}</span>
+                                <span style="font-size: 9px;" class="text-uppercase text-light opacity-75">{{ \Carbon\Carbon::parse($tasks->fromdate)->format('M') }}</span>
+                            </span>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-1 fw-semibold text-dark fs-13">{{ $tasks->pap }}</h6>
+                            <p class="text-muted mb-1 fs-12">{{ $tasks->description }}</p>
+                            <span class="badge bg-light text-muted border fs-10">
+                                <i class="ri-map-pin-line me-1"></i> {{ $tasks->location ?: 'Location TBD' }}
+                            </span>
+                        </div>
+                    </div>
+                    </a>
+                    @empty
+                    <div class="text-center py-5 text-muted">
+                        <i class="ri-calendar-check-line fs-24 mb-2 d-block"></i>
+                        <p class="fs-12 mb-0">No upcoming events scheduled for this month.</p>
+                    </div>
+                    @endforelse
+                </div>
 
+            </div>
+        </div>
+    </div>
+
+</div>
 
 @endsection
 
 <script>
-     document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
         const userType = @json(Auth::user()->usertype);
         const assignTaskBtn = document.getElementById('assignTaskBtn');
-       if (userType !== 'admin') {
+        if (assignTaskBtn && userType !== 'admin') {
             assignTaskBtn.style.display = 'none';
         }
     });

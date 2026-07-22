@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('papmanagement', function (Blueprint $table) {
-    $table->string('google_event_id')->nullable();
+    $table->string('googlecalendareventID')->nullable();
     });
         
     }
@@ -22,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tasks', function (Blueprint $table) {
-            //
+        Schema::table('papmanagement', function (Blueprint $table) {
+            $table->dropColumn('googlecalendareventID');
         });
     }
 };

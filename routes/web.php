@@ -10,13 +10,19 @@ use App\Models\Task;
 use Spatie\GoogleCalendar\Event;
 use Carbon\Carbon;
 
-Route::get('/Task', [TaskController::class, 'dashboard']) -> name('dashboard');
-
 Route::get('/', [AuthenticationController::class, 'index']);
 Route::post('/', [AuthenticationController::class, 'authenticate']) -> name('login');
+
 Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGooglCallbak'])->name('google.callback');
 Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
+
+
+Route::middleware('auth')->group(function () {
+
+
+Route::get('/Task', [TaskController::class, 'dashboard']) -> name('dashboard');
+
 
 //Task Routes
 Route::get('/Task/task/{date?}/{papM?}', [TaskController::class, 'index'])->name('task');
@@ -68,3 +74,5 @@ Route::post('/obexmanagement/obex/{id}', [App\Http\Controllers\OBEXcontroller::c
 
 //calendar routes
 
+
+});

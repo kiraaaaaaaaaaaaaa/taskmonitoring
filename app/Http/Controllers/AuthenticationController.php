@@ -37,6 +37,8 @@ class AuthenticationController extends Controller
  
             return redirect()->intended('/Task');
         }
+      
+        
  
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',

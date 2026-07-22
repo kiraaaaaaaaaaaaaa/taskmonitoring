@@ -22,6 +22,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Spatie\GoogleCalendar\Event;
 use App\Services\GoogleCalendarService;
+use App\Mail\TaskAssignedMail;
+use Illuminate\Support\Facades\Mail;
 
 class TaskController extends Controller
 {
@@ -39,7 +41,7 @@ class TaskController extends Controller
             ->leftjoin('divisions', 'paps.divID', '=', 'divisions.id')
             ->leftjoin('outputsupported', 'paps.oosID', '=', 'outputsupported.oosID')
             ->where('papmanagement.id', $papM)
-            ->select('papmanagement.*', 'paps.pap', 'users.name as focalPerson', 'fundsource.fundName as fundName', 'divisions.*', 'outputsupported.oosName')
+            ->select('papmanagement.*', 'paps.pap', 'users.name as focalPerson', 'fundsource.fundName as fundName', 'divisions.*', 'outputsupported.oosName', 'papmanagement.id as newID')
             ->get();
 
       
@@ -365,10 +367,12 @@ class TaskController extends Controller
     ->leftjoin('mooe', 'tasks.allocatedbudget', '=', 'mooe.mooeID')
     ->leftJoin('subprogram', 'mooe.subprogramID', '=', 'subprogram.id')
     ->leftJoin('sectorprogram', 'subprogram.programID', '=', 'sectorprogram.id')
+    ->leftJoin('fundsource', 'paps.fundID', '=', 'fundsource.id')
     ->select(
         'tasks.*',
         'paps.pap',
         'paptask.tasks',
+        'fundsource.fundName',
 
         'ASSIGNED.name as Assigned',
         'r1.name as rv1',
@@ -415,6 +419,7 @@ class TaskController extends Controller
             ->leftjoin('mooe', 'tasks.allocatedbudget', '=', 'mooe.mooeID')
             ->leftJoin('subprogram', 'mooe.subprogramID', '=', 'subprogram.id')
             ->leftJoin('sectorprogram', 'subprogram.programID', '=', 'sectorprogram.id')
+            ->leftJoin('fundsource', 'paps.fundID', '=', 'fundsource.id')
             ->select(
                 'tasks.*',
                 'paps.pap',
@@ -429,10 +434,12 @@ class TaskController extends Controller
                 'r5.name as rv5',
                 'papmanagement.fromdate as papdate',
                 'papmanagement.todate as papdateend',
+                'fundsource.fundName as fundname',
 
                 'subprogram.id as subprogram_id',
                 'subprogram.subprogramname',
                 'mooe.mooeID',
+                'mooe.mooeName',
 
                 'sectorprogram.id as program_id',
                 'sectorprogram.programname',
@@ -722,6 +729,12 @@ class TaskController extends Controller
         // ]);
 
         foreach ($request->tasks as $taskId) {
+            $email = User::where('id', $request->assigned)->first();
+            $paptask = paptask::where('id', $taskId)->first();
+            $paps = Paps::where('id', $request->paps)->first();
+
+           
+           
             DB::table('tasks')->insert([
                 'PAP' => $request->PAP,
                 'task' => $taskId,
@@ -756,6 +769,12 @@ class TaskController extends Controller
                 'reviewLevel' => 3, // default to first level
             ]);
         }
+
+        Mail::to($email->email)->send(new TaskAssignedMail([
+            'duedate' => $request->duedate,
+            'task' => $paptask->tasks,
+            'paps' => $paps->pap
+        ]));
         // Task::create($validate);
         return redirect()->route('task disposition')->with('success', 'Task(s) created successfully.');
     }
