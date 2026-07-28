@@ -432,6 +432,7 @@
             icon: 'success',
             title: 'Success',
             text: '{{ session('success') }}',
+            background: '#d2dad6',
             timer: 3000,
             showConfirmButton: false,
             confirmButtonColor: '#1b4332'
@@ -443,6 +444,7 @@
             icon: 'error',
             title: 'Error',
             text: '{{ session('error') }}',
+            background: '#d2dad6',
             showConfirmButton: true,
             confirmButtonColor: '#1b4332'
         });
@@ -453,6 +455,7 @@
             icon: 'warning',
             title: 'Warning',
             text: '{{ session('warning') }}',
+            background: '#d2dad6',
             confirmButtonColor: '#ffb703'
         });
     @endif

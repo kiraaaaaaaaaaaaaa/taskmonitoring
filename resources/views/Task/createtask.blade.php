@@ -37,13 +37,16 @@
         border-radius: 0.50rem;
         border: 1px solid #ced4da;
         padding: 0.65rem 0.9rem;
+    
         font-size: 0.925rem;
+
         transition: all 0.2s ease;
     }
 
     .form-control:focus, .form-select:focus {
         border-color: var(--bs-accent-green);
         box-shadow: 0 0 0 0.25rem rgba(25, 111, 71, 0.15);
+   
     }
 
     .form-control[readonly] {
@@ -118,6 +121,29 @@
     .modal-header .btn-close {
         filter: brightness(0) invert(1);
     }
+
+    .choices__inner {
+    background-color: #ffffff !important;
+    border: 1px solid #ced4da !important;
+    border-radius: 0.5rem !important;
+    min-height: 44px;
+    padding: .45rem .75rem !important;
+}
+
+.choices__list--dropdown,
+.choices__list[aria-expanded] {
+    background: #ffffff !important;
+    border: 1px solid #ced4da !important;
+}
+
+.choices__input {
+    background: #ffffff !important;
+}
+
+.choices__item {
+    color: #212529;
+}
+
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">

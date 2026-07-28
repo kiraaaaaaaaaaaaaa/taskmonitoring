@@ -99,6 +99,7 @@ class TaskController extends Controller
         $task = createdPAP::join('paps', 'papmanagement.papID', '=', 'paps.id')
             ->select('papmanagement.*', 'paps.pap')
             ->whereMonth('papmanagement.fromdate', $now->month)
+            ->orderBy('papmanagement.fromdate', 'asc')
             ->get();
 
 

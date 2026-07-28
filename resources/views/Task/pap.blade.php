@@ -29,6 +29,7 @@
     .card-activity:hover {
         transform: translateY(-4px);
         box-shadow: 0 0.75rem 2rem rgba(11, 60, 41, 0.08);
+        
     }
 
     /* Month Navigation Header Styling */
@@ -102,6 +103,19 @@
         border-radius: 1rem;
         box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15);
     }
+     .pap-hero-card {
+        background: #ffffff;
+    color: var(--bs-dark-green);
+    border: none;
+    border-left: 10px solid var(--bs-dark-green);
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(10, 54, 34, 0.1);
+    }
+    .task-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0.5rem 1.25rem rgba(10, 54, 34, 0.08);
+        border-color: var(--bs-golden-yellow);
+    }
 </style>
 
 <!-- Month Navigation Header -->
@@ -137,7 +151,7 @@
         
     </div>
     <a data-bs-toggle="modal" id="assignTaskBtn" data-bs-target="#addPapModal" class="btn btn-dark-green btn-label rounded-pill px-4 py-2 shadow-sm">
-        <i class="ri-add-line label-icon align-middle rounded-pill fs-16 me-2"></i>
+        <i class="ri-add-line align-middle rounded-pill fs-16 me-2"></i>
         Add Activity
     </a>
 </div>
@@ -152,10 +166,10 @@
 </div>
 @else
 
-<div class="row g-4">
+<div class="row g-4 " >
     @foreach ($newtask as $task)
-    <div class="col-12 col-md-6 col-xl-4">
-        <div class="card card-activity h-100">
+    <div class="col-12s col-md-6 col-xl-4  ">
+        <div class="card card-activity task-card h-100 pap-hero-card">
             <div class="card-body p-4 d-flex flex-column justify-content-between">
                 <div>
                     <!-- Status Banner / Ribbon Header -->

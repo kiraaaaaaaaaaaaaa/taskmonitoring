@@ -54,7 +54,7 @@
     .task-card:hover {
         transform: translateY(-3px);
         box-shadow: 0 0.5rem 1.25rem rgba(10, 54, 34, 0.08);
-        border-color: var(--bs-golden-yellow-border);
+        border-color: var(--bs-golden-yellow);
     }
 
     .task-title a {
@@ -97,18 +97,25 @@
         border-radius: 0.5rem;
         overflow: hidden;
     }
+     .pap-hero {
+        background: #ffffff;
+    color: var(--bs-dark-green);
+    border: none;
+    border-left: 10px solid var(--bs-dark-green);
+    border-radius: 1rem;
+    box-shadow: 0 0.5rem 1.5rem rgba(10, 54, 34, 0.1);
+    }
 </style>
 
 <div class="container-fluid px-0 py-3">
 @foreach($viewpap as $viewpaps)
     <!-- Back Navigation -->
     <div class="mb-4">
-        <a href="javascript:history.back()" class="btn btn-outline-dark-green btn-label waves-effect waves-light rounded-pill px-3 shadow-sm">
-            <i class="ri-arrow-left-s-line label-icon align-middle rounded-pill fs-16 me-2"></i>
-            Back
-        </a>
-        
-    </div>
+   
+    <a href="javascript:history.back()" class="btn btn-outline-dark-green btn-label waves-effect waves-light rounded-pill px-3 shadow-sm">
+                                        <i class="ri-arrow-left-s-line align-bottom me-2 text-success rounded-pill"></i> Back
+                                    </a>
+</div>
 
     <!-- PAP Overview Section -->
     
@@ -181,8 +188,8 @@
                 $progressClass = $percent >= 80 ? 'bg-success' : ($percent >= 50 ? 'bg-warning' : 'bg-danger');
             @endphp
 
-            <div class="col-12 col-md-6 col-xl-4">
-                <div class="card task-card h-100 d-flex flex-column">
+            <div class="col-12 col-md-6 col-xl-4 ">
+                <div class="card task-card h-100 d-flex flex-column pap-hero">
                     <div class="card-body p-4 d-flex flex-column justify-content-between">
                         
                         <div>
