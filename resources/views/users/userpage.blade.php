@@ -113,7 +113,7 @@
     </div>
     <div class="col-sm-6 text-sm-end mt-3 mt-sm-0">
         <button data-bs-toggle="modal" data-bs-target="#showModal" class="btn btn-theme-accent btn-label waves-effect waves-light rounded-pill shadow-sm">
-            <i class="ri-add-fill label-icon align-middle rounded-pill fs-16 me-2"></i>
+            <i class="ri-add-fill align-middle rounded-pill fs-16 me-2"></i>
             Create New User
         </button>
     </div>
