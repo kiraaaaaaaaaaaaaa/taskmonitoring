@@ -185,8 +185,13 @@
                                 <input type="url" id="filelink" name="link" class="form-control" value="{{$fromtask->link}}" placeholder="https://example.com">
                             </div>
                         </div>
-
+                        <div class="mb-4" id="forusertype2">
+                             <button type="submit" class="btn btn-dark-green rounded-pill px-4 shadow-sm" value="staff" name="action">
+                                <i class="ri-save-line label-icon align-middle rounded-pill fs-16 me-2"></i> Save and Submit for Review 
+                            </button>
+                        </div>
                         <hr class="my-4 text-muted opacity-25">
+                        
 
                         <!-- Reviewers & Status Section -->
                         <h5 class="fw-bold mb-3" style="color: var(--bs-dark-green);">
@@ -196,8 +201,8 @@
                         <div class="reviewer-row" id="row_r2">
                             <div class="row align-items-center">
                                 <div class="col-md-6 mb-2 mb-md-0">
-                                    <label class="form-label text-muted fs-11 mb-1">Reviewer 1</label>
-                                    <input value="{{$fromtask->rv1}}" class="form-control bg-light" readonly />
+                                    <label class="form-label text-muted fs-11 mb-1">Reviewer</label>
+                                    <input value="{{$fromtask->rv1}}" id="r1" class="form-control bg-light" readonly />
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label text-muted fs-11 mb-1">Status 1</label>
@@ -215,7 +220,7 @@
                         <div class="reviewer-row" id="row_r2_sub">
                             <div class="row align-items-center">
                                 <div class="col-md-6 mb-2 mb-md-0">
-                                    <label class="form-label text-muted fs-11 mb-1">Reviewer 2</label>
+                                    <label class="form-label text-muted fs-11 mb-1">Reviewer</label>
                                     <input value="{{$fromtask->rv2}}" id="r2" class="form-control bg-light" readonly />
                                 </div>
                                 <div class="col-md-6">
@@ -234,7 +239,7 @@
                         <div class="reviewer-row" id="row_r3_sub">
                             <div class="row align-items-center">
                                 <div class="col-md-6 mb-2 mb-md-0">
-                                    <label class="form-label text-muted fs-11 mb-1">Reviewer 3</label>
+                                    <label class="form-label text-muted fs-11 mb-1">Reviewer</label>
                                     <input value="{{$fromtask->rv3}}" id="r3" class="form-control bg-light" readonly />
                                 </div>
                                 <div class="col-md-6">
@@ -253,7 +258,7 @@
                         <div class="reviewer-row" id="row_r4_sub">
                             <div class="row align-items-center">
                                 <div class="col-md-6 mb-2 mb-md-0">
-                                    <label class="form-label text-muted fs-11 mb-1">Reviewer 4</label>
+                                    <label class="form-label text-muted fs-11 mb-1">Reviewer</label>
                                     <input value="{{$fromtask->rv4}}" id="r4" class="form-control bg-light" readonly />
                                 </div>
                                 <div class="col-md-6">
@@ -272,7 +277,7 @@
                         <div class="reviewer-row" id="row_r5_sub">
                             <div class="row align-items-center">
                                 <div class="col-md-6 mb-2 mb-md-0">
-                                    <label class="form-label text-muted fs-11 mb-1">Reviewer 5</label>
+                                    <label class="form-label text-muted fs-11 mb-1">Reviewer</label>
                                     <input value="{{$fromtask->rv5}}" id="r5" class="form-control bg-light" readonly />
                                 </div>
                                 <div class="col-md-6">
@@ -288,9 +293,12 @@
                             </div>
                         </div>
 
+                        
+
                     </div>
                 </div>
             </div>
+           
 
             <!-- Toggle Button Column -->
             <div class="col-auto d-none d-lg-flex justify-content-center align-items-center">
@@ -340,12 +348,14 @@
             </div>
 
         </div>
+        
 
     </form>
 </div>
 
 <script>
     const pairs = [
+        
         { row: "row_r2_sub", r: "r2", s: "s2", status: @json($fromtask->status2) },
         { row: "row_r3_sub", r: "r3", s: "s3", status: @json($fromtask->status3) },
         { row: "row_r4_sub", r: "r4", s: "s4", status: @json($fromtask->status4) },
@@ -368,6 +378,9 @@
         const obligationDetails = document.getElementById('obligationDetails');
         const mooeSelect = document.getElementById('mooe');
         const toggleButton = document.getElementById('toggleObligation');
+        const utype2 = document.getElementById('forusertype2');
+
+        
 
         if(mooeSelect.value !== "")
         {
@@ -387,6 +400,42 @@
                 document.getElementById('toggleIcon').classList.add('ri-arrow-right-s-line');
             }
         });
+
+        
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const utype2 = document.getElementById('forusertype2');
+        const userType = @json(Auth::user()->usertype);
+
+        if (userType <= 2) {
+            utype2.style.display = 'block';
+        } else {
+            utype2.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const pairs = [
+        { row: "row_r2", r: "r1",   user: @json($fromtask->reviewer1) },
+        { row: "row_r2_sub", r: "r2", user: @json($fromtask->reviewer2) },
+        { row: "row_r3_sub", r: "r3",  user: @json($fromtask->reviewer3) },
+        { row: "row_r4_sub", r: "r4",  user: @json($fromtask->reviewer4) },
+        { row: "row_r5_sub", r: "r5",  user: @json($fromtask->reviewer5)},
+    ];
+
+    pairs.forEach(item => {
+
+        const rowWrapper = document.getElementById(item.row);
+        const r = document.getElementById(item.r);
+        const uid = String(item.user ?? "");
+        const currentUser = String(@json(Auth::user()->id));
+
+        
+        if (uid !== currentUser) {
+        rowWrapper.style.display = "none";
+        }
+    });
     });
 </script>
 

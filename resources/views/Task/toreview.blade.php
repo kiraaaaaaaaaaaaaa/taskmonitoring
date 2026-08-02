@@ -201,14 +201,14 @@
                         <i class="ri-checkbox-circle-line text-success"></i> Done
                     </h5>
                     <span class="column-badge">
-                        {{ $groupedTasks->filter(fn($t) => $t->progressScore >= 1 && \Carbon\Carbon::parse($t->duedate)->isSameMonth(now()))->count() }} Tasks
+                        {{ $completedtasks->filter(fn($t) => $t->progressScore >= 1 && \Carbon\Carbon::parse($t->duedate)->isSameMonth(now()))->count() }} Tasks
                     </span>
                 </div>
 
                 <div class="d-flex flex-column gap-3 mb-3">
                     <label class="text-muted fs-11 mb-1">*Tasks that are reviewed this month</label>
 
-                    @foreach ($groupedTasks as $task)
+                    @foreach ($completedtasks as $task)
                         @if($task->progressScore >= 1 && \Carbon\Carbon::parse($task->duedate)->isSameMonth(now()))
                             @include('components.taskcard', ['task' => $task, 'status' => 'done'])
                         @endif
@@ -247,7 +247,7 @@
                         </thead>
 
                         <tbody class="fs-12">
-                            @foreach ($groupedTasks as $task)
+                            @foreach ($completedtasks as $task)
                                 @if($task->progressScore >= 1)
                                 <tr>
                                     <td class="px-3 fw-medium text-dark">{{ $task->pap }}</td>

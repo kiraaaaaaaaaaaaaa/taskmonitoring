@@ -125,9 +125,14 @@
                                     <td class="d-none">{{$pap->id}}</td>
                                     <td>
                                         <div class="d-flex align-items-center justify-content-between py-1">
-                                            <span style="color: var(--bs-dark-green);" class="fs-15">
-                                                <i class="ri-folder-shield-2-line me-2"></i>{{ $pap->pap }}
-                                            </span>
+                                           <span class="fs-15 d-flex align-items-center">
+    <i class="ri-arrow-down-s-line me-2 toggle-icon"
+       style="cursor:pointer"
+       data-pap="{{ $pap->id }}"></i>
+
+    <i class="ri-folder-shield-2-line me-2"></i>
+    {{ $pap->pap }}
+</span>
                                             <div class="dropdown">
                                                 <a href="#" class="text-muted px-2 py-1" data-bs-toggle="dropdown">
                                                     <i class="ri-more-fill fs-16"></i>
@@ -157,7 +162,7 @@
                                 <!-- Associated Tasks -->
                                 @foreach($paptasks as $tasksss)
                                    @if($tasksss->papID == $pap->id)
-                                <tr class="task-row">
+                                <tr class="task-row task-group-{{$tasksss->papID}}">
                                     <td class="d-none">{{$tasksss->id}}</td>
                                     <td>
                                         <div class="d-flex align-items-center justify-content-between ps-4 py-1">
@@ -385,7 +390,36 @@
         if(inputsector) {
             inputsector.dispatchEvent(new Event('change'));
         }
+
+        
     });
+    document.addEventListener("DOMContentLoaded", function () {
+
+    document.querySelectorAll(".toggle-icon").forEach(icon => {
+
+        icon.addEventListener("click", function () {
+
+            const papId = this.dataset.pap;
+
+            const tasks = document.querySelectorAll(".task-group-" + papId);
+
+            tasks.forEach(task => {
+                task.classList.toggle("d-none");
+            });
+
+            if (this.classList.contains("ri-arrow-down-s-line")) {
+                this.classList.remove("ri-arrow-down-s-line");
+                this.classList.add("ri-arrow-right-s-line");
+            } else {
+                this.classList.remove("ri-arrow-right-s-line");
+                this.classList.add("ri-arrow-down-s-line");
+            }
+
+        });
+
+    });
+
+});
 </script>
 
 @endsection

@@ -66,6 +66,16 @@ class UserController extends Controller
     } else {
 
         // CREATE
+        $duplicateemail = User::where(strtolower('email'), strtolower($request->email))->first();
+        $duplicatename = User::where(strtolower('name'), strtolower($request->name))->first();
+        if ($duplicateemail) {
+            return back()->with('error', 'User with this email already exists.');
+        }
+        if ($duplicatename) {
+            return back()->with('error', 'User with this name already exists.');
+        }
+        else
+            {
         User::create([ 
             'name' => $request->name,
             'email' => $request->email,
@@ -76,6 +86,7 @@ class UserController extends Controller
             'sectorID' => $request->sector,
         ]);
         $request->session()->flash('success', 'User created successfully.');
+            }
     }
 
         return redirect()-> route('user management');

@@ -390,16 +390,16 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const reviewersContainer = document.getElementById('reviewersContainer');
-    let reviewerCount = document.querySelectorAll('[id^="reviewer"]').length;
+    let reviewerCount = document.querySelectorAll('select[id^="reviewer"]').length;
 
     addReviewerBtn.addEventListener('click', () => {
-        reviewerCount++;
+        
         if (reviewerCount > 5) {
             alert('Maximum of 5 reviewers allowed.');
             reviewerCount--;
             return;
         }
-
+        reviewerCount++;
         const fieldset = document.createElement('fieldset');
         fieldset.classList.add('reviewer-fieldset', 'border', 'rounded', 'p-3', 'mb-3');
         fieldset.innerHTML = `
@@ -435,6 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         reviewersContainer.appendChild(fieldset);
+        
 
         fieldset.querySelector('.removeReviewerBtn').addEventListener('click', () => {
             fieldset.remove();

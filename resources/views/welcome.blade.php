@@ -53,10 +53,10 @@
 </style>
 
 <!-- Top Dashboard Metrics Row -->
-<div class="row g-4 mb-4">
+<div class="d-flex gap-3 flex-nowrap mb-4">
     
     <!-- Approved Budget Card -->
-    <div class="col-xl-6 col-md-6">
+    <div class="flex-fill">
         <div class="card card-animate border-start border-4 border-success bg-white">
             <div class="card-body p-4 d-flex justify-content-between align-items-center">
                 <div>
@@ -75,7 +75,7 @@
     </div>
 
     <!-- Utilized Budget Card -->
-    <div class="col-xl-6 col-md-6">
+    <div class="flex-fill">
         <div class="card card-animate border-start border-4 border-warning bg-white">
             <div class="card-body p-4 d-flex justify-content-between align-items-center">
                 <div>
@@ -92,6 +92,46 @@
                         </span>
                     </div>
                     <div class="circular-progress shadow-sm" style="--value:{{ ($totalobligation[0]->totalobligation / max($fybudget[0]->grandtotal, 1)) * 100 }}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-fill">
+        
+        <div class="card card-animate border-start border-4 border-success bg-white">
+            <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-uppercase fw-semibold text-muted mb-1 fs-12 tracking-wide">My Active Task</p>
+                    <h3 class="mt-2 fw-bold text-dark font-monospace mb-0">
+                        {{count($counttask)}} Task(s)
+                    </h3>
+                </div>
+                <div class="flex-shrink-0 d-flex align-items-center gap-3">
+                    <div class="text-end d-none d-sm-block">
+                        <span class="avatar-title rounded-circle p-3 fs-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px; background-color: var(--bs-dark-green); color: white;">
+                        <i class=" ri-pushpin-line"></i>
+                    </span>
+                    </div>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex-fill">
+        <div class="card card-animate border-start border-4 border-warning bg-white">
+            <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="text-uppercase fw-semibold text-muted mb-1 fs-12 tracking-wide">Task to be Reviewed</p>
+                    <h3 class="mt-2 fw-bold text-dark font-monospace mb-0">
+                        {{count($reviewcounttasks)}} Task(s)
+                    </h3>
+                </div>
+                <div class="flex-shrink-0 d-flex align-items-center gap-3">
+                    <span class="avatar-title rounded-circle p-3 fs-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 60px; height: 60px; background-color: var(--bs-golden-yellow); color: white;">
+                        <i class=" ri-file-edit-line"></i>
+                   
                 </div>
             </div>
         </div>
