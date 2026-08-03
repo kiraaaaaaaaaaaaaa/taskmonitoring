@@ -119,7 +119,7 @@
         </div>
     </div>
 
-    <div class="flex-fill">
+    <div class="flex-fill" id="reviewTaskCard">
         <div class="card card-animate border-start border-4 border-warning bg-white">
             <div class="card-body p-4 d-flex justify-content-between align-items-center">
                 <div>
@@ -283,9 +283,14 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const userType = @json(Auth::user()->usertype);
+        const userlevel = @json(Auth::user()->userlevel);
         const assignTaskBtn = document.getElementById('assignTaskBtn');
+        const reviewTaskCard = document.getElementById('reviewTaskCard');
         if (assignTaskBtn && userType !== 'admin') {
             assignTaskBtn.style.display = 'none';
+        }
+        if (reviewTaskCard && userlevel = 2) {
+            reviewTaskCard.style.display = 'none';
         }
     });
 </script>
