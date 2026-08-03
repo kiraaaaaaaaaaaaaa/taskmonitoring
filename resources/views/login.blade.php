@@ -187,7 +187,7 @@
                 
                 <div class="card auth-card">
                     <div class="auth-header-bg">
-                        <h4 class="fw-bold mb-1">BRO Task Monitoring</h4>
+                        <h4 class="fw-bold text-white mb-1">BRO Task Monitoring</h4>
                         <p class="text-white-50 mb-0 fs-14">Sign in to continue to your dashboard</p>
                     </div>
 
