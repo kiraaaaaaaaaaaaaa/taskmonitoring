@@ -150,7 +150,7 @@
                                     <td class="phone text-muted">{{$users->email}}</td>
                                     <td class="status">
                                         <span class="badge badge-custom-success text-uppercase px-2.5 py-1.5 rounded-pill">
-                                            {{$users->usertype}}
+                                            {{$users->position}}
                                         </span>
                                     </td>
                                     <td class="division">
