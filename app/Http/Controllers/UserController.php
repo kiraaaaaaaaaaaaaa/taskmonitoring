@@ -32,7 +32,7 @@ class UserController extends Controller
         $user = DB::table('users')
         ->join('divisions', 'users.divisionID', '=', 'divisions.id')
         ->leftjoin('usertype', 'users.usertype', '=', 'usertype.id')
-        ->select('users.*', 'divisions.division_short_name', 'divisions.division_name', 'usertype.position as usertype')
+        ->select('users.*', 'divisions.division_short_name', 'divisions.division_name', 'usertype.position')
         ->get();
         return view('users.userpage',['user'=>$user, 'divisions'=>$divisions, 'sector'=>$sector, 'utypes'=>$utypes]);
     }
