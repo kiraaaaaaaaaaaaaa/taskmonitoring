@@ -187,6 +187,7 @@
                                 <i class="ri-calendar-event-line me-1"></i> {{ \Carbon\Carbon::parse($task->fromdate)->diffForHumans() }}
                             </span>
                         @endif -->
+                        <div></div>
 
                         <div class="dropdown">
                             <a href="#" class="btn btn-icon btn-sm btn-ghost-secondary rounded-circle shadow-none" data-bs-toggle="dropdown">
@@ -194,16 +195,16 @@
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 py-2">
                                 <li>
-                                    <a class="dropdown-item py-2 text-dark" href="/Task.createtask/{{ $task->newID }}" id="addTaskBtn">
+                                    <a class="dropdown-item addTaskBtn py-2 text-dark" href="/Task.createtask/{{ $task->newID }}" id="addTaskBtn">
                                         <i class="ri-add-circle-line align-bottom me-2 text-success"></i> Add Task
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item py-2 text-dark editPapLink" id="editPapLinkbtn" href="#" data-bs-toggle="modal" data-bs-target="#editPapModal" data-id="{{ $task->newID }}" data-googlecalendareventID="{{ $task->googlecalendareventID }}" data-papid="{{ $task->papID }}" data-pap="{{ $task->pap }}" data-location="{{ $task->location }}" data-datefrom="{{ $task->fromdate }}" data-dateend="{{$task->todate}}" data-description="{{ $task->description }}">
+                                    <a class="dropdown-item py-2 editPapLinkbtn text-dark editPapLink" id="editPapLinkbtn" href="#" data-bs-toggle="modal" data-bs-target="#editPapModal" data-id="{{ $task->newID }}" data-googlecalendareventID="{{ $task->googlecalendareventID }}" data-papid="{{ $task->papID }}" data-pap="{{ $task->pap }}" data-location="{{ $task->location }}" data-datefrom="{{ $task->fromdate }}" data-dateend="{{$task->todate}}" data-description="{{ $task->description }}">
                                         <i class="ri-pencil-line align-bottom me-2 text-warning"></i> Edit PAP
                                     </a>
                                 </li>
-                                <li id="removePapBtn">
+                                <li class="removePapBtn">
                                     <form action="/Task/pap/{{ $task->newID }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="dropdown-item py-2 text-danger" onclick="return confirm('Are you sure you want to remove this PAP?')">
@@ -390,22 +391,36 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const userType = @json(Auth::user()->usertype);
-        const assignTaskBtn = document.getElementById('assignTaskBtn');
-        const addTaskBtn = document.getElementById('addTaskBtn');
-        const editPapLinkBtn = document.getElementById('editPapLinkbtn');
-        const deletePapBtn = document.getElementById('deletepapbtn');
-        const dropdownDivider = document.getElementById('dropdownDivider');
-        const removePapBtn = document.getElementById('removePapBtn');
         
-        if (userType === '2') {
-            if(assignTaskBtn) assignTaskBtn.style.display = 'none';
-            if(addTaskBtn) addTaskBtn.style.display = 'none';
-            if(editPapLinkBtn) editPapLinkBtn.style.display = 'none';
-            if(deletePapBtn) deletePapBtn.style.display = 'none';
-            if(dropdownDivider) dropdownDivider.style.display = 'none';
-            if(removePapBtn) removePapBtn.style.display = 'none';
-        }
+        const userType = @json(Auth::user()->usertype);
+
+    if (userType === '2') {
+
+        document.querySelectorAll('.assignTaskBtn').forEach(el => {
+            el.style.display = 'none';
+        });
+
+        document.querySelectorAll('.addTaskBtn').forEach(el => {
+            el.style.display = 'none';
+        });
+
+        document.querySelectorAll('.editPapLink').forEach(el => {
+            el.style.display = 'none';
+        });
+
+        document.querySelectorAll('.deletePapBtn').forEach(el => {
+            el.style.display = 'none';
+        });
+
+        document.querySelectorAll('.dropdownDivider').forEach(el => {
+            el.style.display = 'none';
+        });
+
+        document.querySelectorAll('.removePapBtn').forEach(el => {
+            el.style.display = 'none';
+        });
+
+    }
 
         document.querySelectorAll('.editPapLink').forEach(link => {
             link.addEventListener('click', function() {
