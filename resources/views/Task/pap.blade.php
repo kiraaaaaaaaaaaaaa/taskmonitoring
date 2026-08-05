@@ -203,7 +203,7 @@
                                         <i class="ri-pencil-line align-bottom me-2 text-warning"></i> Edit PAP
                                     </a>
                                 </li>
-                                <li>
+                                <li id="removePapBtn">
                                     <form action="/Task/pap/{{ $task->newID }}" method="POST" class="d-inline">
                                         @csrf
                                         <button type="submit" class="dropdown-item py-2 text-danger" onclick="return confirm('Are you sure you want to remove this PAP?')">
@@ -396,6 +396,7 @@
         const editPapLinkBtn = document.getElementById('editPapLinkbtn');
         const deletePapBtn = document.getElementById('deletepapbtn');
         const dropdownDivider = document.getElementById('dropdownDivider');
+        const removePapBtn = document.getElementById('removePapBtn');
         
         if (userType === '2') {
             if(assignTaskBtn) assignTaskBtn.style.display = 'none';
@@ -403,6 +404,7 @@
             if(editPapLinkBtn) editPapLinkBtn.style.display = 'none';
             if(deletePapBtn) deletePapBtn.style.display = 'none';
             if(dropdownDivider) dropdownDivider.style.display = 'none';
+            if(removePapBtn) removePapBtn.style.display = 'none';
         }
 
         document.querySelectorAll('.editPapLink').forEach(link => {
