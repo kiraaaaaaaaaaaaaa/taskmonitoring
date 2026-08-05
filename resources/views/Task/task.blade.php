@@ -212,7 +212,7 @@
                                             </a>
                                         </li>
                                         <li><hr class="dropdown-divider my-1"></li>
-                                        <li>
+                                        <li id="removeTaskBtn">
                                             <form action="/Task/task/{{ $task->taskid }}" method="POST" class="d-inline">
                                                 @csrf
                                                 <button type="submit" class="dropdown-item py-2 text-danger" onclick="return confirm('Are you sure you want to remove this task?')">
@@ -259,6 +259,17 @@
 
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const userType = "{{ Auth::user()->usertype }}";
+        
+        const removeTaskBtn = document.getElementById('removeTaskBtn');
 
+        if (userType === '2') {
+            
+            if(removeTaskBtn) removeTaskBtn.style.display = 'none';
+        }
+    });
+</script>
 
 @endsection
