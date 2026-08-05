@@ -264,10 +264,12 @@
         const userType = "{{ Auth::user()->usertype }}";
         
         const removeTaskBtn = document.getElementById('removeTaskBtn');
+        const addtask = document.getElementById('addTaskBtn');
 
         if (userType === '2') {
             
             if(removeTaskBtn) removeTaskBtn.style.display = 'none';
+            if(addtask) addtask.style.display = 'none';
         }
     });
 </script>
