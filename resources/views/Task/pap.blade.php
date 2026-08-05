@@ -393,6 +393,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         
         const userType = @json(Auth::user()->usertype);
+        const addbtn = document.getElementById('assignTaskBtn');
 
     if (userType === '2') {
 
@@ -419,6 +420,8 @@
         document.querySelectorAll('.removePapBtn').forEach(el => {
             el.style.display = 'none';
         });
+
+        addbtn.style.display = 'none';
 
     }
 
