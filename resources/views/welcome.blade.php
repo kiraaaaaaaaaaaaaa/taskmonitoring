@@ -289,15 +289,17 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const userType = @json(Auth::user()->usertype);
+         const userType = @json(Auth::user()->usertype);
         const userlevel = @json(Auth::user()->userlevel);
         const assignTaskBtn = document.getElementById('assignTaskBtn');
         const reviewTaskCard = document.getElementById('reviewTaskCard');
         if (assignTaskBtn && userType !== 'admin') {
             assignTaskBtn.style.display = 'none';
         }
-        if (reviewTaskCard && userType === 'user') {
-            reviewTaskCard.style.display = 'none';
+        if (userType === '2') {
+            if(reviewTaskCard) {
+                reviewTaskCard.style.display = 'none';
+            }
         }
     });
 </script>
