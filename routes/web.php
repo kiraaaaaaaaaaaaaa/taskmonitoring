@@ -43,6 +43,7 @@ Route::get('/papmangement', [TaskController::class, 'papmanagement'])->name('pap
 Route::post('/Task/pap', [TaskController::class, 'savePAP'])->name('savePAP');
 Route::post('/Task/task/{id}', [TaskController::class, 'removepaptask'])->name('deletetask');
 Route::post('/Task/pap/{id}', [TaskController::class, 'deletepapmanagement'])->name('deletepapmanagement');
+Route::get('/Task/taskdisposition', [TaskController::class, 'taskdisposition'])->name('task disposition');
 
 
 //User routes

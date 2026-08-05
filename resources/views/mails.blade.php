@@ -32,7 +32,7 @@
 </table>
 
 <p>Please log in to the BRO Task Monitoring System to review your assignment.</p>
-<p>http://taskmonitoring.mfbm-bro.online/</p>
+<p>https://task.mfbmbro.cloud/</p>
 
 </body>
 </html>

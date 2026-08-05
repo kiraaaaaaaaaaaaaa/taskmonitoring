@@ -1018,4 +1018,14 @@ class TaskController extends Controller
             'oos'
         ));
     }
+
+    public function taskdisposition()
+    {
+        $newtask = DB::table('papmanagement')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->select('papmanagement.id as newID', 'papmanagement.*', 'paps.pap')
+            ->get();
+
+            return view('Task.taskdesposition', compact('newtask'));
+    }
 }
