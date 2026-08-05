@@ -296,7 +296,7 @@
         if (assignTaskBtn && userType !== 'admin') {
             assignTaskBtn.style.display = 'none';
         }
-        if (reviewTaskCard && userlevel == 2) {
+        if (reviewTaskCard && userType === 'user') {
             reviewTaskCard.style.display = 'none';
         }
     });
