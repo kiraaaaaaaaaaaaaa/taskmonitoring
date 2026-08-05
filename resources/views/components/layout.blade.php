@@ -138,23 +138,23 @@
                     <div class="d-flex">
                         <!-- LOGO -->
                         <div class="navbar-brand-box horizontal-logo">
-                            <a href="index.html" class="logo logo-dark">
+                            
                                 <span class="logo-sm">
                                     <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="28">
                                 </span>
                                 <span class="logo-lg">
                                     <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="50">
                                 </span>
-                            </a>
+                            
 
-                            <a href="index.html" class="logo logo-light">
+                            
                                 <span class="logo-sm">
                                     <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="28">
                                 </span>
                                 <span class="logo-lg">
                                     <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="50">
                                 </span>
-                            </a>
+                            
                         </div>
 
                         <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger shadow-none" id="topnav-hamburger-icon">
