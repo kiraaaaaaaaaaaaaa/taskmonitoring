@@ -138,23 +138,23 @@
                     <div class="d-flex">
                         <!-- LOGO -->
                         <div class="navbar-brand-box horizontal-logo">
-                            
+                            <a class="logo logo-dark">
                                 <span class="logo-sm">
                                     <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="28">
                                 </span>
                                 <span class="logo-lg">
                                     <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="50">
                                 </span>
-                            
+                            </a>
 
-                            
+                            <a  class="logo logo-light">
                                 <span class="logo-sm">
                                     <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="28">
                                 </span>
                                 <span class="logo-lg">
                                     <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="50">
                                 </span>
-                            
+                            </a>
                         </div>
 
                         <button type="button" class="btn btn-sm px-3 fs-16 header-item vertical-menu-btn topnav-hamburger shadow-none" id="topnav-hamburger-icon">
@@ -234,7 +234,7 @@
         <div class="app-menu navbar-menu">
             <!-- LOGO -->
             <div class="navbar-brand-box py-4 text-center">
-                <a href="index.html" class="logo logo-dark">
+                <a  class="logo logo-dark">
                     <span class="logo-sm">
                         <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="28">
                     </span>
@@ -242,7 +242,7 @@
                         <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="50">
                     </span>
                 </a>
-                <a href="index.html" class="logo logo-light">
+                <a  class="logo logo-light">
                     <span class="logo-sm">
                         <img src="{{asset('assets/images/mfbm.png')}}" alt="" height="28">
                     </span>
