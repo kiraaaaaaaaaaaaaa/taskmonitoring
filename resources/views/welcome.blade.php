@@ -99,13 +99,16 @@
 
     <div class="flex-fill">
         
-        <div class="card card-animate border-start border-4 border-success bg-white">
+        <div class="card card-animate border-start border-4 border-success bg-white" href="{{ route('my task') }}">
             <div class="card-body p-4 d-flex justify-content-between align-items-center">
                 <div>
+                
                     <p class="text-uppercase fw-semibold text-muted mb-1 fs-12 tracking-wide">My Active Task</p>
                     <h3 class="mt-2 fw-bold text-dark font-monospace mb-0">
+
                         {{count($counttask)}} Task(s)
                     </h3>
+                    
                 </div>
                 <div class="flex-shrink-0 d-flex align-items-center gap-3">
                     <div class="text-end d-none d-sm-block">
@@ -119,7 +122,7 @@
         </div>
     </div>
 
-    <div class="flex-fill" id="reviewTaskCard">
+    <div class="flex-fill" id="reviewTaskCard" href="{{ route('review') }}">
         <div class="card card-animate border-start border-4 border-warning bg-white">
             <div class="card-body p-4 d-flex justify-content-between align-items-center">
                 <div>

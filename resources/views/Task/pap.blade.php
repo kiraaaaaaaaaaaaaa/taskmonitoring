@@ -174,7 +174,7 @@
                 <div>
                     <!-- Status Banner / Ribbon Header -->
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        @if(\Carbon\Carbon::parse($task->fromdate)->isPast())
+                       <!-- @if(\Carbon\Carbon::parse($task->fromdate)->isPast())
                             <span class="badge activity-badge-done px-2.5 py-1.5 rounded-pill fs-11 fw-medium">
                                 <i class="ri-checkbox-circle-line me-1"></i> Activity Done
                             </span>
@@ -186,7 +186,7 @@
                             <span class="badge bg-light text-muted border px-2.5 py-1.5 rounded-pill fs-11">
                                 <i class="ri-calendar-event-line me-1"></i> {{ \Carbon\Carbon::parse($task->fromdate)->diffForHumans() }}
                             </span>
-                        @endif
+                        @endif -->
 
                         <div class="dropdown">
                             <a href="#" class="btn btn-icon btn-sm btn-ghost-secondary rounded-circle shadow-none" data-bs-toggle="dropdown">
