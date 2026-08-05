@@ -100,6 +100,7 @@
     <div class="flex-fill">
         
         <div class="card card-animate border-start border-4 border-success bg-white" href="{{ route('my task') }}">
+        <a href="{{ route('my task') }}" class="text-decoration-none">
             <div class="card-body p-4 d-flex justify-content-between align-items-center">
                 <div>
                 
@@ -119,10 +120,12 @@
                    
                 </div>
             </div>
+            </a>
         </div>
     </div>
 
     <div class="flex-fill" id="reviewTaskCard" href="{{ route('review') }}">
+    <a href="{{ route('review') }}" class="text-decoration-none">
         <div class="card card-animate border-start border-4 border-warning bg-white">
             <div class="card-body p-4 d-flex justify-content-between align-items-center">
                 <div>
@@ -138,6 +141,7 @@
                 </div>
             </div>
         </div>
+        </a>
     </div>
 
 </div>
