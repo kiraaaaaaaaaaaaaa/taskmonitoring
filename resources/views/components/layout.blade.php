@@ -266,6 +266,11 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link menu-link" href="{{route('calendar')}}" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
+                                <i class="mdi mdi-view-grid-plus-outline"></i> <span data-key="t-apps">Calendar of Activities</span>
+                            </a>
+                        </li>
+                         <li class="nav-item">
                             <a class="nav-link menu-link" href="{{route('task disposition')}}" role="button" aria-expanded="false" aria-controls="sidebarDashboards">
                                 <i class="mdi mdi-view-grid-plus-outline"></i> <span data-key="t-apps">Task Disposition</span>
                             </a>
@@ -329,15 +334,7 @@
                 <div class="container-fluid">
 
                     <!-- start page title -->
-                    <div class="row mb-3">
-                        <div class="col-12">
-                            <div class="page-title-box d-sm-flex align-items-center justify-content-between bg-white p-3 rounded-4 shadow-sm border-0">
-                                <h4 class="mb-sm-0 fs-18 fw-bold" style="color: var(--bs-dark-green);">
-                                    <i class="ri-dashboard-3-line me-2 text-warning"></i>{{ Str::title(str_replace('.', ' ', Route::currentRouteName())) }}
-                                </h4>
-                            </div>
-                        </div>
-                    </div>
+                    
                     <!-- end page title -->
 
                     @yield('content')

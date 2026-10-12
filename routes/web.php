@@ -17,6 +17,13 @@ Route::get('/auth/google', [GoogleController::class, 'redirectToGoogle'])->name(
 Route::get('/auth/google/callback', [GoogleController::class, 'handleGooglCallbak'])->name('google.callback');
 Route::post('/logout', [GoogleController::class, 'logout'])->name('logout');
 
+Route::get('/qr-review/{token}', [TaskController::class, 'qrReview'])
+    ->name('task.qr.review');
+
+Route::post('/qr-review/{token}', [TaskController::class, 'qrReviewUpdate'])
+    ->middleware('throttle:10,1')
+    ->name('task.qr.review.update');
+
 
 Route::middleware('auth')->group(function () {
 
@@ -32,7 +39,7 @@ Route::post('/Task/createtask', [TaskController::class, 'createPAP'])->name('cre
 Route::post('/papmangement/pap/{papID}', [TaskController::class, 'deletePAP'])->name('deletePAP');
 Route::post('/papmangement/task/{tasksID}', [TaskController::class, 'deleteTasks']);
 Route::get('/Task/viewtask/{id}', [TaskController::class, 'viewTask']);
-Route::get('/Task/pap/{year?}/{month?}', [TaskController::class, 'forpap'])->name('task disposition');
+Route::get('/Task/pap/{year?}/{month?}', [TaskController::class, 'forpap'])->name('calendar');
 Route::get('/Task/mytask', [TaskController::class, 'mytask'])->name('my task');
 Route::get('/Task/updatetask/{id}', [TaskController::class, 'viewupdateTask']);
 Route::post('/Task/updatetask', [TaskController::class, 'update']) -> name('updatetask');
@@ -44,6 +51,8 @@ Route::post('/Task/pap', [TaskController::class, 'savePAP'])->name('savePAP');
 Route::post('/Task/task/{id}', [TaskController::class, 'removepaptask'])->name('deletetask');
 Route::post('/Task/pap/{id}', [TaskController::class, 'deletepapmanagement'])->name('deletepapmanagement');
 Route::get('/Task/taskdisposition', [TaskController::class, 'taskdisposition'])->name('task disposition');
+Route::get('/Task/newtask/{id}', [TaskController::class, 'newtask'])->name('all pap');
+
 
 
 //User routes

@@ -395,15 +395,22 @@
     });
     document.addEventListener("DOMContentLoaded", function () {
 
-    document.querySelectorAll(".toggle-icon").forEach(icon => {
+    // Hide all task rows when page loads
+    document.querySelectorAll(".task-row").forEach(function (task) {
+        task.classList.add("d-none");
+    });
+
+    // Set all arrows to right arrow initially
+    document.querySelectorAll(".toggle-icon").forEach(function (icon) {
+        icon.classList.remove("ri-arrow-down-s-line");
+        icon.classList.add("ri-arrow-right-s-line");
 
         icon.addEventListener("click", function () {
 
             const papId = this.dataset.pap;
-
             const tasks = document.querySelectorAll(".task-group-" + papId);
 
-            tasks.forEach(task => {
+            tasks.forEach(function (task) {
                 task.classList.toggle("d-none");
             });
 
@@ -416,10 +423,11 @@
             }
 
         });
-
     });
 
 });
+
+
 </script>
 
 @endsection

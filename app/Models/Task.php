@@ -40,6 +40,7 @@ class Task extends Model
                             ,'costing'
                             ,'is_read'
                             ,'allocatedbudget'
+                            ,'qr_review_token'
                             ,'reviewLevel'];
 
     /** @use HasFactory<\Database\Factories\TaskFactory> */
