@@ -144,7 +144,6 @@ class TaskController extends Controller
 
 
         return view('Task.task', ["fromtask" => $tasks, "viewpap" => $viewpap]);
-
     }
 
 
@@ -152,20 +151,13 @@ class TaskController extends Controller
     // for dashboard.blade
 
     public function dashboard()
-
     {
-
         $now = Carbon::now();
-
-
 
         $userId = Auth::user()->id;
 
 
-
         if (Auth::user()->usertype != "1") {
-
-
 
             $reviewcounttasks = DB::table('tasks')
 
@@ -176,43 +168,44 @@ class TaskController extends Controller
                 ->join('paptask', 'tasks.task', '=', 'paptask.id')
 
                 ->select(
-
                     'tasks.id',
-
                     'tasks.activitydate',
-
                     'tasks.duedate',
-
                     DB::raw($this->reviewerProgressSql() . ' as progressScore'),
-
                     'tasks.is_read',
-
                     'paps.pap',
-
                     'paptask.tasks as task'
-
                 )
 
                 ->where('tasks.reviewLevel', '>=', 1)
+
                 ->whereExists(function ($query) use ($userId) {
-                    $query->selectRaw('1')->from('task_reviewers as tr')
+
+                    $query->selectRaw('1')
+
+                        ->from('task_reviewers as tr')
+
                         ->whereColumn('tr.task_id', 'tasks.id')
+
                         ->where('tr.reviewer_id', $userId)
+
                         ->whereIn('tr.status', ['Pending', 'Received', 'In Progress'])
+
                         ->whereNotExists(function ($prior) {
-                            $prior->selectRaw('1')->from('task_reviewers as previous')
+
+                            $prior->selectRaw('1')
+
+                                ->from('task_reviewers as previous')
+
                                 ->whereColumn('previous.task_id', 'tr.task_id')
+
                                 ->whereColumn('previous.review_order', '<', 'tr.review_order')
+
                                 ->whereNotIn('previous.status', ['Completed', 'Not Applicable']);
                         });
                 })
 
-
-
-
-
                 ->get();
-
         } else {
 
             $reviewcounttasks = DB::table('tasks')
@@ -224,38 +217,30 @@ class TaskController extends Controller
                 ->join('paptask', 'tasks.task', '=', 'paptask.id')
 
                 ->select(
-
                     'tasks.id',
-
                     'tasks.activitydate',
-
                     'tasks.duedate',
-
                     DB::raw($this->reviewerProgressSql() . ' as progressScore'),
-
                     'tasks.is_read',
-
                     'paps.pap',
-
                     'paptask.tasks as task'
-
                 )
 
                 ->where('tasks.reviewLevel', '>=', 1)
+
                 ->whereExists(function ($query) {
-                    $query->selectRaw('1')->from('task_reviewers as tr')
+
+                    $query->selectRaw('1')
+
+                        ->from('task_reviewers as tr')
+
                         ->whereColumn('tr.task_id', 'tasks.id')
+
                         ->whereIn('tr.status', ['Pending', 'Received', 'In Progress']);
                 })
 
-
-
-
-
                 ->get();
-
         }
-
 
 
         $counttask = DB::table('tasks')
@@ -267,36 +252,38 @@ class TaskController extends Controller
             ->join('paptask', 'tasks.task', '=', 'paptask.id')
 
             ->select(
-
                 'tasks.id',
-
                 'tasks.activitydate',
-
                 'tasks.duedate',
-
                 DB::raw($this->reviewerProgressSql() . ' as progressScore'),
-
                 'tasks.is_read',
-
                 'paps.pap',
-
-                'paptask.tasks as task',
-
-
-
+                'paptask.tasks as task'
             )
 
             ->where('tasks.assigned', Auth::user()->id)
 
             ->where(function ($query) {
+
                 $query->whereExists(function ($reviewers) {
-                    $reviewers->selectRaw('1')->from('task_reviewers as tr')
+
+                    $reviewers->selectRaw('1')
+
+                        ->from('task_reviewers as tr')
+
                         ->whereColumn('tr.task_id', 'tasks.id')
+
                         ->whereIn('tr.status', ['Pending', 'Received', 'In Progress']);
-                })->orWhereNotExists(function ($reviewers) {
-                    $reviewers->selectRaw('1')->from('task_reviewers as tr')
-                        ->whereColumn('tr.task_id', 'tasks.id');
-                });
+                })
+
+                    ->orWhereNotExists(function ($reviewers) {
+
+                        $reviewers->selectRaw('1')
+
+                            ->from('task_reviewers as tr')
+
+                            ->whereColumn('tr.task_id', 'tasks.id');
+                    });
             })
 
             ->orderByDesc('tasks.activitydate')
@@ -304,12 +291,12 @@ class TaskController extends Controller
             ->get();
 
 
-
         $totalmooe = DB::table('mooe')
 
             ->select(DB::raw('SUM(budgetallotment) as grandtotal, SUM(adjustedbudget) as totaladjusted'))
 
             ->get();
+
 
         $totalobligation = DB::table('tasks')
 
@@ -319,85 +306,85 @@ class TaskController extends Controller
 
 
 
-       $monthtask = DB::table('tasks')
-    ->join('users', 'tasks.assigned', '=', 'users.id')
-    ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
-    ->join('paps', 'papmanagement.papID', '=', 'paps.id')
-    ->join('paptask', 'tasks.task', '=', 'paptask.id')
+        $monitoringQuery = DB::table('tasks')
 
-    // Current reviewer
-    ->leftJoin('task_reviewers as cr', function ($join) {
-        $join->on('tasks.id', '=', 'cr.task_id')
-            ->whereRaw("
-                cr.id = (
-                    SELECT tr.id
-                    FROM task_reviewers tr
-                    WHERE tr.task_id = tasks.id
-                    AND tr.status IN ('Received', 'Pending')
-                    ORDER BY
-                        CASE
-                            WHEN tr.status = 'Received' THEN 0
-                            WHEN tr.status = 'Pending' THEN 1
-                        END,
-                        tr.review_order ASC
-                    LIMIT 1
-                )
-            ");
-    })
+            ->join('users', 'tasks.assigned', '=', 'users.id')
 
-    ->leftJoin(
-        'users as current_reviewer_user',
-        'cr.reviewer_id',
-        '=',
-        'current_reviewer_user.id'
-    )
+            ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
 
-    ->whereMonth('tasks.duedate', $now->month)
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
 
-    ->select(
-        'tasks.*',
-        'users.name',
-        'paps.pap',
-        'paptask.tasks',
-        'users.avatar',
+            ->join('paptask', 'tasks.task', '=', 'paptask.id')
 
-        // Current reviewer information
-        'current_reviewer_user.name as current_reviewer',
-        'cr.status as current_status',
-        'cr.review_order as current_review_order'
-    )
+            ->leftJoin('task_reviewers as cr', function ($join) {
 
-    ->selectRaw(
-        $this->reviewerProgressSql() . ' as reviewer_progress'
-    )
+                $join->on('tasks.id', '=', 'cr.task_id')
 
-    ->get();
+                    ->whereRaw("
+                    cr.id = (
+                        SELECT tr.id
+                        FROM task_reviewers tr
+                        WHERE tr.task_id = tasks.id
+                        AND tr.status IN ('Received', 'Pending')
+                        ORDER BY
+                            CASE
+                                WHEN tr.status = 'Received' THEN 0
+                                WHEN tr.status = 'Pending' THEN 1
+                            END,
+                            tr.review_order ASC
+                        LIMIT 1
+                    )
+                ");
+            })
+
+            ->leftJoin(
+                'users as current_reviewer_user',
+                'cr.reviewer_id',
+                '=',
+                'current_reviewer_user.id'
+            )
 
 
 
+            ->select(
+                'tasks.*',
+                'users.name',
+                'users.avatar',
+                'paps.pap',
+                'paptask.tasks',
+                'current_reviewer_user.name as current_reviewer',
+                'cr.status as current_status',
+                'cr.review_order as current_review_order'
+            )
+
+            ->selectRaw(
+                $this->reviewerProgressSql() . ' as reviewer_progress'
+            );
+
+
+
+        $allMonitoring = (clone $monitoringQuery)
+            ->whereRaw("LOWER(TRIM(paptask.tasks)) IN ('apf', 'par', 'concept note', 'pr')")
+            ->orderBy('tasks.duedate', 'asc')
+            ->get()
+            ->groupBy('PAP');
 
 
 
 
-        // $budget = DB::table('budget')
 
-        //     ->join('paps', 'budget.budgetPAP', '=', 'paps.id')
 
-        //     ->leftJoin('tasks', 'budget.id', '=', 'tasks.allocatedbudget')
 
-        //     ->select(
+        $otherMonitoring = (clone $monitoringQuery)
 
-        //         'budget.*',
+            ->whereRaw("LOWER(TRIM(paptask.tasks)) NOT IN ('apf', 'par', 'concept note', 'pr')")
+            ->whereMonth('tasks.duedate', $now->month)
 
-        //         'paps.pap',
+            ->whereYear('tasks.duedate', $now->year)
 
-        //         DB::raw('SUM(tasks.costing) AS total')
+            ->orderBy('tasks.duedate', 'asc')
 
-        //     )
-
-        //     ->groupBy('budget.id')
-
-        //     ->get();
+            ->get();
 
 
 
@@ -407,16 +394,23 @@ class TaskController extends Controller
 
             ->whereMonth('papmanagement.fromdate', $now->month)
 
+            ->whereYear('papmanagement.fromdate', $now->year)
+
             ->orderBy('papmanagement.fromdate', 'asc')
 
             ->get();
 
 
 
-
-
-        return view('welcome', ["task" => $task, "monthtask" => $monthtask, "fybudget" => $totalmooe, "totalobligation" => $totalobligation, "counttask" => $counttask, "reviewcounttasks" => $reviewcounttasks]);
-
+        return view('welcome', [
+            "task" => $task,
+            "allMonitoring" => $allMonitoring,
+            "otherMonitoring" => $otherMonitoring,
+            "fybudget" => $totalmooe,
+            "totalobligation" => $totalobligation,
+            "counttask" => $counttask,
+            "reviewcounttasks" => $reviewcounttasks
+        ]);
     }
 
 
@@ -474,7 +468,6 @@ class TaskController extends Controller
 
 
             return back()->with('success', 'Updated successfully');
-
         } else {
 
 
@@ -536,9 +529,7 @@ class TaskController extends Controller
 
 
             return back()->with('success', 'Saved successfully');
-
         }
-
     }
 
 
@@ -550,99 +541,131 @@ class TaskController extends Controller
     // for pap.blade
 
     public function forpap($year = null, $month = null)
-
     {
-
         $now = Carbon::now();
+
+        $Year = ($year && $year > 0)
+            ? $year
+            : $now->year;
+
+        $Month = ($month && $month >= 1 && $month <= 12)
+            ? $month
+            : $now->month;
+
+
+        // Selected month
+        $selectedDate = Carbon::create($Year, $Month, 1);
+
+        $startOfMonth = $selectedDate->copy()->startOfMonth();
+
+        $endOfMonth = $selectedDate->copy()->endOfMonth();
+
 
         $papOptions = Paps::all();
 
 
-
-
-
-        $Year = ($year && $year > 0) ? $year : $now->year;
-
-        $Month = ($month && $month >= 1 && $month <= 12) ? $month : $now->month;
-
-
-
         $tasks = DB::table('tasks')
-
             ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
-
             ->join('paps', 'papmanagement.papID', '=', 'paps.id')
-
             ->whereNotNull('tasks.activitydate')
-
             ->whereYear('tasks.activitydate', $Year)
-
             ->whereMonth('tasks.activitydate', $Month)
-
             ->select(
-
                 'paps.pap',
-
                 'tasks.PAP',
-
                 DB::raw('MIN(tasks.activitydate) as first_activity'),
-
-                DB::raw('AVG(' . $this->reviewerProgressSql() . ') as average_progress')
-
+                DB::raw(
+                    'AVG(' .
+                        $this->reviewerProgressSql() .
+                        ') as average_progress'
+                )
             )
-
-            ->groupBy('tasks.PAP', 'paps.pap')
-
+            ->groupBy(
+                'tasks.PAP',
+                'paps.pap'
+            )
             ->get();
-
 
 
         $newtask = DB::table('papmanagement')
-
             ->join('paps', 'papmanagement.papID', '=', 'paps.id')
-
             ->whereYear('papmanagement.fromdate', $Year)
-
             ->whereMonth('papmanagement.fromdate', $Month)
-
-            ->select('papmanagement.id as newID', 'papmanagement.*', 'paps.pap')
-
+            ->select(
+                'papmanagement.id as newID',
+                'papmanagement.*',
+                'paps.pap'
+            )
+            ->orderBy('papmanagement.fromdate', 'asc')
             ->get();
 
 
-
         $yearlyTasks = DB::table('papmanagement')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->whereYear('papmanagement.fromdate', $Year)
+            ->select(
+                'papmanagement.id as newID',
+                'papmanagement.*',
+                'paps.pap'
+            )
+            ->orderBy('papmanagement.fromdate', 'asc')
+            ->get();
 
-        ->join('paps', 'papmanagement.papID', '=', 'paps.id')
 
-        ->whereYear('papmanagement.fromdate', $Year)
-
-        ->select(
-
-            'papmanagement.id as newID',
-
-            'papmanagement.*',
-
-            'paps.pap'
-
+        // Activities displayed in the calendar
+        // Includes activities that overlap the selected month.
+        $task = createdPAP::join(
+            'paps',
+            'papmanagement.papID',
+            '=',
+            'paps.id'
         )
+            ->select(
+                'papmanagement.*',
+                'paps.pap'
+            )
+            ->whereDate(
+                'papmanagement.fromdate',
+                '<=',
+                $endOfMonth
+            )
+            ->where(function ($query) use ($startOfMonth) {
 
-        ->orderBy('papmanagement.fromdate', 'asc')
+                $query
+                    ->whereDate(
+                        'papmanagement.todate',
+                        '>=',
+                        $startOfMonth
+                    )
+                    ->orWhere(function ($query) use ($startOfMonth) {
 
-        ->get();
+                        $query
+                            ->whereNull('papmanagement.todate')
+                            ->whereDate(
+                                'papmanagement.fromdate',
+                                '>=',
+                                $startOfMonth
+                            );
+                    });
+            })
+
+            ->orderBy(
+                'papmanagement.fromdate',
+                'asc'
+            )
+            ->get();
 
 
-
-
-
-
-
-
-
-
-
-        return view('Task.pap', compact('tasks', 'Year', 'Month', 'papOptions', 'newtask', 'yearlyTasks'));
-
+        return view('Task.pap', compact(
+            'tasks',
+            'Year',
+            'Month',
+            'papOptions',
+            'newtask',
+            'yearlyTasks',
+            'task',
+            'now'
+        ));
     }
 
 
@@ -744,9 +767,7 @@ class TaskController extends Controller
                         'tasks' => $task->tasks
 
                     ];
-
                 });
-
             });
 
 
@@ -764,7 +785,6 @@ class TaskController extends Controller
             'newpap'
 
         ));
-
     }
 
 
@@ -776,7 +796,6 @@ class TaskController extends Controller
         Task::where('id', $id)->delete();
 
         return back()->with('success', 'Deleted successfully');
-
     }
 
 
@@ -814,7 +833,6 @@ class TaskController extends Controller
 
 
             ]);
-
         }
 
 
@@ -828,7 +846,6 @@ class TaskController extends Controller
                 'tasks' => $request->task
 
             ]);
-
         }
 
 
@@ -852,7 +869,6 @@ class TaskController extends Controller
                 'oosID' => $request->editoosSelect
 
             ]);
-
         }
 
 
@@ -864,7 +880,6 @@ class TaskController extends Controller
                 'tasks' => $request->task,
 
             ]);
-
         }
 
 
@@ -876,7 +891,6 @@ class TaskController extends Controller
 
 
         return back()->with('success', 'Saved successfully');
-
     }
 
 
@@ -890,7 +904,6 @@ class TaskController extends Controller
         Paps::where('id', $id)->delete();
 
         return back()->with('success', 'Deleted successfully');
-
     }
 
     public function deleteTasks($id)
@@ -900,7 +913,6 @@ class TaskController extends Controller
         paptask::where('id', $id)->delete();
 
         return back()->with('success', 'Deleted successfully');
-
     }
 
     //for deleting pap in papmanagement
@@ -924,7 +936,6 @@ class TaskController extends Controller
         createdPAP::where('id', $id)->delete();
 
         return back()->with('success', 'Deleted successfully');
-
     }
 
 
@@ -996,7 +1007,6 @@ class TaskController extends Controller
             ->orderBy('task_reviewers.review_order')
             ->select('task_reviewers.*', 'users.name as reviewer_name')->get();
         return view('Task.viewtask', ["fromtask" => $tasks, "reviewers" => $reviewers]);
-
     }
 
 
@@ -1096,7 +1106,6 @@ class TaskController extends Controller
             ->orderBy('task_reviewers.review_order')
             ->select('task_reviewers.*', 'users.name as reviewer_name')->get();
         return view('Task.updatetask', ["fromtask" => $tasks, "reviewers" => $reviewers, "program" => $program, "subprogram" => $subprogram, "mooe" => $mooe]);
-
     }
 
 
@@ -1148,7 +1157,6 @@ class TaskController extends Controller
         $groupedTasks = $tasks->groupBy(function ($task) {
 
             return Carbon::parse($task->activitydate)->toDateString();
-
         });
 
 
@@ -1158,7 +1166,6 @@ class TaskController extends Controller
             'groupedTasks' => $tasks
 
         ]);
-
     }
 
 
@@ -1173,9 +1180,13 @@ class TaskController extends Controller
             ->join('paps', 'papmanagement.papID', '=', 'paps.id')
             ->join('paptask', 'tasks.task', '=', 'paptask.id')
             ->select(
-                'tasks.id', 'tasks.activitydate', 'tasks.duedate',
-                DB::raw($this->reviewerProgressSql() . ' as progressScore'), 'tasks.is_read',
-                'paps.pap', 'paptask.tasks as task'
+                'tasks.id',
+                'tasks.activitydate',
+                'tasks.duedate',
+                DB::raw($this->reviewerProgressSql() . ' as progressScore'),
+                'tasks.is_read',
+                'paps.pap',
+                'paptask.tasks as task'
             );
 
         if ((string) Auth::user()->usertype === '1') {
@@ -1260,7 +1271,6 @@ class TaskController extends Controller
             'displayColumns' => []
 
         ]);
-
     }
 
 
@@ -1352,9 +1362,7 @@ class TaskController extends Controller
                 default:
 
                     $displayColumns[] = $col;
-
             }
-
         }
 
 
@@ -1428,7 +1436,6 @@ class TaskController extends Controller
         if ($request->filled('preparer')) {
 
             $query->where('preparer', $request->preparer);
-
         }
 
 
@@ -1438,7 +1445,6 @@ class TaskController extends Controller
         if ($request->filled('assigned')) {
 
             $query->where('assigned', $request->assigned);
-
         }
 
 
@@ -1446,7 +1452,6 @@ class TaskController extends Controller
         if ($request->filled('activitydate')) {
 
             $query->whereDate('activitydate', $request->activitydate);
-
         }
 
 
@@ -1472,7 +1477,6 @@ class TaskController extends Controller
         if (in_array('budget', $displayColumns)) {
 
             $totals['budget'] = $reportData->sum('budget');
-
         }
 
 
@@ -1480,7 +1484,6 @@ class TaskController extends Controller
         if (in_array('costing', $displayColumns)) {
 
             $totals['costing'] = $reportData->sum('costing');
-
         }
 
 
@@ -1488,7 +1491,6 @@ class TaskController extends Controller
         if (in_array('remaining', $displayColumns)) {
 
             $totals['remaining'] = $reportData->sum('remaining');
-
         }
 
 
@@ -1512,7 +1514,6 @@ class TaskController extends Controller
             'totals'
 
         ));
-
     }
 
 
@@ -1543,17 +1544,22 @@ class TaskController extends Controller
             foreach ($data['tasks'] as $taskId) {
                 $qrToken = (string) Str::uuid();
                 $id = DB::table('tasks')->insertGetId([
-                    'PAP' => $data['PAP'], 'task' => $taskId,
+                    'PAP' => $data['PAP'],
+                    'task' => $taskId,
                     'assigned' => $data['assigned'],
-                    'activitydate' => $data['activitydate'], 'duedate' => $data['duedate'],
+                    'activitydate' => $data['activitydate'],
+                    'duedate' => $data['duedate'],
                     'reviewLevel' => 0,
                     'qr_review_token' => $qrToken,
-                    'created_at' => now(), 'updated_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
                 foreach (array_values($data['reviewers']) as $index => $reviewerId) {
                     taskReviewer::create([
-                        'task_id' => $id, 'reviewer_id' => $reviewerId,
-                        'review_order' => $index + 1, 'status' => 'Pending',
+                        'task_id' => $id,
+                        'reviewer_id' => $reviewerId,
+                        'review_order' => $index + 1,
+                        'status' => 'Pending',
                     ]);
                 }
                 $ids[] = $id;
@@ -1567,71 +1573,73 @@ class TaskController extends Controller
         foreach ($data['tasks'] as $taskId) {
             $taskName = Paptask::findOrFail($taskId)->tasks;
             Mail::to($email->email)->send(new TaskAssignedMail([
-                'duedate' => $data['duedate'], 'task' => $taskName, 'paps' => $papName,
+                'duedate' => $data['duedate'],
+                'task' => $taskName,
+                'paps' => $papName,
             ]));
         }
         return redirect()->route('task disposition')->with('success', 'Task(s) created successfully.');
     }
     // for updating task (updatetask.blade)
     public function update(Request $request)
-{
-    $data = $request->validate([
-        'id' => ['required', 'exists:tasks,id'],
+    {
+        $data = $request->validate([
+            'id' => ['required', 'exists:tasks,id'],
 
-        'action' => ['nullable', 'in:staff'],
+            'action' => ['nullable', 'in:staff'],
 
-        'note' => ['nullable', 'string'],
-        'link' => ['nullable', 'url'],
+            'note' => ['nullable', 'string'],
+            'link' => ['nullable', 'url'],
 
-        'mooe' => ['nullable'],
-        'budget' => ['nullable', 'numeric'],
+            'mooe' => ['nullable'],
+            'budget' => ['nullable', 'numeric'],
 
-        'review_status' => ['nullable', 'array'],
+            'review_status' => ['nullable', 'array'],
 
-        'review_status.*' => [
-            'in:Pending,Received,Completed,Not Applicable'
-        ],
-    ]);
+            'review_status.*' => [
+                'in:Pending,Received,Completed,Not Applicable'
+            ],
+        ]);
 
 
-    DB::transaction(function () use ($data) {
+        DB::transaction(function () use ($data) {
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Get Task
         |--------------------------------------------------------------------------
         */
 
-        $task = Task::whereKey($data['id'])
-            ->lockForUpdate()
-            ->firstOrFail();
+            $task = Task::whereKey($data['id'])
+                ->lockForUpdate()
+                ->firstOrFail();
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Update Basic Task Information
         |--------------------------------------------------------------------------
         */
 
-        $task->update([
-            'note' => $data['note'] ?? null,
-            'link' => $data['link'] ?? null,
-            'allocatedbudget' => $data['mooe'] ?? null,
-            'obligatedbudget' => $data['budget'] ?? null,
-        ]);
+            $task->update([
+                'note' => $data['note'] ?? null,
+                'link' => $data['link'] ?? null,
+                'allocatedbudget' => $data['mooe'] ?? null,
+                'obligatedbudget' => $data['budget'] ?? null,
+            ]);
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | Check if logged-in user is assigned personnel
         |--------------------------------------------------------------------------
         */
 
-        $isAssignedPersonnel =
-            (int) $task->assigned === (int) Auth::id();
+            $isAssignedPersonnel =
+                (int) $task->assigned === (int) Auth::id();
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | ASSIGNED PERSONNEL
         |--------------------------------------------------------------------------
@@ -1641,83 +1649,80 @@ class TaskController extends Controller
         |
         */
 
-        if ($isAssignedPersonnel) {
+            if ($isAssignedPersonnel) {
 
-            /*
+                /*
             |--------------------------------------------------------------------------
             | Start Review Process
             |--------------------------------------------------------------------------
             */
 
-            if ((int) $task->reviewLevel === 0) {
+                if ((int) $task->reviewLevel === 0) {
 
-                $task->update([
-                    'reviewLevel' => 1,
-                ]);
+                    $task->update([
+                        'reviewLevel' => 1,
+                    ]);
+                }
 
-            }
 
-
-            /*
+                /*
             |--------------------------------------------------------------------------
             | Manual Reviewer Status Updates
             |--------------------------------------------------------------------------
             */
 
-            if (!empty($data['review_status'])) {
+                if (!empty($data['review_status'])) {
 
-                foreach ($data['review_status'] as $reviewerRowId => $status) {
+                    foreach ($data['review_status'] as $reviewerRowId => $status) {
 
-                    /*
+                        /*
                     |--------------------------------------------------------------
                     | Security:
                     | Make sure reviewer row belongs to this task.
                     |--------------------------------------------------------------
                     */
 
-                    $reviewer = taskReviewer::where('id', $reviewerRowId)
-                        ->where('task_id', $task->id)
-                        ->lockForUpdate()
-                        ->first();
+                        $reviewer = taskReviewer::where('id', $reviewerRowId)
+                            ->where('task_id', $task->id)
+                            ->lockForUpdate()
+                            ->first();
 
-                    if (!$reviewer) {
-                        continue;
-                    }
+                        if (!$reviewer) {
+                            continue;
+                        }
 
 
-                    /*
+                        /*
                     |--------------------------------------------------------------
                     | Only update when status actually changed
                     |--------------------------------------------------------------
                     */
 
-                    if ($reviewer->status !== $status) {
+                        if ($reviewer->status !== $status) {
 
-                        $reviewer->update([
+                            $reviewer->update([
 
-                            'status' => $status,
+                                'status' => $status,
 
-                            'reviewed_at' => in_array(
-                                $status,
-                                [
-                                    'Completed',
-                                    'Not Applicable'
-                                ],
-                                true
-                            )
-                                ? now()
-                                : null,
+                                'reviewed_at' => in_array(
+                                    $status,
+                                    [
+                                        'Completed',
+                                        'Not Applicable'
+                                    ],
+                                    true
+                                )
+                                    ? now()
+                                    : null,
 
-                            'returned_date' => null,
+                                'returned_date' => null,
 
-                        ]);
-
+                            ]);
+                        }
                     }
 
-                }
 
-
-                /*
+                    /*
                 |--------------------------------------------------------------------------
                 | Recalculate Current Reviewer
                 |--------------------------------------------------------------------------
@@ -1729,10 +1734,185 @@ class TaskController extends Controller
                 |
                 */
 
-                $next = taskReviewer::where(
+                    $next = taskReviewer::where(
                         'task_id',
                         $task->id
                     )
+                        ->whereNotIn(
+                            'status',
+                            [
+                                'Completed',
+                                'Not Applicable'
+                            ]
+                        )
+                        ->orderBy('review_order')
+                        ->first();
+
+
+                    /*
+                |--------------------------------------------------------------------------
+                | Update reviewLevel
+                |--------------------------------------------------------------------------
+                */
+
+                    if ($next) {
+
+                        $task->update([
+                            'reviewLevel' =>
+                            $next->review_order
+                        ]);
+                    } else {
+
+                        /*
+                    |--------------------------------------------------------------
+                    | All reviewers completed
+                    |--------------------------------------------------------------
+                    */
+
+                        $lastReviewer = taskReviewer::where(
+                            'task_id',
+                            $task->id
+                        )
+                            ->orderByDesc('review_order')
+                            ->first();
+
+
+                        if ($lastReviewer) {
+
+                            $task->update([
+                                'reviewLevel' =>
+                                $lastReviewer->review_order + 1
+                            ]);
+                        }
+                    }
+                }
+
+
+                /*
+            |--------------------------------------------------------------------------
+            | Assigned Personnel Finished
+            |--------------------------------------------------------------------------
+            */
+
+                return;
+            }
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | NORMAL REVIEWER WORKFLOW
+        |--------------------------------------------------------------------------
+        |
+        | Everything below retains your existing reviewer restriction.
+        |
+        */
+
+            abort_unless(
+                (int) $task->reviewLevel >= 1,
+                403
+            );
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | Find Current Reviewer
+        |--------------------------------------------------------------------------
+        */
+
+            $current = taskReviewer::where(
+                'task_id',
+                $task->id
+            )
+                ->whereNotIn(
+                    'status',
+                    [
+                        'Completed',
+                        'Not Applicable'
+                    ]
+                )
+                ->orderBy('review_order')
+                ->lockForUpdate()
+                ->first();
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | Only current reviewer can update
+        |--------------------------------------------------------------------------
+        */
+
+            abort_unless(
+                $current &&
+                    (int) $current->reviewer_id ===
+                    (int) Auth::id(),
+                403
+            );
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | Get Submitted Status
+        |--------------------------------------------------------------------------
+        */
+
+            $status =
+                $data['review_status'][$current->id]
+                ?? null;
+
+
+            abort_unless(
+                $status !== null,
+                422
+            );
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | Update Current Reviewer
+        |--------------------------------------------------------------------------
+        */
+
+            $current->update([
+
+                'status' => $status,
+
+                'reviewed_at' => in_array(
+                    $status,
+                    [
+                        'Completed',
+                        'Not Applicable'
+                    ],
+                    true
+                )
+                    ? now()
+                    : null,
+
+                'returned_date' => null,
+
+            ]);
+
+
+            /*
+        |--------------------------------------------------------------------------
+        | Move to Next Reviewer
+        |--------------------------------------------------------------------------
+        */
+
+            if (
+                in_array(
+                    $status,
+                    [
+                        'Completed',
+                        'Not Applicable'
+                    ],
+                    true
+                )
+            ) {
+
+                $next = taskReviewer::where(
+                    'task_id',
+                    $task->id
+                )
                     ->whereNotIn(
                         'status',
                         [
@@ -1744,204 +1924,22 @@ class TaskController extends Controller
                     ->first();
 
 
-                /*
-                |--------------------------------------------------------------------------
-                | Update reviewLevel
-                |--------------------------------------------------------------------------
-                */
+                $task->update([
 
-                if ($next) {
+                    'reviewLevel' => $next
+                        ? $next->review_order
+                        : $current->review_order + 1
 
-                    $task->update([
-                        'reviewLevel' =>
-                            $next->review_order
-                    ]);
-
-                } else {
-
-                    /*
-                    |--------------------------------------------------------------
-                    | All reviewers completed
-                    |--------------------------------------------------------------
-                    */
-
-                    $lastReviewer = taskReviewer::where(
-                            'task_id',
-                            $task->id
-                        )
-                        ->orderByDesc('review_order')
-                        ->first();
-
-
-                    if ($lastReviewer) {
-
-                        $task->update([
-                            'reviewLevel' =>
-                                $lastReviewer->review_order + 1
-                        ]);
-
-                    }
-
-                }
-
+                ]);
             }
+        });
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Assigned Personnel Finished
-            |--------------------------------------------------------------------------
-            */
-
-            return;
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | NORMAL REVIEWER WORKFLOW
-        |--------------------------------------------------------------------------
-        |
-        | Everything below retains your existing reviewer restriction.
-        |
-        */
-
-        abort_unless(
-            (int) $task->reviewLevel >= 1,
-            403
+        return back()->with(
+            'success',
+            'Task updated successfully.'
         );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Find Current Reviewer
-        |--------------------------------------------------------------------------
-        */
-
-        $current = taskReviewer::where(
-                'task_id',
-                $task->id
-            )
-            ->whereNotIn(
-                'status',
-                [
-                    'Completed',
-                    'Not Applicable'
-                ]
-            )
-            ->orderBy('review_order')
-            ->lockForUpdate()
-            ->first();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Only current reviewer can update
-        |--------------------------------------------------------------------------
-        */
-
-        abort_unless(
-            $current &&
-            (int) $current->reviewer_id ===
-            (int) Auth::id(),
-            403
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Get Submitted Status
-        |--------------------------------------------------------------------------
-        */
-
-        $status =
-            $data['review_status'][$current->id]
-            ?? null;
-
-
-        abort_unless(
-            $status !== null,
-            422
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Update Current Reviewer
-        |--------------------------------------------------------------------------
-        */
-
-        $current->update([
-
-            'status' => $status,
-
-            'reviewed_at' => in_array(
-                $status,
-                [
-                    'Completed',
-                    'Not Applicable'
-                ],
-                true
-            )
-                ? now()
-                : null,
-
-            'returned_date' => null,
-
-        ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Move to Next Reviewer
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            in_array(
-                $status,
-                [
-                    'Completed',
-                    'Not Applicable'
-                ],
-                true
-            )
-        ) {
-
-            $next = taskReviewer::where(
-                    'task_id',
-                    $task->id
-                )
-                ->whereNotIn(
-                    'status',
-                    [
-                        'Completed',
-                        'Not Applicable'
-                    ]
-                )
-                ->orderBy('review_order')
-                ->first();
-
-
-            $task->update([
-
-                'reviewLevel' => $next
-                    ? $next->review_order
-                    : $current->review_order + 1
-
-            ]);
-
-        }
-
-    });
-
-
-    return back()->with(
-        'success',
-        'Task updated successfully.'
-    );
-}
+    }
 
     // for file management page(papmanagement.blade)
 
@@ -2002,9 +2000,7 @@ class TaskController extends Controller
                         'tasks' => $task->tasks
 
                     ];
-
                 });
-
             });
 
 
@@ -2034,7 +2030,6 @@ class TaskController extends Controller
             'oos'
 
         ));
-
     }
 
 
@@ -2077,8 +2072,7 @@ class TaskController extends Controller
 
 
 
-            return view('Task.taskdisposition', compact('newtask', 'fund', 'paps', 'papOptions', 'users', 'division', 'sector', 'oos'));
-
+        return view('Task.taskdisposition', compact('newtask', 'fund', 'paps', 'papOptions', 'users', 'division', 'sector', 'oos'));
     }
 
 
@@ -2087,7 +2081,7 @@ class TaskController extends Controller
 
     {
 
-         $fund = fundSource::all();
+        $fund = fundSource::all();
 
         $paps = Paps::all();
 
@@ -2129,7 +2123,7 @@ class TaskController extends Controller
 
 
 
-            $newtask = DB::table('papmanagement')
+        $newtask = DB::table('papmanagement')
 
             ->join('paps', 'papmanagement.papID', '=', 'paps.id')
 
@@ -2141,7 +2135,7 @@ class TaskController extends Controller
 
 
 
-            $newtaskforpap = DB::table('paptask')
+        $newtaskforpap = DB::table('paptask')
 
             ->where('paptask.papID', $id)
 
@@ -2151,7 +2145,7 @@ class TaskController extends Controller
 
 
 
-            $link = DB::table('tasks')
+        $link = DB::table('tasks')
 
             ->leftjoin('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
 
@@ -2178,122 +2172,121 @@ class TaskController extends Controller
 
 
         return view('Task.newtask', compact('pap', 'newtask', 'fund', 'paps', 'papOptions', 'users', 'division', 'sector', 'oos', 'newtaskforpap', 'link'));
-
     }
 
     public function qrReview($token)
-{
-    // Find the task using the QR token
-    $task = DB::table('tasks')
-        ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
-        ->join('paps', 'papmanagement.papID', '=', 'paps.id')
-        ->join('paptask', 'tasks.task', '=', 'paptask.id')
-        ->where('tasks.qr_review_token', $token)
-        ->select(
-            'tasks.id',
-            'tasks.qr_review_token',
-            'tasks.activitydate',
-            'tasks.duedate',
-            'tasks.reviewLevel',
-            'paps.pap',
-            'paptask.tasks as task'
-        )
-        ->first();
-
-    abort_if(!$task, 404);
-
-    // Get all dynamic reviewers
-    $reviewers = DB::table('task_reviewers')
-        ->leftJoin('users', 'task_reviewers.reviewer_id', '=', 'users.id')
-        ->where('task_reviewers.task_id', $task->id)
-        ->select(
-            'task_reviewers.*',
-            'users.name as reviewer_name'
-        )
-        ->orderBy('task_reviewers.review_order')
-        ->get();
-
-    // Find the first unfinished reviewer
-    $currentReviewer = $reviewers->first(function ($reviewer) {
-        return !in_array(
-            $reviewer->status,
-            ['Completed', 'Not Applicable'],
-            true
-        );
-    });
-
-    return view('Task.qr-review', [
-        'task' => $task,
-        'reviewers' => $reviewers,
-        'currentReviewer' => $currentReviewer,
-    ]);
-}
-
-public function qrReviewUpdate(Request $request, $token)
-{
-    $data = $request->validate([
-        'status' => [
-            'required',
-            'in:Received,Signed'
-        ],
-    ]);
-
-    DB::transaction(function () use ($data, $token) {
-
-        $task = Task::where('qr_review_token', $token)
-            ->lockForUpdate()
-            ->firstOrFail();
-
-        abort_unless(
-            (int) $task->reviewLevel >= 1,
-            403
-        );
-
-        // Current dynamic reviewer
-        $current = taskReviewer::where('task_id', $task->id)
-            ->whereNotIn('status', [
-                'Completed',
-                'Not Applicable'
-            ])
-            ->orderBy('review_order')
-            ->lockForUpdate()
+    {
+        // Find the task using the QR token
+        $task = DB::table('tasks')
+            ->join('papmanagement', 'tasks.PAP', '=', 'papmanagement.id')
+            ->join('paps', 'papmanagement.papID', '=', 'paps.id')
+            ->join('paptask', 'tasks.task', '=', 'paptask.id')
+            ->where('tasks.qr_review_token', $token)
+            ->select(
+                'tasks.id',
+                'tasks.qr_review_token',
+                'tasks.activitydate',
+                'tasks.duedate',
+                'tasks.reviewLevel',
+                'paps.pap',
+                'paptask.tasks as task'
+            )
             ->first();
 
-        abort_unless(
-            $current,
-            422,
-            'No active reviewer found.'
-        );
+        abort_if(!$task, 404);
 
-        /*
+        // Get all dynamic reviewers
+        $reviewers = DB::table('task_reviewers')
+            ->leftJoin('users', 'task_reviewers.reviewer_id', '=', 'users.id')
+            ->where('task_reviewers.task_id', $task->id)
+            ->select(
+                'task_reviewers.*',
+                'users.name as reviewer_name'
+            )
+            ->orderBy('task_reviewers.review_order')
+            ->get();
+
+        // Find the first unfinished reviewer
+        $currentReviewer = $reviewers->first(function ($reviewer) {
+            return !in_array(
+                $reviewer->status,
+                ['Completed', 'Not Applicable'],
+                true
+            );
+        });
+
+        return view('Task.qr-review', [
+            'task' => $task,
+            'reviewers' => $reviewers,
+            'currentReviewer' => $currentReviewer,
+        ]);
+    }
+
+    public function qrReviewUpdate(Request $request, $token)
+    {
+        $data = $request->validate([
+            'status' => [
+                'required',
+                'in:Received,Signed'
+            ],
+        ]);
+
+        DB::transaction(function () use ($data, $token) {
+
+            $task = Task::where('qr_review_token', $token)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            abort_unless(
+                (int) $task->reviewLevel >= 1,
+                403
+            );
+
+            // Current dynamic reviewer
+            $current = taskReviewer::where('task_id', $task->id)
+                ->whereNotIn('status', [
+                    'Completed',
+                    'Not Applicable'
+                ])
+                ->orderBy('review_order')
+                ->lockForUpdate()
+                ->first();
+
+            abort_unless(
+                $current,
+                422,
+                'No active reviewer found.'
+            );
+
+            /*
         |--------------------------------------------------------------------------
         | RECEIVED
         |--------------------------------------------------------------------------
         */
 
-        if ($data['status'] === 'Received') {
+            if ($data['status'] === 'Received') {
 
-            abort_unless(
-                in_array(
-                    $current->status,
-                    ['Pending', 'In Progress'],
-                    true
-                ),
-                422,
-                'Document cannot be marked as received.'
-            );
+                abort_unless(
+                    in_array(
+                        $current->status,
+                        ['Pending', 'In Progress'],
+                        true
+                    ),
+                    422,
+                    'Document cannot be marked as received.'
+                );
 
-            $current->update([
-                'status' => 'Received',
-                'reviewed_at' => null,
-                'returned_date' => null,
-            ]);
+                $current->update([
+                    'status' => 'Received',
+                    'reviewed_at' => null,
+                    'returned_date' => null,
+                ]);
 
-            return;
-        }
+                return;
+            }
 
 
-        /*
+            /*
         |--------------------------------------------------------------------------
         | SIGNED
         |
@@ -2302,69 +2295,58 @@ public function qrReviewUpdate(Request $request, $token)
         |--------------------------------------------------------------------------
         */
 
-        if ($data['status'] === 'Signed') {
+            if ($data['status'] === 'Signed') {
 
-            abort_unless(
-                in_array(
-                    $current->status,
-                    ['Received', 'In Progress'],
-                    true
-                ),
-                422,
-                'Document must be received before it can be signed.'
-            );
+                abort_unless(
+                    in_array(
+                        $current->status,
+                        ['Received', 'In Progress'],
+                        true
+                    ),
+                    422,
+                    'Document must be received before it can be signed.'
+                );
 
-            $current->update([
-                'status' => 'Completed',
-                'reviewed_at' => now(),
-                'returned_date' => null,
-            ]);
+                $current->update([
+                    'status' => 'Completed',
+                    'reviewed_at' => now(),
+                    'returned_date' => null,
+                ]);
 
 
-            /*
+                /*
             |--------------------------------------------------------------------------
             | Find Next Reviewer
             |--------------------------------------------------------------------------
             */
 
-            $next = taskReviewer::where('task_id', $task->id)
-                ->whereNotIn('status', [
-                    'Completed',
-                    'Not Applicable'
-                ])
-                ->orderBy('review_order')
-                ->first();
+                $next = taskReviewer::where('task_id', $task->id)
+                    ->whereNotIn('status', [
+                        'Completed',
+                        'Not Applicable'
+                    ])
+                    ->orderBy('review_order')
+                    ->first();
 
 
-            /*
+                /*
             |--------------------------------------------------------------------------
             | Keep reviewLevel synchronized
             |--------------------------------------------------------------------------
             */
 
-            $task->update([
-                'reviewLevel' => $next
-                    ? $next->review_order
-                    : $current->review_order + 1
-            ]);
-        }
-
-    });
-
-
-    return back()->with(
-        'success',
-        'Document status updated successfully.'
-    );
-}
+                $task->update([
+                    'reviewLevel' => $next
+                        ? $next->review_order
+                        : $current->review_order + 1
+                ]);
+            }
+        });
 
 
-
-
+        return back()->with(
+            'success',
+            'Document status updated successfully.'
+        );
+    }
 } //end of class
-
-
-
-
-
-

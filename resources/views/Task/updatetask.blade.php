@@ -583,7 +583,7 @@
 
                     <div class="mb-3">
                         @php
-    $taskUrl = url('http://192.168.68.111:8003/qr-review/' . $fromtask->qr_review_token);
+    $taskUrl = url('http://10.40.136.53:8003/qr-review/' . $fromtask->qr_review_token);
 
     $qrCode = app(\SimpleSoftwareIO\QrCode\Generator::class)
         ->size(220)

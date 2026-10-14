@@ -2,1913 +2,1063 @@
 
 @section('content')
 
+@php
+$currentDate = \Carbon\Carbon::create((int) $Year, (int) $Month, 1)->startOfDay();
+
+$previousMonth = $currentDate->copy()->subMonth();
+$nextMonth = $currentDate->copy()->addMonth();
+
+$startOfMonth = $currentDate->copy()->startOfMonth()->startOfDay();
+$endOfMonth = $currentDate->copy()->endOfMonth()->endOfDay();
+
+$calendarStart = $startOfMonth
+->copy()
+->startOfWeek(\Carbon\Carbon::SUNDAY)
+->startOfDay();
+
+$calendarEnd = $endOfMonth
+->copy()
+->endOfWeek(\Carbon\Carbon::SATURDAY)
+->endOfDay();
+@endphp
+
 <style>
-
-    /* =========================================================
-       THEME
-       ========================================================= */
-
     :root {
-        --bs-dark-green: #0b3c29;
-        --bs-medium-green: #134e38;
-        --bs-accent-green: #1f7a55;
-        --bs-golden-yellow: #d4af37;
-        --bs-golden-yellow-light: #fef9e7;
+        --green-dark: #0a3d2c;
+        --green-main: #0d5139;
+        --green-soft: #edf6f1;
+        --gold: #d4af37;
+        --gold-soft: #fff9e8;
+        --border: #e7ece9;
+        --text-dark: #17212b;
+        --text-muted: #667085;
+        --page-bg: #f5f8f6;
     }
 
     body {
-        background-color: #f8f9fa;
+        background-color: var(--page-bg);
     }
 
-
-    /* =========================================================
-       CARD VIEW
-       ========================================================= */
-
-    .card-activity {
-        border: none;
-        border-radius: 1rem;
-        transition: all 0.3s ease;
-        box-shadow: 0 0.5rem 1.25rem rgba(11, 60, 41, 0.04);
-        background: #ffffff;
-        overflow: hidden;
-    }
-
-    .card-activity:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 0.75rem 2rem rgba(11, 60, 41, 0.08);
-    }
-
-    .pap-hero-card {
-        background: #ffffff;
-        color: var(--bs-dark-green);
-        border: none;
-        border-left: 10px solid var(--bs-dark-green);
-        border-radius: 1rem;
-        box-shadow: 0 0.5rem 1.5rem rgba(10, 54, 34, 0.1);
-    }
-
-    .task-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 0.5rem 1.25rem rgba(10, 54, 34, 0.08);
-        border-color: var(--bs-golden-yellow);
-    }
-
-
-    /* =========================================================
-       MONTH NAVIGATION
-       ========================================================= */
-
-    .month-nav-container {
-        background: #ffffff;
-        border-radius: 50rem;
-        padding: 0.5rem 1.5rem;
-        box-shadow: 0 0.25rem 0.75rem rgba(11, 60, 41, 0.04);
-        display: inline-flex;
-        align-items: center;
-    }
-
-    .btn-month-nav {
-        background-color: var(--bs-golden-yellow-light);
-        color: var(--bs-dark-green);
-        border: 1px solid rgba(212, 175, 55, 0.3);
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
+    .schedule-header {
         display: flex;
         align-items: center;
-        justify-content: center;
-        transition: all 0.2s ease;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 24px;
     }
 
-    .btn-month-nav:hover {
-        background-color: var(--bs-golden-yellow);
-        color: #ffffff;
+    .schedule-title {
+        margin: 0;
+        color: var(--text-dark);
+        font-size: 24px;
+        font-weight: 700;
     }
 
-
-    /* =========================================================
-       BUTTONS
-       ========================================================= */
-
-    .btn-dark-green {
-        background-color: var(--bs-dark-green);
-        color: #ffffff;
-        border: none;
-        transition: background-color 0.2s ease;
+    .schedule-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
-
-    .btn-dark-green:hover {
-        background-color: var(--bs-medium-green);
-        color: #ffffff;
-    }
-
-    .btn-golden {
-        background-color: var(--bs-golden-yellow);
-        color: #ffffff;
-        border: none;
-    }
-
-    .btn-golden:hover {
-        background-color: #b8972b;
-        color: #ffffff;
-    }
-
-
-    /* =========================================================
-       VIEW TOGGLE
-       ========================================================= */
 
     .view-toggle {
-        background: #ffffff;
-        border: 1px solid #e8ecea;
-        border-radius: 50rem;
+        display: flex;
         padding: 3px;
-        display: inline-flex;
-        box-shadow: 0 0.25rem 0.75rem rgba(11, 60, 41, 0.04);
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 50px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
     }
 
-    .view-toggle .btn {
+    .view-toggle button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
         border: none;
-        border-radius: 50rem !important;
-        padding: 7px 15px;
+        border-radius: 50px;
+        background: transparent;
+        color: var(--text-muted);
         font-size: 12px;
-        transition: all 0.2s ease;
+        font-weight: 500;
+        transition: .2s ease;
     }
 
-    .view-toggle .btn-dark-green {
-        background-color: var(--bs-dark-green);
-        color: #ffffff;
+    .view-toggle button.active {
+        background: var(--green-dark);
+        color: #fff;
     }
 
-    .view-toggle .btn-light {
-        background-color: transparent;
-        color: #6c757d;
-    }
-
-    .view-toggle .btn-light:hover {
-        background-color: #f5f7f6;
-        color: var(--bs-dark-green);
-    }
-
-
-    /* =========================================================
-       BADGES
-       ========================================================= */
-
-    .activity-badge-done {
-        background-color: #e8f5e9;
-        color: #2e7d32;
-        border: 1px solid rgba(46, 125, 50, 0.2);
-    }
-
-    .activity-badge-today {
-        background-color: var(--bs-golden-yellow-light);
-        color: #8c7310;
-        border: 1px solid rgba(212, 175, 55, 0.3);
-    }
-
-
-    /* =========================================================
-       MODAL
-       ========================================================= */
-
-    .modal-content {
+    .btn-add-activity {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 20px;
         border: none;
-        border-radius: 1rem;
-        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15);
+        border-radius: 50px;
+        background: var(--green-dark);
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(10, 61, 44, .15);
+        transition: .2s ease;
     }
 
-
-    /* =========================================================
-       YEARLY TABLE
-       ========================================================= */
-
-    .yearly-pap-table {
-        border-collapse: separate;
-        border-spacing: 0;
-        width: 100%;
+    .btn-add-activity:hover {
+        background: var(--green-main);
+        color: #fff;
     }
 
-
-    /* YEAR HEADER */
-
-    .year-header th {
-        background: #f8faf9;
-        color: var(--bs-dark-green);
-        padding: 20px 24px;
-        border-bottom: 1px solid #e4e9e6;
+    .month-navigation-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 25px;
     }
 
-    .year-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 12px;
-        background: var(--bs-golden-yellow-light);
-        color: var(--bs-golden-yellow);
+    .month-navigation {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        padding: 7px 14px;
+        background: #fff;
+        border-radius: 50px;
+        box-shadow: 0 5px 18px rgba(0, 0, 0, .05);
+    }
+
+    .month-button {
+        width: 38px;
+        height: 38px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 21px;
+        border: 1px solid #e7d89f;
+        border-radius: 50%;
+        background: var(--gold-soft);
+        color: var(--green-dark);
+        font-size: 18px;
+        text-decoration: none;
+        transition: .2s ease;
     }
 
+    .month-button:hover {
+        background: var(--gold);
+        color: #fff;
+    }
 
-    /* TABLE COLUMN HEADER */
+    .month-title {
+        min-width: 155px;
+        color: #111827;
+        font-size: 16px;
+        font-weight: 700;
+        text-align: center;
+    }
 
-    .yearly-pap-table .column-header th {
-        background: #ffffff;
-        color: #6c757d;
+    /* CARDS */
+
+    .pap-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+    }
+
+    .pap-tile {
+        position: relative;
+        min-height: 275px;
+        padding: 25px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-left: 9px solid var(--green-dark);
+        border-radius: 15px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, .06);
+        overflow: hidden;
+        transition: .25s ease;
+    }
+
+    .pap-tile:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, .09);
+    }
+
+    .pap-tile-menu {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+    }
+
+    .pap-tile-menu button {
+        padding: 5px;
+        border: none;
+        background: transparent;
+        color: var(--green-dark);
+        font-size: 19px;
+    }
+
+    .pap-tile-content {
+        padding-top: 38px;
+    }
+
+    .pap-title {
+        display: block;
+        margin-bottom: 9px;
+        color: #111827;
+        font-size: 18px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .pap-title:hover {
+        color: var(--green-main);
+    }
+
+    .pap-description {
+        min-height: 65px;
+        margin-bottom: 16px;
+        color: #4b5563;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .pap-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        margin-top: 15px;
+        padding-top: 17px;
+        border-top: 1px solid var(--border);
+    }
+
+    .pap-location {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        color: var(--text-muted);
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .pap-location i {
+        margin-right: 5px;
+        color: #00a66c;
+        font-size: 14px;
+    }
+
+    .pap-location span {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .pap-date {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        color: #344054;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .pap-date i {
+        margin-right: 6px;
+        color: #f0a500;
+        font-size: 14px;
+    }
+
+    .empty-state {
+        padding: 80px 20px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        color: #98a2b3;
+        text-align: center;
+    }
+
+    .empty-state i {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 40px;
+    }
+
+    /* CALENDAR */
+
+    .calendar-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px;
+    }
+
+    .activity-calendar {
+        min-width: 950px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, .05);
+    }
+
+    .calendar-weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        background: var(--green-dark);
+        color: #fff;
+    }
+
+    .calendar-weekday {
+        padding: 14px 10px;
+        border-right: 1px solid rgba(255, 255, 255, .1);
+        text-align: center;
         font-size: 11px;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: .04em;
-        padding: 13px 10px;
-        border-bottom: 1px solid #e9ecef;
+    }
+
+    .calendar-weekday:last-child {
+        border-right: none;
+    }
+
+    .calendar-week {
+        position: relative;
+        min-height: calc(80px + (var(--event-rows) * 34px));
+        border-bottom: 1px solid var(--border);
+    }
+
+    .calendar-week:last-child {
+        border-bottom: none;
+    }
+
+    .calendar-days-row {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+
+    .calendar-day {
+        min-height: 100%;
+        padding: 9px;
+        background: #fff;
+        border-right: 1px solid var(--border);
+    }
+
+    .calendar-day:last-child {
+        border-right: none;
+    }
+
+    .calendar-day.other-month {
+        background: #f7f9f8;
+    }
+
+    .calendar-day-number {
+        width: 29px;
+        height: 29px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #344054;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .calendar-day.other-month .calendar-day-number {
+        color: #b5bdb9;
+    }
+
+    .calendar-day.today {
+        background: #fbfdfc;
+    }
+
+    .calendar-day.today .calendar-day-number {
+        background: var(--green-dark);
+        color: #fff;
+    }
+
+    .calendar-linear-events {
+        position: relative;
+        z-index: 10;
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        grid-auto-rows: 28px;
+        row-gap: 5px;
+        padding-top: 43px;
+        pointer-events: none;
+    }
+
+    .linear-calendar-event {
+        display: flex;
+        align-items: center;
+        height: 28px;
+        margin: 0 3px;
+        padding: 0 9px;
+        background: var(--green-dark);
+        border-radius: 5px;
+        color: #fff;
+        text-decoration: none;
+        overflow: hidden;
+        pointer-events: auto;
+        transition: .2s ease;
+    }
+
+    .linear-calendar-event:hover {
+        background: var(--green-main);
+        color: #fff;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, .14);
+    }
+
+    .linear-event-content {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .linear-event-title {
+        min-width: 0;
+        overflow: hidden;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .linear-event-location {
+        margin-left: auto;
+        flex-shrink: 0;
+        color: rgba(255, 255, 255, .78);
+        font-size: 9px;
         white-space: nowrap;
     }
 
+    .linear-event-location i {
+        margin-right: 2px;
+    }
 
-    /* MONTH ROW */
+    .linear-calendar-event.continues-before {
+        margin-left: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
 
-    .month-group-row td {
-        background: #eef5f1;
-        color: var(--bs-dark-green);
+    .linear-calendar-event.continues-before::before {
+        content: "‹";
+        margin-right: 5px;
         font-size: 14px;
-        padding: 13px 24px !important;
-        border-top: 1px solid #dfe9e4;
-        border-bottom: 1px solid #dfe9e4;
     }
 
-    .month-small-icon {
-        width: 30px;
-        height: 30px;
-        border-radius: 8px;
-        background: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--bs-dark-green);
+    .linear-calendar-event.continues-after {
+        margin-right: 0;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
     }
 
-    .month-group-row .badge {
-        background: var(--bs-dark-green);
-        color: #ffffff;
-        font-size: 10px;
+    .linear-calendar-event.continues-after::after {
+        content: "›";
+        margin-left: auto;
+        padding-left: 5px;
+        font-size: 14px;
     }
 
-
-    /* PAP GROUP ROW */
-
-    .pap-group-row td {
-        background: #fafcfb;
-        padding: 12px 20px !important;
-        border-bottom: 1px solid #edf1ef;
+    @media (max-width: 1199px) {
+        .pap-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
     }
 
-    .pap-group-icon {
-        width: 34px;
-        height: 34px;
-        border-radius: 9px;
-        background: var(--bs-dark-green);
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-
-    /* ACTIVITY ROW */
-
-    .activity-row td {
-        padding: 13px 10px;
-        background: #ffffff;
-        border-bottom: 1px solid #f0f2f1;
-        font-size: 12px;
-    }
-
-    .activity-row:hover td {
-        background: #fafcfb;
-    }
-
-
-    /* ACTIVITY NUMBER */
-
-    .activity-number {
-        width: 25px;
-        height: 25px;
-        border-radius: 50%;
-        background: #f1f4f2;
-        color: var(--bs-dark-green);
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 10px;
-        font-weight: 700;
-        flex-shrink: 0;
-    }
-
-
-    /* EMPTY MONTH */
-
-    .empty-month-row td {
-        background: #ffffff;
-        padding: 10px 20px;
-        font-size: 12px;
-    }
-
-
-    /* TABLE ACTIONS */
-
-    .yearly-pap-table .btn-light {
-        border: 1px solid #edf0ee;
-        background: #ffffff;
-    }
-
-    .yearly-pap-table .btn-light:hover {
-        background: #f4f7f5;
-    }
-
-
-    /* =========================================================
-       RESPONSIVE
-       ========================================================= */
-
-    @media (max-width: 768px) {
-
-        .view-toggle .btn {
-            padding: 7px 11px;
+    @media (max-width: 767px) {
+        .schedule-header {
+            flex-direction: column;
+            align-items: flex-start;
         }
 
-        .view-toggle .btn span {
-            display: none;
+        .schedule-actions {
+            width: 100%;
+            justify-content: space-between;
         }
 
-        .yearly-pap-table {
-            min-width: 1000px;
+        .pap-grid {
+            grid-template-columns: 1fr;
         }
 
-        .month-nav-container {
-            padding: 0.4rem 0.8rem;
+        .pap-footer {
+            flex-direction: column;
+            align-items: flex-start;
         }
-
-        .month-nav-container span {
-            font-size: 13px !important;
-        }
-
     }
 
 </style>
 
+<div class="schedule-header">
+    <h2 class="schedule-title">Activity Schedule</h2>
 
-
-
-
-{{-- =========================================================
-     PAGE HEADER
-     ========================================================= --}}
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-
-    <div>
-
-        <h4 class="fw-bold text-dark mb-1">
-            Activity Schedule
-        </h4>
-
-    </div>
-
-
-    <div class="d-flex align-items-center gap-2">
-
-
-        {{-- VIEW TOGGLE --}}
-
+    <div class="schedule-actions">
         <div class="view-toggle">
-
-            <button type="button"
-                    class="btn btn-dark-green active"
-                    id="cardViewBtn">
-
-                <i class="ri-layout-grid-line me-1"></i>
-                <span>Cards</span>
-
+            <button type="button" id="cardsViewBtn" class="active">
+                <i class="ri-layout-grid-line"></i>
+                Cards
             </button>
 
-
-            <button type="button"
-                    class="btn btn-light"
-                    id="tableViewBtn">
-
-                <i class="ri-table-line me-1"></i>
-                <span>Table</span>
-
+            <button type="button" id="calendarViewBtn">
+                <i class="ri-calendar-line"></i>
+                Calendar
             </button>
-
         </div>
 
-
-        {{-- ADD ACTIVITY --}}
-
-        <a data-bs-toggle="modal"
-           id="assignTaskBtn"
-           data-bs-target="#addPapModal"
-           class="btn btn-dark-green btn-label rounded-pill px-4 py-2 shadow-sm">
-
-            <i class="ri-add-line align-middle rounded-pill fs-16 me-2"></i>
-
+        <button type="button" class="btn-add-activity" data-bs-toggle="modal" data-bs-target="#addPapModal">
+            <i class="ri-add-line"></i>
             Add Activity
-
-        </a>
-
+        </button>
     </div>
-
 </div>
 
-
-
-{{-- =========================================================
-     CARD VIEW
-     ========================================================= --}}
-
-<div id="cardViewSection">
-{{-- =========================================================
-     MONTH NAVIGATION
-     This is ONLY for CARD VIEW
-     ========================================================= --}}
-
-<div class="d-flex justify-content-center align-items-center mb-4" id="monthNavContainer" >
-
-    <div class="month-nav-container" >
-
-        {{-- PREVIOUS MONTH --}}
-
-        <a href="{{ route('calendar', [
-            'year' => $Month == 1 ? $Year - 1 : $Year,
-            'month' => $Month == 1 ? 12 : $Month - 1
-        ]) }}"
-        class="btn btn-month-nav me-3 shadow-none text-decoration-none">
-
-            <i class="ri-arrow-left-s-line fs-18"></i>
-
+<div class="month-navigation-container">
+    <div class="month-navigation">
+        <a href="/Task/pap/{{ $previousMonth->year }}/{{ $previousMonth->month }}" class="month-button">
+            <i class="ri-arrow-left-s-line"></i>
         </a>
 
+        <div class="month-title">
+            {{ $currentDate->format('F Y') }}
+        </div>
 
-        {{-- CURRENT MONTH --}}
-
-        <span class="fw-bold fs-5 text-dark px-3 font-monospace">
-
-            {{ \Carbon\Carbon::create($Year, $Month, 1)->format('F Y') }}
-
-        </span>
-
-
-        {{-- NEXT MONTH --}}
-
-        <a href="{{ route('calendar', [
-            'year' => $Month == 12 ? $Year + 1 : $Year,
-            'month' => $Month == 12 ? 1 : $Month + 1
-        ]) }}"
-        class="btn btn-month-nav ms-3 shadow-none text-decoration-none">
-
-            <i class="ri-arrow-right-s-line fs-18"></i>
-
+        <a href="/Task/pap/{{ $nextMonth->year }}/{{ $nextMonth->month }}" class="month-button">
+            <i class="ri-arrow-right-s-line"></i>
         </a>
-
     </div>
-
 </div>
 
-    @if($newtask->isEmpty())
+{{-- CARD VIEW --}}
 
-        <div class="card border-0 shadow-sm rounded-4 p-5 text-center bg-white">
+<div id="cardsView">
 
-            <div class="avatar-lg mx-auto mb-3 bg-light rounded-circle d-flex align-items-center justify-content-center text-muted fs-24">
+    @if(count($newtask) > 0)
 
-                <i class="ri-calendar-line"></i>
+    <div class="pap-grid">
 
+        @foreach($newtask as $activity)
+
+        @php
+        $fromDate = \Carbon\Carbon::parse($activity->fromdate);
+
+        $toDate = !empty($activity->todate)
+        ? \Carbon\Carbon::parse($activity->todate)
+        : $fromDate->copy();
+        @endphp
+
+        <div class="pap-tile">
+
+            <div class="dropdown pap-tile-menu">
+                <button type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="ri-more-2-fill"></i>
+                </button>
+
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" href="/Task/task/{{ $activity->fromdate }}/{{ $activity->newID }}">
+                            <i class="ri-eye-line me-2"></i>
+                            View Activity
+                        </a>
+                    </li>
+                </ul>
             </div>
 
-            <h5 class="fw-bold text-dark">
-                No Activities Found
-            </h5>
+            <div class="pap-tile-content">
 
-            <p class="text-muted fs-13 mb-0">
+                <a href="/Task/task/{{ $activity->fromdate }}/{{ $activity->newID }}" class="pap-title" title="{{ $activity->pap }}">
+                    {{ $activity->pap }}
+                </a>
 
-                No PAPs are scheduled for
-                {{ \Carbon\Carbon::create($Year, $Month, 1)->format('F Y') }}.
+                <div class="pap-description">
+                    {{ $activity->description ?: 'No description provided.' }}
+                </div>
 
-            </p>
+                <div class="pap-footer">
 
-        </div>
+                    <div class="pap-location">
+                        <i class="ri-map-pin-line"></i>
 
-    @else
+                        <span>
+                            {{ strtoupper($activity->location ?: 'LOCATION TBD') }}
+                        </span>
+                    </div>
 
-        <div class="row g-4">
+                    <div class="pap-date">
+                        <i class="ri-calendar-2-line"></i>
 
-            @foreach ($newtask as $task)
+                        @if($fromDate->isSameDay($toDate))
 
-                <div class="col-12 col-md-6 col-xl-4">
+                        {{ $fromDate->format('M d, Y') }}
 
-                    <div class="card card-activity task-card h-100 pap-hero-card">
+                        @elseif($fromDate->isSameMonth($toDate))
 
-                        <div class="card-body p-4 d-flex flex-column justify-content-between">
+                        {{ $fromDate->format('M d') }}
+                        -
+                        {{ $toDate->format('M d, Y') }}
 
-                            <div>
+                        @else
 
+                        {{ $fromDate->format('M d, Y') }}
+                        -
+                        {{ $toDate->format('M d, Y') }}
 
-                                {{-- CARD HEADER --}}
-
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-
-                                    <div></div>
-
-                                    <div class="dropdown">
-
-                                        <a href="#"
-                                           class="btn btn-icon btn-sm btn-ghost-secondary rounded-circle shadow-none"
-                                           data-bs-toggle="dropdown">
-
-                                            <i class="ri-more-2-fill fs-16"></i>
-
-                                        </a>
-
-
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-3 py-2">
-
-
-                                            {{-- ADD TASK --}}
-
-                                            <li>
-
-                                                <a class="dropdown-item addTaskBtn py-2 text-dark"
-                                                   href="/Task.createtask/{{ $task->newID }}">
-
-                                                    <i class="ri-add-circle-line align-bottom me-2 text-success"></i>
-
-                                                    Add Task
-
-                                                </a>
-
-                                            </li>
-
-
-                                            {{-- EDIT --}}
-
-                                            <li>
-
-                                                <a class="dropdown-item py-2 editPapLinkbtn text-dark editPapLink"
-                                                   href="#"
-
-                                                   data-bs-toggle="modal"
-                                                   data-bs-target="#editPapModal"
-
-                                                   data-id="{{ $task->newID }}"
-                                                   data-googlecalendareventID="{{ $task->googlecalendareventID }}"
-                                                   data-papid="{{ $task->papID }}"
-                                                   data-pap="{{ $task->pap }}"
-                                                   data-location="{{ $task->location }}"
-                                                   data-datefrom="{{ $task->fromdate }}"
-                                                   data-dateend="{{ $task->todate }}"
-                                                   data-description="{{ $task->description }}">
-
-                                                    <i class="ri-pencil-line align-bottom me-2 text-warning"></i>
-
-                                                    Edit PAP
-
-                                                </a>
-
-                                            </li>
-
-
-                                            {{-- REMOVE --}}
-
-                                            <li class="removePapBtn">
-
-                                                <form action="/Task/pap/{{ $task->newID }}"
-                                                      method="POST"
-                                                      class="d-inline">
-
-                                                    @csrf
-
-                                                    <button type="submit"
-                                                            class="dropdown-item py-2 text-danger"
-
-                                                            onclick="return confirm('Are you sure you want to remove this PAP?')">
-
-                                                        <i class="ri-subtract-line align-bottom me-2"></i>
-
-                                                        Remove PAP
-
-                                                    </button>
-
-                                                </form>
-
-                                            </li>
-
-
-                                            <li>
-
-                                                <hr class="dropdown-divider my-1">
-
-                                            </li>
-
-
-                                            {{-- VIEW --}}
-
-                                            <li>
-
-                                                <a class="dropdown-item py-2 text-dark"
-                                                   href="/Task/task/{{ $task->fromdate }}/{{ $task->newID }}">
-
-                                                    <i class="ri-eye-line align-bottom me-2 text-primary"></i>
-
-                                                    View Details
-
-                                                </a>
-
-                                            </li>
-
-                                        </ul>
-
-                                    </div>
-
-                                </div>
-
-
-                                {{-- PAP NAME --}}
-
-                                <h5 class="fw-bold text-dark mb-2 text-truncate"
-                                    title="{{ $task->pap }}">
-
-                                    {{ $task->pap }}
-
-                                </h5>
-
-
-                                {{-- DESCRIPTION --}}
-
-                                @if(!empty($task->description))
-
-                                    <p class="text-muted fs-12 mb-3 text-clamp-2">
-
-                                        {{ $task->description }}
-
-                                    </p>
-
-                                @endif
-
-                            </div>
-
-
-                            {{-- CARD FOOTER --}}
-
-                            <div class="pt-3 border-top mt-3 d-flex align-items-center justify-content-between text-muted fs-12">
-
-                                <div class="d-flex align-items-center gap-1 text-truncate">
-
-                                    <i class="ri-map-pin-line text-success"></i>
-
-                                    <span class="text-truncate"
-                                          style="max-width: 140px;"
-                                          title="{{ $task->location }}">
-
-                                        {{ $task->location ?: 'Location TBD' }}
-
-                                    </span>
-
-                                </div>
-
-
-                                <div class="text-nowrap font-monospace text-dark fw-medium">
-
-                                    <i class="ri-calendar-2-line text-warning me-1"></i>
-
-                                    {{ \Carbon\Carbon::parse($task->fromdate)->format('M d') }}
-
-                                    -
-
-                                    {{ \Carbon\Carbon::parse($task->todate)->format('M d, Y') }}
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
+                        @endif
                     </div>
 
                 </div>
-
-            @endforeach
-
+            </div>
         </div>
+
+        @endforeach
+
+    </div>
+
+    @else
+
+    <div class="empty-state">
+        <i class="ri-calendar-line"></i>
+
+        <h6 class="fw-bold text-dark">
+            No Activities
+        </h6>
+
+        <p class="mb-0">
+            No activities scheduled for {{ $currentDate->format('F Y') }}.
+        </p>
+    </div>
 
     @endif
 
 </div>
 
 
+{{-- CALENDAR VIEW --}}
 
-{{-- =========================================================
-     WHOLE YEAR TABLE VIEW
+<div id="calendarView" class="d-none">
 
-     YEAR
-       ↓
-     MONTH
-       ↓
-     PAP
-       ↓
-     ACTIVITIES
-     ========================================================= --}}
+    <div class="calendar-wrapper">
 
-<div id="tableViewSection" style="display: none;">
+        <div class="activity-calendar">
 
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-
-        <div class="table-responsive">
-
-            <table class="table mb-0 yearly-pap-table">
-
-
-                {{-- =================================================
-                     YEAR
-                     ================================================= --}}
-
-                <thead>
-
-                    <tr class="year-header">
-
-                        <th colspan="6">
-
-                            <div class="d-flex align-items-center gap-3">
-
-                                <div class="year-icon">
-
-                                    <i class="ri-calendar-2-line"></i>
-
-                                </div>
-
-                                <div>
-
-                                    <h5 class="fw-bold mb-0">
-
-                                        {{ $Year }}
-
-                                    </h5>
-
-                                    <small class="text-muted">
-
-                                        Annual Activity Schedule
-
-                                    </small>
-
-                                </div>
-
-                            </div>
-
-                        </th>
-
-                    </tr>
-
-
-                    {{-- COLUMN HEADERS --}}
-
-                    <tr class="column-header">
-
-                        <th style="width: 25%;" class="ps-4">
-                            PAP / Activity
-                        </th>
-
-                        <th style="width: 25%;">
-                            Description
-                        </th>
-
-                        <th style="width: 15%;">
-                            Location
-                        </th>
-
-                        <th style="width: 12%;">
-                            Date From
-                        </th>
-
-                        <th style="width: 12%;">
-                            Date To
-                        </th>
-
-                        <th style="width: 11%;" class="text-end pe-4">
-                            Actions
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-
-                    {{-- GROUP YEARLY DATA BY MONTH --}}
-
-                    @php
-
-                        $groupedYearlyTasks = $yearlyTasks->groupBy(function ($item) {
-
-                            return \Carbon\Carbon::parse($item->fromdate)->format('n');
-
-                        });
-
-                    @endphp
-
-
-                    {{-- =================================================
-                         JANUARY TO DECEMBER
-                         ================================================= --}}
-
-                    @for($monthNumber = 1; $monthNumber <= 12; $monthNumber++)
-
-
-                        @php
-
-                            $monthTasks = $groupedYearlyTasks->get(
-                                $monthNumber,
-                                collect()
-                            );
-
-                        @endphp
-
-
-                        {{-- =================================================
-                             MONTH ROW
-                             ================================================= --}}
-
-                        <tr class="month-group-row">
-
-                            <td colspan="6">
-
-                                <div class="d-flex align-items-center gap-2">
-
-                                    <div class="month-small-icon">
-
-                                        <i class="ri-calendar-line"></i>
-
-                                    </div>
-
-
-                                    <span class="fw-bold">
-
-                                        {{ \Carbon\Carbon::create($Year, $monthNumber, 1)->format('F') }}
-
-                                    </span>
-
-
-                                    <span class="badge rounded-pill">
-
-                                        {{ $monthTasks->count() }}
-
-                                    </span>
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-
-                        {{-- =================================================
-                             EMPTY MONTH
-                             ================================================= --}}
-
-                        @if($monthTasks->isEmpty())
-
-                            <tr class="empty-month-row">
-
-                                <td colspan="6" class="ps-5">
-
-                                    <span class="text-muted fst-italic">
-
-                                        No activities scheduled for this month.
-
-                                    </span>
-
-                                </td>
-
-                            </tr>
-
-
-                        @else
-
-
-                            {{-- =================================================
-                                 GROUP BY PAP
-                                 ================================================= --}}
-
-                            @foreach($monthTasks->groupBy('papID') as $papID => $papTasks)
-
-
-                                {{-- PAP ROW --}}
-
-                               
-
-
-                                {{-- =================================================
-                                     ACTIVITIES UNDER PAP
-                                     ================================================= --}}
-
-                                @foreach($papTasks as $index => $task)
-
-                                    <tr class="activity-row">
-
-
-                                        {{-- PAP / ACTIVITY --}}
-
-                                        <td class="ps-5">
-
-                                            <div class="d-flex align-items-center gap-2">
-
-                                                <span class="activity-number">
-
-                                                    {{ $index + 1 }}
-
-                                                </span>
-
-
-                                                <span class="text-dark fw-medium">
-
-                                                    {{ $task->pap }}
-
-                                                </span>
-
-                                            </div>
-
-                                        </td>
-
-
-                                        {{-- DESCRIPTION --}}
-
-                                        <td>
-
-                                            @if(!empty($task->description))
-
-                                                <span class="text-muted">
-
-                                                    {{ $task->description }}
-
-                                                </span>
-
-                                            @else
-
-                                                <span class="text-muted fst-italic">
-
-                                                    No description
-
-                                                </span>
-
-                                            @endif
-
-                                        </td>
-
-
-                                        {{-- LOCATION --}}
-
-                                        <td>
-
-                                            <div class="d-flex align-items-center gap-1">
-
-                                                <i class="ri-map-pin-line text-success"></i>
-
-                                                <span>
-
-                                                    {{ $task->location ?: 'Location TBD' }}
-
-                                                </span>
-
-                                            </div>
-
-                                        </td>
-
-
-                                        {{-- DATE FROM --}}
-
-                                        <td>
-
-                                            <span class="font-monospace small">
-
-                                                {{ \Carbon\Carbon::parse($task->fromdate)->format('M d, Y') }}
-
-                                            </span>
-
-                                        </td>
-
-
-                                        {{-- DATE TO --}}
-
-                                        <td>
-
-                                            <span class="font-monospace small">
-
-                                                {{ \Carbon\Carbon::parse($task->todate)->format('M d, Y') }}
-
-                                            </span>
-
-                                        </td>
-
-
-                                        {{-- ACTIONS --}}
-
-                                        <td class="text-end pe-4">
-
-                                            <div class="d-inline-flex gap-1">
-
-
-                                                {{-- ADD TASK --}}
-
-                                                <a href="/Task.createtask/{{ $task->newID }}"
-                                                   class="btn  text-success addTaskBtn"
-                                                   title="Add Task">
-
-                                                    <i class="ri-add-circle-line"></i>
-
-                                                </a>
-
-
-                                                {{-- EDIT --}}
-
-                                                <a 
-                                                   class="btn text-warning editPapLink"
-
-                                                   data-bs-toggle="modal"
-                                                   data-bs-target="#editPapModal"
-
-                                                   data-id="{{ $task->newID }}"
-                                                   data-googlecalendareventID="{{ $task->googlecalendareventID }}"
-                                                   data-papid="{{ $task->papID }}"
-                                                   data-pap="{{ $task->pap }}"
-                                                   data-location="{{ $task->location }}"
-                                                   data-datefrom="{{ $task->fromdate }}"
-                                                   data-dateend="{{ $task->todate }}"
-                                                   data-description="{{ $task->description }}"
-
-                                                   title="Edit PAP">
-
-                                                    <i class="ri-pencil-line"></i>
-
-                                                </a>
-
-
-                                                {{-- REMOVE --}}
-
-                                                <form action="/Task/pap/{{ $task->newID }}"
-                                                      method="POST"
-                                                      class="d-inline removePapBtn">
-
-                                                    @csrf
-
-                                                    <button type="submit"
-                                                            class="btn text-danger"
-
-                                                            title="Remove PAP"
-
-                                                            onclick="return confirm('Are you sure you want to remove this PAP?')">
-
-                                                        <i class="ri-delete-bin-line"></i>
-
-                                                    </button>
-
-                                                </form>
-
-
-                                                {{-- VIEW DETAILS --}}
-
-                                                <a href="/Task/task/{{ $task->fromdate }}/{{ $task->newID }}"
-                                                   class="btn text-primary"
-                                                   title="View Details">
-
-                                                    <i class="ri-eye-line"></i>
-
-                                                </a>
-
-                                            </div>
-
-                                        </td>
-
-                                    </tr>
-
-                                @endforeach
-
-                            @endforeach
-
-                        @endif
-
-                    @endfor
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-
-{{-- =========================================================
-     ADD ACTIVITY MODAL
-     ========================================================= --}}
-
-<div class="modal fade"
-     id="addPapModal"
-     tabindex="-1"
-     aria-labelledby="addPapModalLabel"
-     aria-hidden="true">
-
-    <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <div class="modal-header border-0 pb-0">
-
-                <h5 class="modal-title fw-bold text-dark"
-                    id="addPapModalLabel">
-
-                    New Activity Milestone
-
-                </h5>
-
-                <button type="button"
-                        class="btn-close shadow-none"
-                        data-bs-dismiss="modal">
-
-                </button>
-
+            <div class="calendar-weekdays">
+                <div class="calendar-weekday">Sunday</div>
+                <div class="calendar-weekday">Monday</div>
+                <div class="calendar-weekday">Tuesday</div>
+                <div class="calendar-weekday">Wednesday</div>
+                <div class="calendar-weekday">Thursday</div>
+                <div class="calendar-weekday">Friday</div>
+                <div class="calendar-weekday">Saturday</div>
             </div>
 
+            @php
+            $weekStart = $calendarStart->copy();
+            @endphp
+
+            @while($weekStart->lte($calendarEnd))
+
+            @php
+            $weekEnd = $weekStart
+            ->copy()
+            ->addDays(6)
+            ->endOfDay();
+
+            $weekActivities = $task
+            ->filter(function ($activity) use ($weekStart, $weekEnd) {
+
+            // Do not display Consultancy PAPs in calendar
+            if (
+            isset($activity->pap) &&
+            str_contains(
+                strtolower($activity->pap),
+                'consultancy'
+            )
+            ) {
+            return false;
+            }
+
+            $activityStart = \Carbon\Carbon::parse(
+            $activity->fromdate
+            )->startOfDay();
+
+            $activityEnd = !empty($activity->todate)
+            ? \Carbon\Carbon::parse(
+            $activity->todate
+            )->endOfDay()
+            : $activityStart
+            ->copy()
+            ->endOfDay();
+
+            return
+            $activityStart->lte($weekEnd)
+            &&
+            $activityEnd->gte($weekStart);
+            })
+            ->values();
+
+            $activityRows = [];
+            $occupiedRows = [];
+
+            foreach ($weekActivities as $activity) {
+
+            $activityStart = \Carbon\Carbon::parse(
+            $activity->fromdate
+            )->startOfDay();
+
+            $activityEnd = !empty($activity->todate)
+            ? \Carbon\Carbon::parse(
+            $activity->todate
+            )->endOfDay()
+            : $activityStart
+            ->copy()
+            ->endOfDay();
+
+            $segmentStart = $activityStart->lt($weekStart)
+            ? $weekStart->copy()->startOfDay()
+            : $activityStart->copy()->startOfDay();
+
+            $segmentEnd = $activityEnd->gt($weekEnd)
+            ? $weekEnd->copy()->startOfDay()
+            : $activityEnd->copy()->startOfDay();
+
+            /*
+            * Carbon dayOfWeek:
+            *
+            * Sunday = 0
+            * Monday = 1
+            * Tuesday = 2
+            * Wednesday = 3
+            * Thursday = 4
+            * Friday = 5
+            * Saturday = 6
+            *
+            * CSS calendar columns:
+            *
+            * Sunday = 1
+            * Monday = 2
+            * Tuesday = 3
+            * Wednesday = 4
+            * Thursday = 5
+            * Friday = 6
+            * Saturday = 7
+            */
+
+            $startColumn = ((int) $segmentStart->dayOfWeek) + 1;
+
+            /*
+            * CSS grid ending line is exclusive.
+            *
+            * Monday only:
+            * 2 / 3
+            *
+            * Monday-Friday:
+            * 2 / 7
+            */
 
-            <form method="POST"
-                  action="{{ route('savePAP') }}">
+            $endColumn = ((int) $segmentEnd->dayOfWeek) + 2;
 
-                @csrf
+            if ($endColumn > 8) {
+            $endColumn = 8;
+            }
 
-                <div class="modal-body pt-3">
+            $row = 1;
 
+            while (true) {
 
-                    {{-- PAP --}}
+            $hasConflict = false;
 
-                    <div class="mb-3">
+            if (isset($occupiedRows[$row])) {
 
-                        <label for="papName"
-                               class="form-label fw-semibold fs-13">
+            foreach ($occupiedRows[$row] as $occupied) {
 
-                            PAP Name
-                            <span class="text-danger">*</span>
-
-                        </label>
-
-
-                        <select class="form-select rounded-3 py-2"
-                                id="papName"
-                                name="pap"
-                                required>
-
-                            <option value=""
-                                    disabled
-                                    selected>
-
-                                -- Select PAP --
-
-                            </option>
-
-
-                            @foreach($papOptions as $option)
-
-                                <option value="{{ $option->id }}">
-
-                                    {{ $option->pap }}
-
-                                </option>
-
-                            @endforeach
-
-
-                            <option value="addpap"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#addPapModals"
-                                    data-bs-dismiss="modal">
-
-                                -- Add New PAP --
-
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    {{-- DESCRIPTION --}}
-
-                    <div class="mb-3">
-
-                        <label for="description"
-                               class="form-label fw-semibold fs-13">
-
-                            Description
-                            <span class="text-muted fw-normal">
-                                (Optional)
-                            </span>
-
-                        </label>
-
-
-                        <input type="text"
-                               class="form-control rounded-3 py-2"
-                               id="description"
-                               name="description"
-                               placeholder="Brief activity details">
-
-                    </div>
-
-
-                    {{-- DATE --}}
-
-                    <div class="mb-3">
-
-                        <label class="form-label fw-semibold fs-13">
-
-                            Indicative Date Range
-                            <span class="text-danger">*</span>
-
-                        </label>
-
-
-                        <div class="row g-2">
-
-                            <div class="col-6">
-
-                                <div class="input-group">
-
-                                    <span class="input-group-text bg-light border-end-0 fs-12">
-                                        From
-                                    </span>
-
-                                    <input type="date"
-                                           class="form-control rounded-end py-2"
-                                           id="indicativeDate"
-                                           name="datefrom"
-                                           required>
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-6">
-
-                                <div class="input-group">
-
-                                    <span class="input-group-text bg-light border-end-0 fs-12">
-                                        To
-                                    </span>
-
-                                    <input type="date"
-                                           class="form-control rounded-end py-2"
-                                           id="indicativeDateEnd"
-                                           name="dateend"
-                                           required>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- LOCATION --}}
-
-                    <div class="mb-3">
-
-                        <label for="location"
-                               class="form-label fw-semibold fs-13">
-
-                            Location
-
-                        </label>
-
-
-                        <input type="text"
-                               class="form-control rounded-3 py-2"
-                               id="location"
-                               name="location"
-                               placeholder="Venue or location">
-
-                    </div>
-
-                </div>
-
-
-                <div class="modal-footer border-0 pt-0">
-
-                    <button type="button"
-                            class="btn btn-light rounded-pill px-4"
-                            data-bs-dismiss="modal">
-
-                        Close
-
-                    </button>
-
-
-                    <button type="submit"
-                            class="btn btn-dark-green rounded-pill px-4">
-
-                        Save Activity
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-
-{{-- =========================================================
-     ADD NEW PAP MODAL
-     ========================================================= --}}
-
-<form action="{{ route('createPAP') }}"
-      method="POST">
-
-    @csrf
-
-    <div class="modal fade"
-         id="addPapModals"
-         tabindex="-1">
-
-        <div class="modal-dialog modal-dialog-centered">
-
-            <div class="modal-content">
-
-                <div class="modal-header border-0 pb-0">
-
-                    <h5 class="modal-title fw-bold text-dark">
-
-                        Add New PAP
-
-                    </h5>
-
-
-                    <button type="button"
-                            class="btn-close shadow-none"
-                            data-bs-dismiss="modal">
-
-                    </button>
-
-                </div>
-
-
-                <div class="modal-body py-3">
-
-                    <label class="form-label fw-semibold fs-13">
-
-                        PAP Title
-                        <span class="text-danger">*</span>
-
-                    </label>
-
-
-                    <input type="text"
-                           name="pap"
-                           class="form-control rounded-3 py-2"
-                           placeholder="Enter PAP title"
-                           required>
-
-                </div>
-
-
-                <div class="modal-footer border-0 pt-0">
-
-                    <button type="button"
-                            class="btn btn-light rounded-pill px-4"
-                            data-bs-dismiss="modal">
-
-                        Cancel
-
-                    </button>
-
-
-                    <button class="btn btn-dark-green rounded-pill px-4"
-                            name="action"
-                            value="pap">
-
-                        Save PAP
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</form>
-
-
-
-{{-- =========================================================
-     EDIT ACTIVITY MODAL
-     ========================================================= --}}
-
-<div class="modal fade"
-     id="editPapModal"
-     tabindex="-1"
-     aria-labelledby="editPapModalLabel"
-     aria-hidden="true">
-
-    <div class="modal-dialog modal-dialog-centered">
-
-        <div class="modal-content">
-
-            <div class="modal-header border-0 pb-0">
-
-                <h5 class="modal-title fw-bold text-dark"
-                    id="editPapModalLabel">
-
-                    Edit Activity Milestone
-
-                </h5>
-
-
-                <button type="button"
-                        class="btn-close shadow-none"
-                        data-bs-dismiss="modal">
-
-                </button>
-
-            </div>
-
-
-            <form method="POST"
-                  action="{{ route('savePAP') }}">
-
-                @csrf
-
-                <div class="modal-body pt-3">
-
-
-                    <input type="hidden"
-                           id="editpapid"
-                           name="editpapid">
-
-
-                    <input type="hidden"
-                           id="googlecalendareventID"
-                           name="googlecalendareventID">
-
-
-                    {{-- PAP NAME --}}
-
-                    <div class="mb-3">
-
-                        <label for="editpapName"
-                               class="form-label fw-semibold fs-13">
-
-                            PAP Name
-
-                        </label>
-
-
-                        <input type="text"
-                               class="form-control rounded-3 py-2 bg-light text-muted"
-                               id="editpapName"
-                               name="editpapName"
-                               readonly>
-
-                    </div>
-
-
-                    {{-- DESCRIPTION --}}
-
-                    <div class="mb-3">
-
-                        <label for="editdescription"
-                               class="form-label fw-semibold fs-13">
-
-                            Description
-
-                        </label>
-
-
-                        <input type="text"
-                               class="form-control rounded-3 py-2"
-                               id="editdescription"
-                               name="editdescription"
-                               placeholder="Description details">
-
-                    </div>
-
-
-                    {{-- DATES --}}
-
-                    <div class="mb-3">
-
-                        <label class="form-label fw-semibold fs-13">
-
-                            Indicative Date Range
-
-                        </label>
-
-
-                        <div class="row g-2">
-
-                            <div class="col-6">
-
-                                <div class="input-group">
-
-                                    <span class="input-group-text bg-light border-end-0 fs-12">
-                                        From
-                                    </span>
-
-                                    <input type="date"
-                                           class="form-control rounded-end py-2"
-                                           id="editindicativeDate"
-                                           name="editdatefrom">
-
-                                </div>
-
-                            </div>
-
-
-                            <div class="col-6">
-
-                                <div class="input-group">
-
-                                    <span class="input-group-text bg-light border-end-0 fs-12">
-                                        To
-                                    </span>
-
-                                    <input type="date"
-                                           class="form-control rounded-end py-2"
-                                           id="editindicativeDateEnd"
-                                           name="editdateend">
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    {{-- LOCATION --}}
-
-                    <div class="mb-3">
-
-                        <label for="editlocation"
-                               class="form-label fw-semibold fs-13">
-
-                            Location
-
-                        </label>
-
-
-                        <input type="text"
-                               class="form-control rounded-3 py-2"
-                               id="editlocation"
-                               name="editlocation"
-                               placeholder="Venue or location">
-
-                    </div>
-
-                </div>
-
-
-                <div class="modal-footer border-0 pt-0">
-
-                    <button type="button"
-                            class="btn btn-light rounded-pill px-4"
-                            data-bs-dismiss="modal">
-
-                        Close
-
-                    </button>
-
-
-                    <button type="submit"
-                            class="btn btn-dark-green rounded-pill px-4">
-
-                        Save Changes
-
-                    </button>
-
-                </div>
-
-            </form>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-@endsection
-
-
-
-{{-- =========================================================
-     JAVASCRIPT
-     ========================================================= --}}
-
-<script>
-
-document.addEventListener('DOMContentLoaded', function () {
-
-
-    /* =========================================================
-       VIEW TOGGLE
-       ========================================================= */
-
-    const cardViewBtn =
-        document.getElementById('cardViewBtn');
-
-    const tableViewBtn =
-        document.getElementById('tableViewBtn');
-
-    const cardViewSection =
-        document.getElementById('cardViewSection');
-
-    const tableViewSection =
-        document.getElementById('tableViewSection');
-const monthNavContainer = document.getElementById('monthNavContainer');
-
-    if (cardViewBtn && tableViewBtn) {
-
-
-        /* CARD VIEW */
-
-        cardViewBtn.addEventListener('click', function () {
-
-            cardViewSection.style.display = 'block';
-
-            tableViewSection.style.display = 'none';
-            monthNavContainer.style.display = 'block';
-
-
-            cardViewBtn.classList.add(
-                'btn-dark-green',
-                'active'
-            );
-
-            cardViewBtn.classList.remove(
-                'btn-light'
-            );
-
-
-            tableViewBtn.classList.remove(
-                'btn-dark-green',
-                'active'
-            );
-
-            tableViewBtn.classList.add(
-                'btn-light'
-            );
-
-        });
-
-
-        /* TABLE VIEW */
-
-        tableViewBtn.addEventListener('click', function () {
-
-            cardViewSection.style.display = 'none';
-            monthNavContainer.style.display = 'none';
-
-
-            tableViewSection.style.display = 'block';
-
-
-            tableViewBtn.classList.add(
-                'btn-dark-green',
-                'active'
-            );
-
-            tableViewBtn.classList.remove(
-                'btn-light'
-            );
-
-
-            cardViewBtn.classList.remove(
-                'btn-dark-green',
-                'active'
-            );
-
-            cardViewBtn.classList.add(
-                'btn-light'
-            );
-
-        });
-
-    }
-
-
-
-    /* =========================================================
-       USER TYPE PERMISSIONS
-       ========================================================= */
-
-    const userType =
-        @json(Auth::user()->usertype);
-
-    const addbtn =
-        document.getElementById('assignTaskBtn');
-
-
-    if (userType === '2') {
-
-
-        document.querySelectorAll('.assignTaskBtn')
-            .forEach(el => {
-
-                el.style.display = 'none';
-
-            });
-
-
-        document.querySelectorAll('.addTaskBtn')
-            .forEach(el => {
-
-                el.style.display = 'none';
-
-            });
-
-
-        document.querySelectorAll('.editPapLink')
-            .forEach(el => {
-
-                el.style.display = 'none';
-
-            });
-
-
-        document.querySelectorAll('.deletePapBtn')
-            .forEach(el => {
-
-                el.style.display = 'none';
-
-            });
-
-
-        document.querySelectorAll('.dropdownDivider')
-            .forEach(el => {
-
-                el.style.display = 'none';
-
-            });
-
-
-        document.querySelectorAll('.removePapBtn')
-            .forEach(el => {
-
-                el.style.display = 'none';
-
-            });
-
-
-        if (addbtn) {
-
-            addbtn.style.display = 'none';
-
-        }
-
-    }
-
-
-
-    /* =========================================================
-       EDIT PAP MODAL
-       ========================================================= */
-
-    document.querySelectorAll('.editPapLink')
-        .forEach(link => {
-
-            link.addEventListener('click', function () {
-
-
-                const papId =
-                    this.getAttribute('data-id');
-
-
-                const papName =
-                    this.getAttribute('data-pap');
-
-
-                const location =
-                    this.getAttribute('data-location');
-
-
-                const dateFrom =
-                    this.getAttribute('data-datefrom');
-
-
-                const dateEnd =
-                    this.getAttribute('data-dateend');
-
-
-                const description =
-                    this.getAttribute('data-description');
-
-
-                const googlecalendareventID =
-                    this.getAttribute(
-                        'data-googlecalendareventID'
-                    );
-
-
-                document.getElementById(
-                    'editpapid'
-                ).value = papId;
-
-
-                document.getElementById(
-                    'editpapName'
-                ).value = papName;
-
-
-                document.getElementById(
-                    'editlocation'
-                ).value = location;
-
-
-                document.getElementById(
-                    'editindicativeDate'
-                ).value = dateFrom;
-
-
-                document.getElementById(
-                    'editindicativeDateEnd'
-                ).value = dateEnd;
-
-
-                document.getElementById(
-                    'editdescription'
-                ).value = description;
-
-
-                document.getElementById(
-                    'googlecalendareventID'
-                ).value =
-                    googlecalendareventID;
-
-            });
-
-        });
-
-
-
-    /* =========================================================
-       ADD NEW PAP
-       ========================================================= */
-
-    const papNameSelect =
-        document.getElementById('papName');
-
-
-    if (papNameSelect) {
-
-        papNameSelect.addEventListener(
-            'change',
-            function () {
-
-                if (this.value === 'addpap') {
-
-                    const modal =
-                        new bootstrap.Modal(
-                            document.getElementById(
-                                'addPapModals'
-                            )
-                        );
-
-                    modal.show();
-
-                    this.value = '';
+            if (
+            $startColumn < $occupied['end'] && $endColumn> $occupied['start']
+                ) {
+                $hasConflict = true;
+                break;
+                }
 
                 }
 
-            }
-        );
+                }
 
-    }
+                if (!$hasConflict) {
+                break;
+                }
 
-});
+                $row++;
+                }
+
+                if (!isset($occupiedRows[$row])) {
+                $occupiedRows[$row] = [];
+                }
+
+                $occupiedRows[$row][] = [
+                'start' => $startColumn,
+                'end' => $endColumn,
+                ];
+
+                $activityRows[] = [
+                'activity' => $activity,
+                'startColumn' => $startColumn,
+                'endColumn' => $endColumn,
+                'row' => $row,
+                'continuesBefore' => $activityStart->lt($weekStart),
+                'continuesAfter' => $activityEnd->gt($weekEnd),
+                ];
+                }
+
+                $maxRows = !empty($occupiedRows)
+                ? max(array_keys($occupiedRows))
+                : 0;
+                @endphp
+
+
+                <div class="calendar-week" style="--event-rows: {{ $maxRows }};">
+
+                    <div class="calendar-days-row">
+
+                        @for($i = 0; $i < 7; $i++) @php $day=$weekStart ->copy()
+                            ->addDays($i);
+                            @endphp
+
+                            <div class="calendar-day
+                                    {{ !$day->isSameMonth($currentDate) ? 'other-month' : '' }}
+                                    {{ $day->isToday() ? 'today' : '' }}">
+                                <div class="calendar-day-number">
+                                    {{ $day->day }}
+                                </div>
+                            </div>
+
+                            @endfor
+
+                    </div>
+
+
+                    <div class="calendar-linear-events">
+
+                        @foreach($activityRows as $eventData)
+
+                        @php
+                        $activity = $eventData['activity'];
+
+                        $displayStart = \Carbon\Carbon::parse(
+                        $activity->fromdate
+                        );
+
+                        $displayEnd = !empty($activity->todate)
+                        ? \Carbon\Carbon::parse(
+                        $activity->todate
+                        )
+                        : $displayStart->copy();
+                        @endphp
+
+                        <a href="/Task/task/{{ $activity->fromdate }}/{{ $activity->id }}" class="linear-calendar-event
+                                    {{ $eventData['continuesBefore'] ? 'continues-before' : '' }}
+                                    {{ $eventData['continuesAfter'] ? 'continues-after' : '' }}" style="
+                                    grid-column:
+                                        {{ $eventData['startColumn'] }}
+                                        /
+                                        {{ $eventData['endColumn'] }};
+
+                                    grid-row:
+                                        {{ $eventData['row'] }};
+                                " title="{{ $activity->pap }} | {{ $displayStart->format('M d, Y') }} - {{ $displayEnd->format('M d, Y') }}">
+
+                            <div class="linear-event-content">
+
+                                <span class="linear-event-title">
+                                    {{ $activity->pap }}
+                                </span>
+
+                                @if(!empty($activity->location))
+
+                                <span class="linear-event-location">
+                                    <i class="ri-map-pin-line"></i>
+                                    {{ $activity->location }}
+                                </span>
+
+                                @endif
+
+                            </div>
+
+                        </a>
+
+                        @endforeach
+
+                    </div>
+
+                </div>
+
+
+                @php
+                $weekStart = $weekStart
+                ->copy()
+                ->addDays(7)
+                ->startOfDay();
+                @endphp
+
+                @endwhile
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{{-- ADD ACTIVITY MODAL --}}
+
+<div class="modal fade" id="addPapModal" tabindex="-1" aria-labelledby="addPapModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content border-0 rounded-4 shadow">
+
+            <div class="modal-header border-0 pb-0">
+
+                <div>
+                    <h5 class="modal-title fw-bold" id="addPapModalLabel">
+                        Add Activity
+                    </h5>
+
+                    <p class="text-muted fs-12 mb-0">
+                        Create a new activity schedule.
+                    </p>
+                </div>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+
+            <div class="modal-body p-4">
+
+                <form method="POST" action="{{ route('store') }}">
+                    @csrf
+
+                    <div class="mb-3">
+                        <label for="papID" class="form-label fw-semibold">
+                            Program / Activity / Project
+                            <span class="text-danger">*</span>
+                        </label>
+
+                        <select name="papID" id="papID" class="form-select" required>
+                            <option value="">
+                                -- Select PAP --
+                            </option>
+
+                            @foreach($papOptions as $papOption)
+
+                            <option value="{{ $papOption->id }}">
+                                {{ $papOption->pap }}
+                            </option>
+
+                            @endforeach
+
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-semibold">
+                            Description
+                        </label>
+
+                        <textarea name="description" id="description" class="form-control" rows="3" placeholder="Enter activity description"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="location" class="form-label fw-semibold">
+                            Location
+                        </label>
+
+                        <input type="text" name="location" id="location" class="form-control" placeholder="Enter activity location">
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <label for="fromdate" class="form-label fw-semibold">
+                                Start Date
+                                <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="date" name="fromdate" id="fromdate" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="todate" class="form-label fw-semibold">
+                                End Date
+                            </label>
+
+                            <input type="date" name="todate" id="todate" class="form-control">
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-3">
+
+                        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="btn rounded-pill px-4 text-white" style="background: var(--green-dark);">
+                            <i class="ri-save-line me-1"></i>
+                            Save Activity
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const cardsViewBtn = document.getElementById('cardsViewBtn');
+        const calendarViewBtn = document.getElementById('calendarViewBtn');
+
+        const cardsView = document.getElementById('cardsView');
+        const calendarView = document.getElementById('calendarView');
+
+        cardsViewBtn.addEventListener('click', function() {
+
+            cardsView.classList.remove('d-none');
+            calendarView.classList.add('d-none');
+
+            cardsViewBtn.classList.add('active');
+            calendarViewBtn.classList.remove('active');
+
+            localStorage.setItem('papView', 'cards');
+
+        });
+
+        calendarViewBtn.addEventListener('click', function() {
+
+            calendarView.classList.remove('d-none');
+            cardsView.classList.add('d-none');
+
+            calendarViewBtn.classList.add('active');
+            cardsViewBtn.classList.remove('active');
+
+            localStorage.setItem('papView', 'calendar');
+
+        });
+
+        const savedView = localStorage.getItem('papView');
+
+        if (savedView === 'calendar') {
+            calendarViewBtn.click();
+        }
+
+    });
 
 </script>
+
+@endsection
