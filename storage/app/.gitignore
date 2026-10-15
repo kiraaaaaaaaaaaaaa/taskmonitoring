@@ -2,3 +2,7 @@
 !private/
 !public/
 !.gitignore
+
+.env
+.env.backup
+.env.production
